@@ -17,6 +17,7 @@ const serif = Noto_Serif_SC({
   display: "swap",
 });
 
+/* 标签标题生成 */
 export function generateMetadata(): Metadata {
   const site = getSiteConfig();
   return {
@@ -27,6 +28,7 @@ export function generateMetadata(): Metadata {
   };
 }
 
+/* 根布局 */
 export default function RootLayout({
   children,
 }: Readonly<{

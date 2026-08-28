@@ -10,6 +10,6 @@ export function getSiteConfig(): SiteConfig {
     name: process.env.SITE_NAME ?? "个人博客",
     author: process.env.AUTHOR_NAME ?? "作者",
     url: process.env.SITE_URL ?? "http://localhost:3000",
-    intro: "这里是公开笔记。精选与最新文章会在下一阶段接上。",
+    intro: "这里是公开笔记，按日期写下正在想的事情。",
   };
 }

@@ -2,7 +2,9 @@
 
 可自托管的个人博客。第一版按 [docs/todo-v1.md](docs/todo-v1.md) 分阶段实现；产品说明见 [docs/requirements/v1.md](docs/requirements/v1.md)。
 
-当前阶段只提供可运行的占位首页与部署配置，尚未接入文章阅读、搜索和后台。
+对着本仓库学 Next.js：[docs/项目说明](docs/项目说明/README.md)。
+
+当前已完成公开阅读：首页、文章列表、正文、标签和关于页。搜索、暗色模式和后台仍待后续阶段。
 
 ## 本地开发
 

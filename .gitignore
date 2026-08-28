@@ -25,9 +25,13 @@ data/*.db-journal
 data/*.db-wal
 data/*.db-shm
 
-# uploads (keep folder)
+# uploads: ignore user files, keep sample cover
 public/uploads/**
 !public/uploads/.gitkeep
+!public/uploads/.gitignore
+!public/uploads/2026/
+!public/uploads/2026/08/
+!public/uploads/2026/08/cover-notes.svg
 
 # os / editor
 .DS_Store
