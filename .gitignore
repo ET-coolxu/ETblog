@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# next
+.next/
+out/
+dist/
+
+# env
+.env
+.env*.local
+
+# logs / cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+*.tsbuildinfo
+
+# sqlite
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+
+# uploads (keep folder)
+public/uploads/**
+!public/uploads/.gitkeep
+
+# os / editor
+.DS_Store
+Thumbs.db
+
+docs/
+.cursor/

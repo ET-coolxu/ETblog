@@ -1,0 +1,13 @@
+{
+	email {$CADDY_EMAIL:admin@localhost}
+}
+
+{$SITE_DOMAIN::80} {
+	encode gzip
+	reverse_proxy app:3000 {
+		flush_interval -1
+	}
+	header {
+		X-Accel-Buffering no
+	}
+}
