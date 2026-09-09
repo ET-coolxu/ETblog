@@ -1,0 +1,31 @@
+---
+description: Next.js 个人博客的产品与技术约定，实现任何功能时遵守
+alwaysApply: true
+---
+
+# 项目约定
+
+面向中文读者的可自托管个人博客。产品细节以 `docs/requirements/v1.md` 为准。
+
+## 信源与内容
+
+- Markdown 是唯一信源：`content/posts/{slug}.md`、`content/pages/about.md`。
+- 后台只是这些文件的编辑器，禁止再搞一份数据库文章副本。
+- 图片：`public/uploads/{yyyy}/{mm}/`，正文用 `![说明](/uploads/...)`。
+- 发布后 `revalidatePath`，不要靠整站重建发文。
+- slug 仅 `[a-z0-9-]+`，创建后不可改；读写防路径穿越。
+- 正文为 Markdown + GFM，不渲染原始 HTML，不允许 JSX 组件。
+- `SITE_NAME`、`AUTHOR_NAME` 走配置/环境变量，不要写死在组件里。
+
+## 技术栈
+
+- Next.js App Router + TypeScript，`output: 'standalone'`。
+- Tailwind + 自定义设计 token；界面文案全程中文。
+- 渲染：`gray-matter` + `next-mdx-remote/rsc` + `remark-gfm` + Shiki。
+- 搜索用服务端 Flexsearch（须能搜中文）；统计用应用内 SQLite；鉴权为单管理员（环境变量 + httpOnly session）。
+- 部署：Docker Compose + Caddy HTTPS；`content/`、`public/uploads/`、SQLite 目录用数据卷。
+
+## 禁止
+
+- 不要用 `@next/mdx` 把文章塞进 `app/`（和后台随时发布冲突）。
+- 第一版不做：评论、邮件订阅、多用户、独立 Umami/Postgres、CDN、删除文章、修改 slug、后台编辑关于页。

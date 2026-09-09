@@ -1,0 +1,19 @@
+---
+description: 基础遵守的规则
+alwaysApply: true
+---
+
+# 回复与实现前
+
+- 细节不清时先问再答
+- 写代码前在 Planning 模式穷尽追问，消除假设后再实现
+
+# Git
+
+- 不要执行 `git commit`、`git push` 或代为提交；改完代码后把变更说明给我，由我手动提交
+
+# 命令
+
+- 不要运行会花较长时间的命令（例如 `npm install`、`npx create-next-app`、`next build`、`docker compose`、长时间测试或安装）
+- 把完整命令写给我，由我自己在终端执行，再把结果发回
+- 短、只读、可立刻结束的命令（看文件、搜代码、`git status`）可以自己跑

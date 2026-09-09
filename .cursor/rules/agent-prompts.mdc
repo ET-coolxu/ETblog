@@ -1,0 +1,25 @@
+---
+description: 新需求、优化、架构更新必须先写 docs 提示词，再实现或改代码
+alwaysApply: true
+---
+
+# 提示词先行
+
+改代码前先有对应提示词。新需求、优化、架构更新、缺陷修复都走这套流程。
+
+## 必须先做
+
+1. 在 `docs/agent-prompts/` 新增或更新提示词（`features/`、`optimizations/`、`architecture/`、`fixes/`）。
+2. 提示词 `status` 至少为 `ready` 后，才按该文件实现。
+3. 改需求时先改提示词，再改代码；不要只改代码不改提示词。
+4. 完成后把 `status` 改为 `done`，再移到 `docs/agent-prompts/archive/`。
+
+## 不要做
+
+- 不要在没有提示词文件时直接搭功能、做优化或改架构。
+- 不要把提示词只写在聊天里；聊天里的需求要落盘。
+- 不要修改 `_templates/` 来当任务文件。
+
+例外：改错别字、格式、依赖小补丁等纯机械修改，可跳过。拿不准就先写提示词。
+
+详细流程见 `.cursor/skills/agent-prompts/SKILL.md`。

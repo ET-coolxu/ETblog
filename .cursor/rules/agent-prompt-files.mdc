@@ -1,0 +1,30 @@
+---
+description: 编写或修改 docs/agent-prompts 下的任务提示词时遵守格式
+globs: docs/agent-prompts/**/*.md
+alwaysApply: false
+---
+
+# 提示词文件格式
+
+`_templates/` 只作复制源。任务文件放在 `features/`、`optimizations/`、`architecture/`、`fixes/`，完成后移到 `archive/`。
+
+## 文件名
+
+`YYYY-MM-DD-short-slug.md`
+
+## Frontmatter
+
+```yaml
+title: 简短标题
+type: feature | optimization | architecture | fix
+status: draft | ready | in-progress | done
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+related: []
+```
+
+## 正文
+
+必须能单独发给 AI。保留模板里的「背景 / 目标 / 非目标 / 约束 / 验收标准 / 验证」。验收标准用 checkbox。
+
+改需求时更新 `updated`，不要另开一份重复的未完成提示词。

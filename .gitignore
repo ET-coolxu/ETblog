@@ -36,6 +36,3 @@ public/uploads/**
 # os / editor
 .DS_Store
 Thumbs.db
-
-docs/
-.cursor/
