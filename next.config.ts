@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  serverExternalPackages: ["shiki", "@shikijs/rehype"],
+  serverExternalPackages: ["shiki", "@shikijs/rehype", "better-sqlite3"],
   async headers() {
     return [
       {

@@ -4,7 +4,7 @@
 
 对着本仓库学 Next.js：[docs/项目说明](docs/项目说明/README.md)。
 
-当前已完成公开阅读：首页、文章列表、正文、标签和关于页。搜索、暗色模式和后台仍待后续阶段。
+当前已完成公开阅读、搜索、暗色模式、RSS/sitemap 和访问统计写入。后台发文仍待阶段 4。
 
 ## 本地开发
 
@@ -53,16 +53,17 @@ docker compose down
 - 没有 `package-lock.json` 时，Docker 构建会退回 `npm install`，可复现性较差。本地先跑一次 `npm install` 再构建更稳。
 - 本机 Compose 若没有公网域名，Caddy **不会**签发 Let's Encrypt 证书；`localhost` 走 HTTP :80。
 - Linux VPS 上若写入 `public/uploads` 或 `data` 报权限错误，把这两个目录的属主改成容器用户（镜像里是 uid `1001`）。
-- SQLite、搜索、后台登录都还没实现。
+- SQLite 在 `data/stats.sqlite`（访问统计）。搜索、RSS、暗色模式已可用；后台登录仍待阶段 4。
 
 ## 目录
 
 ```
-app/(site)/     公开站点布局与占位首页
+app/(site)/     公开站点（阅读、搜索）
 app/admin/      后台目录预留（占位页）
-content/posts/  文章 Markdown（后续阶段）
+app/feed.xml/   RSS
+content/posts/  文章 Markdown
 content/pages/  关于页等
 public/uploads/ 文章图片
-data/           SQLite 预留
-lib/            站点配置等
+data/           SQLite（stats.sqlite）
+lib/            站点配置、搜索、统计等
 ```
