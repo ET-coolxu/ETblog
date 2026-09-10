@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
   { href: "/posts", label: "文章" },
@@ -28,14 +29,7 @@ export function SiteNav() {
           {item.label}
         </Link>
       ))}
-      <button
-        type="button"
-        disabled
-        title="主题切换将在后续阶段提供"
-        className="cursor-not-allowed text-muted/70"
-      >
-        主题
-      </button>
+      <ThemeToggle />
     </nav>
   );
 }

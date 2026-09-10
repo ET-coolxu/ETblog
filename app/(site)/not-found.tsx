@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "未找到",
+};
 
 export default function SiteNotFound() {
   return (

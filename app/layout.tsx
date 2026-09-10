@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
 import { getSiteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -17,27 +18,41 @@ const serif = Noto_Serif_SC({
   display: "swap",
 });
 
-/* 标签标题生成 */
 export function generateMetadata(): Metadata {
   const site = getSiteConfig();
   return {
+    metadataBase: new URL(site.url),
     title: {
       default: site.name,
       template: `%s · ${site.name}`,
     },
+    description: site.intro,
+    alternates: {
+      types: {
+        "application/rss+xml": "/feed.xml",
+      },
+    },
+    openGraph: {
+      type: "website",
+      locale: "zh_CN",
+      siteName: site.name,
+      title: site.name,
+      description: site.intro,
+    },
   };
 }
 
-/* 根布局 */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className={`${sans.variable} ${serif.variable}`} suppressHydrationWarning>
-      <body className="min-h-dvh bg-paper font-sans text-ink antialiased">
-        {children}
+    <html lang="zh-CN" suppressHydrationWarning>
+      <body
+        className={`${sans.variable} ${serif.variable} min-h-dvh bg-paper font-sans text-ink antialiased`}
+      >
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

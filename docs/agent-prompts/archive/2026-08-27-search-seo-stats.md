@@ -1,12 +1,12 @@
 ---
 title: 搜索、SEO、暗色模式与访问统计
 type: feature
-status: ready
+status: done
 created: 2026-08-27
-updated: 2026-08-27
+updated: 2026-09-10
 related:
   - docs/requirements/v1.md
-  - docs/agent-prompts/features/2026-08-27-public-reading.md
+  - docs/agent-prompts/archive/2026-08-27-public-reading.md
 ---
 
 # 搜索、SEO、暗色模式与访问统计
@@ -40,11 +40,11 @@ related:
 
 ## 验收标准
 
-- [ ] 中文关键词能搜到标题、摘要或正文；只返回已发布；无结果有说明
-- [ ] 浅色/深色可切换，默认跟随系统，刷新保持
-- [ ] `/feed.xml` 最近 20 篇已发布全文；有 sitemap、robots、OG、标题格式正确
-- [ ] 访客打开已发布正文记 PV；若请求带管理员 session 则不记
-- [ ] 统计写入 SQLite；`lib/stats.ts` 能读出总 PV、分文 PV、热门 Top 10
+- [x] 中文关键词能搜到标题、摘要或正文；只返回已发布；无结果有说明
+- [x] 浅色/深色可切换，默认跟随系统，刷新保持
+- [x] `/feed.xml` 最近 20 篇已发布全文；有 sitemap、robots、OG、标题格式正确
+- [x] 访客打开已发布正文记 PV；若请求带管理员 session 则不记
+- [x] 统计写入 SQLite；`lib/stats.ts` 能读出总 PV、分文 PV、热门 Top 10
 
 ## 涉及范围
 
@@ -53,10 +53,10 @@ related:
 
 ## 实现要点
 
-- 搜索：服务端 Flexsearch + 中文切分（字符 bigram 或等价）。
-- 统计：better-sqlite3 或 drizzle + SQLite；正文页服务端写入。
-- 暗色：`next-themes`，class 策略，layout 内防闪脚本。
-- RSS 用已发布列表，内容为渲染前的 Markdown 或 HTML 全文（选一种并保持 20 篇上限）。
+- 搜索：服务端 Flexsearch 0.7 Document；索引前把标题/摘要/正文做成 CJK 单字 + bigram（外加拉丁词），查询同样处理。
+- 统计：`better-sqlite3`，文件 `data/stats.sqlite`；正文页用 `after()` 写入。管理员判断走 `lib/auth.ts` 的 httpOnly HMAC cookie（本切片不做登录页）。
+- 暗色：`next-themes`，`attribute="class"`，默认 `system`，layout 内 ThemeProvider 防闪。
+- RSS：`/feed.xml` 输出最近 20 篇已发布的 **HTML 全文**（remark-gfm → HTML，不跑 Shiki）。
 
 ## 验证
 

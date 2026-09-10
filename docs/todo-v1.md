@@ -2,7 +2,7 @@
 title: 第一版实现 TODO
 status: 进行中
 created: 2026-08-27
-updated: 2026-08-28
+updated: 2026-09-10
 related:
   - docs/requirements/v1.md
 ---
@@ -20,7 +20,7 @@ related:
 | 0 需求文档 | 已完成 | [PRD](./requirements/v1.md) |
 | 1 工程骨架与部署配置 | 已完成 | [architecture](./agent-prompts/archive/2026-08-27-nextjs-personal-blog-v1.md) |
 | 2 公开阅读 | 已完成 | [public-reading](./agent-prompts/archive/2026-08-27-public-reading.md) |
-| 3 搜索 / SEO / 主题 / 统计写入 | 未开始 | [search-seo-stats](./agent-prompts/features/2026-08-27-search-seo-stats.md) |
+| 3 搜索 / SEO / 主题 / 统计写入 | 已完成 | [search-seo-stats](./agent-prompts/archive/2026-08-27-search-seo-stats.md) |
 | 4 后台发文 | 未开始 | [admin-posts](./agent-prompts/features/2026-08-27-admin-posts.md) |
 | 5 上线前 | 未开始 | 无单独提示词，见下方待定项 |
 
@@ -70,16 +70,16 @@ related:
 
 ## 阶段 3 · 搜索、SEO、暗色模式与统计写入
 
-提示词：`docs/agent-prompts/features/2026-08-27-search-seo-stats.md`  
+提示词：`docs/agent-prompts/archive/2026-08-27-search-seo-stats.md`  
 依赖阶段 2。本阶段不做后台 UI。
 
-- [ ] `/search`：标题 + 摘要 + 正文；中文可用（CJK n-gram 或等价）；只返回已发布；无结果说明
-- [ ] 暗色模式：跟随系统、可切换、刷新保持、避免首屏闪浅色
-- [ ] `/feed.xml`：最近 20 篇已发布全文
-- [ ] `sitemap.xml`、`robots.txt`、文档标题 `{页面} · {SITE_NAME}`、文章 OG
-- [ ] `lib/stats.ts` + SQLite：访客打开已发布正文记 PV；有管理员 session 不记
-- [ ] 可读取总 PV、分文 PV、热门 Top 10（供阶段 4 展示）
-- [ ] 验收：搜索有/无结果、主题刷新、curl feed/sitemap/robots、确认 PV 有写入
+- [x] `/search`：标题 + 摘要 + 正文；中文可用（CJK n-gram 或等价）；只返回已发布；无结果说明
+- [x] 暗色模式：跟随系统、可切换、刷新保持、避免首屏闪浅色
+- [x] `/feed.xml`：最近 20 篇已发布全文
+- [x] `sitemap.xml`、`robots.txt`、文档标题 `{页面} · {SITE_NAME}`、文章 OG
+- [x] `lib/stats.ts` + SQLite：访客打开已发布正文记 PV；有管理员 session 不记
+- [x] 可读取总 PV、分文 PV、热门 Top 10（供阶段 4 展示）
+- [x] 验收：搜索有/无结果、主题刷新、curl feed/sitemap/robots、确认 PV 有写入
 
 ---
 

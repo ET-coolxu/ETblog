@@ -7,7 +7,7 @@ updated: 2026-08-27
 related:
   - docs/requirements/v1.md
   - docs/agent-prompts/features/2026-08-27-public-reading.md
-  - docs/agent-prompts/features/2026-08-27-search-seo-stats.md
+  - docs/agent-prompts/archive/2026-08-27-search-seo-stats.md
 ---
 
 # 后台文章编辑与图片上传

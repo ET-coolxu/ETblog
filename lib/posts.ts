@@ -90,7 +90,7 @@ function asCover(value: unknown): string | undefined {
   return cover;
 }
 
-function plainTextFromMarkdown(markdown: string): string {
+export function plainTextFromMarkdown(markdown: string): string {
   return markdown
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/`[^`]*`/g, " ")
@@ -205,11 +205,16 @@ async function listAllParsedPosts(): Promise<(Post & { draft: boolean })[]> {
   });
 }
 
-export const listPublishedPosts = cache(async (): Promise<PostMeta[]> => {
+export const listPublishedPostContents = cache(async (): Promise<Post[]> => {
   const posts = await listAllParsedPosts();
   return posts
     .filter((post) => !post.draft)
-    .map(({ body: _body, draft: _draft, ...meta }) => meta);
+    .map(({ draft: _draft, ...post }) => post);
+});
+
+export const listPublishedPosts = cache(async (): Promise<PostMeta[]> => {
+  const posts = await listPublishedPostContents();
+  return posts.map(({ body: _body, ...meta }) => meta);
 });
 
 export const getPublishedPost = cache(async (slug: string): Promise<Post | null> => {

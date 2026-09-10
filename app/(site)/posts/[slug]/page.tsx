@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { after } from "next/server";
 import { notFound } from "next/navigation";
 import { TableOfContents } from "@/components/table-of-contents";
+import { hasAdminSession } from "@/lib/auth";
 import { extractToc, renderMarkdown } from "@/lib/markdown";
 import {
   formatPostDate,
@@ -9,6 +11,7 @@ import {
   getPublishedPost,
   tagHref,
 } from "@/lib/posts";
+import { recordPostView } from "@/lib/stats";
 
 type PostPageProps = {
   params: Promise<{ slug: string }>;
@@ -23,7 +26,25 @@ export async function generateMetadata({
     return { title: "未找到" };
   }
 
-  return { title: post.title };
+  const images = post.cover ? [{ url: post.cover }] : undefined;
+
+  return {
+    title: post.title,
+    description: post.summary,
+    openGraph: {
+      title: post.title,
+      description: post.summary,
+      type: "article",
+      publishedTime: `${post.date}T00:00:00.000Z`,
+      images,
+    },
+    twitter: {
+      card: post.cover ? "summary_large_image" : "summary",
+      title: post.title,
+      description: post.summary,
+      images,
+    },
+  };
 }
 
 export default async function PostPage({ params }: PostPageProps) {
@@ -32,6 +53,13 @@ export default async function PostPage({ params }: PostPageProps) {
   if (!post) {
     notFound();
   }
+
+  const isAdmin = await hasAdminSession();
+  after(() => {
+    if (!isAdmin) {
+      recordPostView(post.slug);
+    }
+  });
 
   const [content, adjacent] = await Promise.all([
     renderMarkdown(post.body),

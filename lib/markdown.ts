@@ -3,7 +3,9 @@ import type { ReactElement } from "react";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
 import rehypeShiki from "@shikijs/rehype";
+import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
 import { remark } from "remark";
 import type { Heading, Root } from "mdast";
 import { visit } from "unist-util-visit";
@@ -85,4 +87,14 @@ export async function renderMarkdown(source: string): Promise<ReactElement> {
   });
 
   return content;
+}
+
+export async function renderMarkdownToHtml(source: string): Promise<string> {
+  const file = await remark()
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeStringify)
+    .process(source);
+
+  return String(file);
 }
