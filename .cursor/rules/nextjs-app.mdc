@@ -1,0 +1,32 @@
+---
+description: 本仓库 Next.js App Router 写法：Server/Client、目录、鉴权分层、设计 token
+alwaysApply: true
+---
+
+# Next.js App Router 写法
+
+对照 `docs/项目说明/`。产品边界仍以 `docs/requirements/v1.md` 为准。
+
+## 组件与数据
+
+- 默认 **Server Component**。只有需要 state、事件或浏览器 API 时才加 `"use client"`。
+- 客户端组件不要读无 `NEXT_PUBLIC_` 的环境变量，不要 import 读磁盘、SQLite 或鉴权的模块。
+- `lib/auth.ts`、读写文件系统、SQLite 使用 `server-only`。
+- 列表类读盘用 `react.cache()` 做请求内去重；写入后 `revalidatePath`，不要靠整站重建。
+
+## 目录
+
+- 页面只放 `app/`；可复用 UI 放 `components/`；非 UI 逻辑放 `lib/`。文章不进 `app/`。
+- 公开站走 `app/(site)/`（带页眉页脚）。后台走 `app/admin/`，不要套 site layout。
+- 站内跳转用 `next/link`；外链、下载才用 `<a>`。
+- 文档标题走 `generateMetadata` / `metadata`，格式 `{页面} · {SITE_NAME}`。站名、作者来自 `getSiteConfig()`，不要写死。
+
+## 鉴权
+
+- `proxy.ts` 只做有无 cookie 的乐观拦截（`/admin/*`、`/api/upload`）。
+- HMAC 验签放在 dashboard layout、Server Action、上传接口；不要把密钥逻辑堆在请求边界。
+
+## 界面
+
+- 文案中文。颜色用 `paper` / `ink` / `muted` / `rule` / `pine`，不要随手 `gray-*`。
+- 无内容写空状态，不要空白页。正文页的签名是目录，不要用大面积 Hero 替代。

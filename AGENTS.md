@@ -8,6 +8,6 @@
 2. 实现时 `@` 对应提示词文件，或让 agent 按该文件执行。
 3. 改需求先改 PRD 与提示词；完成后把文件移到 `docs/agent-prompts/archive/`。
 
-规则：`.cursor/rules/agent-prompts.mdc`、`.cursor/rules/project-conventions.mdc`  
+规则：`.cursor/rules/main.mdc`、`.cursor/rules/project-conventions.mdc`、`.cursor/rules/nextjs-app.mdc`、`.cursor/rules/agent-prompts.mdc`  
 技能：`.cursor/skills/agent-prompts/SKILL.md`  
 用法：`docs/agent-prompts/README.md`

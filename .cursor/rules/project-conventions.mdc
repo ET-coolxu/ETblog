@@ -25,6 +25,14 @@ alwaysApply: true
 - 搜索用服务端 Flexsearch（须能搜中文）；统计用应用内 SQLite；鉴权为单管理员（环境变量 + httpOnly session）。
 - 部署：Docker Compose + Caddy HTTPS；`content/`、`public/uploads/`、SQLite 目录用数据卷。
 
+## 实现时不要漏
+
+- 列表 / 搜索 / 标签 / 关于无内容时写中文空状态，不要空白页；关于页缺文件不 500。
+- 访客打开草稿或不存在的 slug：404。
+- 文档标题：`{页面} · {SITE_NAME}`。RSS 最近 20 篇已发布**全文**；sitemap 含静态页 + 已发布文章；后台 `noindex`。
+- 图片上传：png / jpg / jpeg / webp / gif，单文件 ≤5MB，禁止 svg；接口必须登录。
+- PV：仅访客成功打开已发布正文记 1 次；带管理员 session 的请求不记。
+
 ## 禁止
 
 - 不要用 `@next/mdx` 把文章塞进 `app/`（和后台随时发布冲突）。
