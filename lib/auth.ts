@@ -1,9 +1,13 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { ADMIN_SESSION_COOKIE } from "@/lib/auth-constants";
 
-export const ADMIN_SESSION_COOKIE = "admin_session";
+export { ADMIN_SESSION_COOKIE };
+
 const SESSION_DAYS = 7;
+const SESSION_MAX_AGE = SESSION_DAYS * 24 * 60 * 60;
 
 type SessionPayload = {
   role: "admin";
@@ -28,11 +32,21 @@ function safeEqual(left: string, right: string): boolean {
   return timingSafeEqual(a, b);
 }
 
+function sessionCookieOptions(maxAge: number) {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: (process.env.SITE_URL ?? "").startsWith("https://"),
+    path: "/",
+    maxAge,
+  };
+}
+
 export function createAdminSessionToken(): string {
   const payload = Buffer.from(
     JSON.stringify({
       role: "admin",
-      exp: Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000,
+      exp: Date.now() + SESSION_MAX_AGE * 1000,
     } satisfies SessionPayload),
   ).toString("base64url");
 
@@ -70,4 +84,33 @@ export async function hasAdminSession(): Promise<boolean> {
   }
 
   return verifyAdminSessionToken(token);
+}
+
+export async function requireAdminSession(): Promise<void> {
+  if (!(await hasAdminSession())) {
+    redirect("/admin/login");
+  }
+}
+
+export function verifyAdminCredentials(username: string, password: string): boolean {
+  const secret = getSecret();
+  const expectedPassword = process.env.ADMIN_PASSWORD ?? "";
+  if (!secret || !expectedPassword) {
+    return false;
+  }
+
+  const expectedUser = process.env.ADMIN_USER?.trim() || "admin";
+  const userOk = safeEqual(sign(`user:${username}`), sign(`user:${expectedUser}`));
+  const passOk = safeEqual(sign(`pass:${password}`), sign(`pass:${expectedPassword}`));
+  return userOk && passOk;
+}
+
+export async function createAdminSession(): Promise<void> {
+  const store = await cookies();
+  store.set(ADMIN_SESSION_COOKIE, createAdminSessionToken(), sessionCookieOptions(SESSION_MAX_AGE));
+}
+
+export async function clearAdminSession(): Promise<void> {
+  const store = await cookies();
+  store.set(ADMIN_SESSION_COOKIE, "", sessionCookieOptions(0));
 }

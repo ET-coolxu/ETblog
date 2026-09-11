@@ -1,6 +1,6 @@
 ---
 title: 先把笔记写下来
-date: 2026-08-26
+date: '2026-08-26'
 tags:
   - 笔记
   - Markdown
@@ -40,3 +40,6 @@ function readingMinutes(chars: number): number {
 | `summary` | 列表和分享用 |
 
 正文里的图写成 `![说明](/uploads/...)`，文件放在 `public/uploads/` 下。
+
+## 功能测试
+测试文章编辑功能

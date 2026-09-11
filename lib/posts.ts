@@ -23,6 +23,24 @@ export type Post = PostMeta & {
   body: string;
 };
 
+export type AdminPost = Post & {
+  draft: boolean;
+};
+
+export type SavePostInput = {
+  slug: string;
+  title: string;
+  date: string;
+  tags: string[];
+  summary: string;
+  cover: string;
+  featured: boolean;
+  draft: boolean;
+  body: string;
+};
+
+export type SavePostResult = { ok: true } | { ok: false; error: string };
+
 export type TagCount = {
   tag: string;
   count: number;
@@ -260,6 +278,85 @@ export async function listTags(): Promise<TagCount[]> {
 export async function getPublishedPostsByTag(tag: string): Promise<PostMeta[]> {
   const posts = await listPublishedPosts();
   return posts.filter((post) => post.tags.includes(tag));
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export const listAdminPosts = cache(async (): Promise<AdminPost[]> => {
+  return listAllParsedPosts();
+});
+
+export const getAdminPost = cache(async (slug: string): Promise<AdminPost | null> => {
+  return readPostFile(slug);
+});
+
+export async function savePost(
+  input: SavePostInput,
+  mode: "create" | "update",
+): Promise<SavePostResult> {
+  if (!isValidSlug(input.slug)) {
+    return { ok: false, error: "slug 只能包含小写字母、数字和连字符。" };
+  }
+  if (input.slug === "new") {
+    return { ok: false, error: "slug 不能使用 new。" };
+  }
+
+  const title = input.title.trim();
+  if (!title) {
+    return { ok: false, error: "标题不能为空。" };
+  }
+
+  const date = input.date.trim();
+  if (!DATE_PATTERN.test(date)) {
+    return { ok: false, error: "日期格式应为 YYYY-MM-DD。" };
+  }
+
+  const filePath = resolvePostFile(input.slug);
+  if (!filePath) {
+    return { ok: false, error: "slug 不合法。" };
+  }
+
+  const exists = await fileExists(filePath);
+  if (mode === "create" && exists) {
+    return { ok: false, error: "这个 slug 已被使用。" };
+  }
+  if (mode === "update" && !exists) {
+    return { ok: false, error: "找不到这篇文章。" };
+  }
+
+  const data: Record<string, unknown> = {
+    title,
+    date,
+    tags: input.tags,
+  };
+  const summary = input.summary.trim();
+  if (summary) {
+    data.summary = summary;
+  }
+  const cover = asCover(input.cover.trim());
+  if (cover) {
+    data.cover = cover;
+  }
+  if (input.featured) {
+    data.featured = true;
+  }
+  if (input.draft) {
+    data.draft = true;
+  }
+
+  const body = input.body.replace(/^\uFEFF/, "").replace(/\s+$/, "");
+  const markdown = matter.stringify(`${body}\n`, data);
+
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, markdown, "utf8");
+  return { ok: true };
 }
 
 export const getAboutSource = cache(async (): Promise<string | null> => {

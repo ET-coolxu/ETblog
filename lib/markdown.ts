@@ -98,3 +98,18 @@ export async function renderMarkdownToHtml(source: string): Promise<string> {
 
   return String(file);
 }
+
+export async function renderMarkdownPreviewHtml(source: string): Promise<string> {
+  const file = await remark()
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeSlug)
+    .use(rehypeShiki, {
+      theme: "vitesse-light",
+      defaultLanguage: "text",
+    })
+    .use(rehypeStringify)
+    .process(source);
+
+  return String(file);
+}
