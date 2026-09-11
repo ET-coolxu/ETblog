@@ -15,6 +15,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# .dockerignore 排除 .env，预渲染页在 build 时读这些值；不要把密码做成 ARG。
+ARG SITE_NAME=个人博客
+ARG AUTHOR_NAME=作者
+ARG SITE_URL=http://localhost:3000
+ENV SITE_NAME=$SITE_NAME
+ENV AUTHOR_NAME=$AUTHOR_NAME
+ENV SITE_URL=$SITE_URL
 RUN npm run build
 
 FROM base AS runner
@@ -23,6 +30,13 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+# 镜像默认与构建时一致；compose 的 env_file 会在运行时覆盖，供动态路由使用。
+ARG SITE_NAME=个人博客
+ARG AUTHOR_NAME=作者
+ARG SITE_URL=http://localhost:3000
+ENV SITE_NAME=$SITE_NAME
+ENV AUTHOR_NAME=$AUTHOR_NAME
+ENV SITE_URL=$SITE_URL
 
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs

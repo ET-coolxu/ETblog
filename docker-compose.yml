@@ -1,6 +1,12 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        # 预渲染首页/关于需要构建期站名；密码不要放进 build args。
+        SITE_NAME: "${SITE_NAME:-个人博客}"
+        AUTHOR_NAME: "${AUTHOR_NAME:-作者}"
+        SITE_URL: "${SITE_URL:-http://localhost:3000}"
     restart: unless-stopped
     env_file:
       - .env
