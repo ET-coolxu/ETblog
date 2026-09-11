@@ -21,7 +21,7 @@ related:
 | 1 工程骨架与部署配置 | 已完成 | [architecture](./agent-prompts/archive/2026-08-27-nextjs-personal-blog-v1.md) |
 | 2 公开阅读 | 已完成 | [public-reading](./agent-prompts/archive/2026-08-27-public-reading.md) |
 | 3 搜索 / SEO / 主题 / 统计写入 | 已完成 | [search-seo-stats](./agent-prompts/archive/2026-08-27-search-seo-stats.md) |
-| 4 后台发文 | 未开始 | [admin-posts](./agent-prompts/features/2026-08-27-admin-posts.md) |
+| 4 后台发文 | 已完成 | [admin-posts](./agent-prompts/archive/2026-08-27-admin-posts.md) |
 | 5 上线前 | 未开始 | 无单独提示词，见下方待定项 |
 
 ---
@@ -85,18 +85,18 @@ related:
 
 ## 阶段 4 · 后台发文
 
-提示词：`docs/agent-prompts/features/2026-08-27-admin-posts.md`  
+提示词：`docs/agent-prompts/archive/2026-08-27-admin-posts.md`  
 依赖阶段 2；统计展示依赖阶段 3。
 
-- [ ] 登录 / 登出：`ADMIN_PASSWORD` + 可选 `ADMIN_USER` + httpOnly session
-- [ ] 未登录访问 `/admin/*`（除 login）重定向到登录页；错误密码笼统提示
-- [ ] `/admin` 文章列表（含草稿状态）；入口：写文章、统计
-- [ ] `/admin/posts/new`：创建时设定 slug；分栏预览；保存草稿 / 发布
-- [ ] `/admin/posts/[slug]`：编辑；slug 只读；无删除；无关于页编辑
-- [ ] 图片上传：png/jpg/jpeg/webp/gif，≤5MB，禁 svg；写入 `public/uploads/{yyyy}/{mm}/` 并插入 Markdown
-- [ ] 保存后 `revalidatePath`，前台不重建即可看到已发布变更
-- [ ] `/admin/stats`：需登录；总 PV、分文 PV、热门 Top 10
-- [ ] 浏览器走通：登录失败 → 成功 → 草稿对访客不可见 → 发布可见含图 → 再编辑前台更新
+- [x] 登录 / 登出：`ADMIN_PASSWORD` + 可选 `ADMIN_USER` + httpOnly session
+- [x] 未登录访问 `/admin/*`（除 login）重定向到登录页；错误密码笼统提示
+- [x] `/admin` 文章列表（含草稿状态）；入口：写文章、统计
+- [x] `/admin/posts/new`：创建时设定 slug；分栏预览；保存草稿 / 发布
+- [x] `/admin/posts/[slug]`：编辑；slug 只读；无删除；无关于页编辑
+- [x] 图片上传：png/jpg/jpeg/webp/gif，≤5MB，禁 svg；写入 `public/uploads/{yyyy}/{mm}/` 并插入 Markdown
+- [x] 保存后 `revalidatePath`，前台不重建即可看到已发布变更
+- [x] `/admin/stats`：需登录；总 PV、分文 PV、热门 Top 10
+- [x] 浏览器走通：登录失败 → 成功 → 草稿对访客不可见 → 发布可见含图 → 再编辑前台更新
 
 ---
 

@@ -35,4 +35,4 @@
 1. [从零搭建工程骨架与部署配置](./archive/2026-08-27-nextjs-personal-blog-v1.md)（已完成）
 2. [公开阅读](./archive/2026-08-27-public-reading.md)（已完成）
 3. [搜索、SEO、暗色模式与访问统计](./archive/2026-08-27-search-seo-stats.md)（已完成）
-4. [后台文章编辑与图片上传](./features/2026-08-27-admin-posts.md)
+4. [后台文章编辑与图片上传](./archive/2026-08-27-admin-posts.md)（已完成）

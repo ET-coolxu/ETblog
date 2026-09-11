@@ -1,12 +1,12 @@
 ---
 title: 后台文章编辑与图片上传
 type: feature
-status: ready
+status: done
 created: 2026-08-27
-updated: 2026-08-27
+updated: 2026-09-10
 related:
   - docs/requirements/v1.md
-  - docs/agent-prompts/features/2026-08-27-public-reading.md
+  - docs/agent-prompts/archive/2026-08-27-public-reading.md
   - docs/agent-prompts/archive/2026-08-27-search-seo-stats.md
 ---
 
@@ -46,12 +46,12 @@ related:
 
 ## 验收标准
 
-- [ ] 未登录访问 `/admin` 其他页会到登录页；错误密码有提示
-- [ ] 可新建文章（此时设定 slug）、保存草稿、发布；可再编辑；发布后前台立刻可见
-- [ ] 可上传允许类型图片并插入正文；超限或 svg 失败且有原因
-- [ ] 无删除按钮；编辑页 slug 只读；无关于页编辑入口
-- [ ] `/admin/stats` 需登录；展示总 PV、分文 PV、热门 Top 10
-- [ ] 草稿对访客仍 404 且不出现在公开列表
+- [x] 未登录访问 `/admin` 其他页会到登录页；错误密码有提示
+- [x] 可新建文章（此时设定 slug）、保存草稿、发布；可再编辑；发布后前台立刻可见
+- [x] 可上传允许类型图片并插入正文；超限或 svg 失败且有原因
+- [x] 无删除按钮；编辑页 slug 只读；无关于页编辑入口
+- [x] `/admin/stats` 需登录；展示总 PV、分文 PV、热门 Top 10
+- [x] 草稿对访客仍 404 且不出现在公开列表
 
 ## 涉及范围
 
@@ -60,10 +60,11 @@ related:
 
 ## 实现要点
 
-- iron-session 或同等 httpOnly cookie session。
-- 新建时校验 slug 唯一且格式合法；重名拒绝并提示。
-- 预览与前台同一套 Markdown 管线，避免「后台一种样子、前台另一种」。
+- 沿用阶段 3 的 HMAC httpOnly cookie（`admin_session`），不另引入 iron-session。
+- 新建时校验 slug 唯一且格式合法；重名拒绝并提示。`new` 不能当 slug。
+- 预览走同一套 GFM + Shiki 管线（`renderMarkdownPreviewHtml`）。
 - 统计页只读，不在本切片改计数规则。
+- 请求边界用 Next.js 16 的 `proxy.ts` 做乐观检查；真正验签在 layout / Server Action / 上传接口。
 
 ## 验证
 

@@ -4,7 +4,7 @@
 
 对着本仓库学 Next.js：[docs/项目说明](docs/项目说明/README.md)。
 
-当前已完成公开阅读、搜索、暗色模式、RSS/sitemap 和访问统计写入。后台发文仍待阶段 4。
+当前已完成公开阅读、搜索、暗色模式、RSS/sitemap、访问统计，以及后台登录、发文和图片上传。
 
 ## 本地开发
 
@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-浏览器打开 [http://localhost:3000](http://localhost:3000)。站名、作者来自 `.env.local` 里的 `SITE_NAME`、`AUTHOR_NAME`。
+浏览器打开 [http://localhost:3000](http://localhost:3000)。站名、作者来自 `.env.local` 里的 `SITE_NAME`、`AUTHOR_NAME`。后台在 [http://localhost:3000/admin](http://localhost:3000/admin)，账号见 `ADMIN_USER`、`ADMIN_PASSWORD`。
 
 生产构建（可选）：
 
@@ -53,17 +53,18 @@ docker compose down
 - 没有 `package-lock.json` 时，Docker 构建会退回 `npm install`，可复现性较差。本地先跑一次 `npm install` 再构建更稳。
 - 本机 Compose 若没有公网域名，Caddy **不会**签发 Let's Encrypt 证书；`localhost` 走 HTTP :80。
 - Linux VPS 上若写入 `public/uploads` 或 `data` 报权限错误，把这两个目录的属主改成容器用户（镜像里是 uid `1001`）。
-- SQLite 在 `data/stats.sqlite`（访问统计）。搜索、RSS、暗色模式已可用；后台登录仍待阶段 4。
+- SQLite 在 `data/stats.sqlite`（访问统计）。搜索、RSS、暗色模式、后台发文已可用。上线前请改掉 `.env` 里的 `ADMIN_PASSWORD` 和 `SESSION_SECRET`。
 
 ## 目录
 
 ```
 app/(site)/     公开站点（阅读、搜索）
-app/admin/      后台目录预留（占位页）
+app/admin/      后台（登录、写文章、统计）
+app/api/upload/ 后台图片上传
 app/feed.xml/   RSS
 content/posts/  文章 Markdown
 content/pages/  关于页等
 public/uploads/ 文章图片
 data/           SQLite（stats.sqlite）
-lib/            站点配置、搜索、统计等
+lib/            站点配置、文章读写、搜索、统计、鉴权
 ```

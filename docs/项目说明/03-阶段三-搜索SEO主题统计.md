@@ -98,7 +98,7 @@ Flexsearch 默认按空格分词。中文词之间没有空格，所以索引前
 
 本阶段没有统计页面。要确认写入，可打开一篇已发布正文后看 `data/stats.sqlite`。
 
-登录仍未实现，所以本地开发时几乎每次打开正文都会 +1。阶段 4 会调用 `lib/auth.ts` 里的 `createAdminSessionToken` 种上同一颗 cookie。
+登录仍未实现，所以本地开发时几乎每次打开正文都会 +1。阶段 4 会调用 `lib/auth.ts` 里的 `createAdminSessionToken` 种上同一颗 cookie。登录页与统计展示见 [04-阶段四-后台发文.md](./04-阶段四-后台发文.md)。
 
 ---
 
