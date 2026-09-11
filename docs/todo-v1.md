@@ -2,7 +2,7 @@
 title: 第一版实现 TODO
 status: 进行中
 created: 2026-08-27
-updated: 2026-09-10
+updated: 2026-09-11
 related:
   - docs/requirements/v1.md
 ---
@@ -22,7 +22,7 @@ related:
 | 2 公开阅读 | 已完成 | [public-reading](./agent-prompts/archive/2026-08-27-public-reading.md) |
 | 3 搜索 / SEO / 主题 / 统计写入 | 已完成 | [search-seo-stats](./agent-prompts/archive/2026-08-27-search-seo-stats.md) |
 | 4 后台发文 | 已完成 | [admin-posts](./agent-prompts/archive/2026-08-27-admin-posts.md) |
-| 5 上线前 | 未开始 | 无单独提示词，见下方待定项 |
+| 5 上线前 | 进行中 | [go-live](./agent-prompts/archive/2026-09-11-go-live.md) |
 
 ---
 
@@ -102,12 +102,16 @@ related:
 
 ## 阶段 5 · 上线前（不阻塞开发）
 
-无单独提示词。做完阶段 1–4 再填。
+提示词：[go-live](./agent-prompts/archive/2026-09-11-go-live.md)  
+运维助手执行清单：[docs/vps-go-live.md](./vps-go-live.md)
 
-- [ ] 填写实际上线的 `SITE_NAME`、`AUTHOR_NAME`、`SITE_URL`
-- [ ] 域名与 HTTPS 证书（Caddy 自动签发或已有证书）
-- [ ] VPS 上 Docker / Compose 跑通，数据卷持久化
-- [ ] 改掉示例文章或确认可以公开
+已确认：`SITE_NAME=CoolXu's Blog`，`AUTHOR_NAME=coolxu`，`SITE_URL=https://coolxu.com`，域名 `coolxu.com`（尚未解析），证书邮箱 `maxxubuly@gmail.com`。首页简介与文章均不改。
+
+- [x] 填写实际上线的 `SITE_NAME`、`AUTHOR_NAME`、`SITE_URL`
+- [x] 仓库内上线清单与 README 入口已写好（DNS / Compose 仍待在 VPS 上执行）
+- [ ] 域名 DNS 指向 VPS，Caddy 自动签发 HTTPS
+- [ ] 全新 VPS 安装 Docker / Compose，数据卷持久化并跑通
+- [x] 确认示例文章可以公开（本阶段不动文章）
 
 ---
 
