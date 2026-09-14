@@ -43,6 +43,7 @@ docker compose up --build
 - 数据卷（绑定到仓库目录）：`content/`、`public/uploads/`、`data/`（SQLite 预留）。
 - 本地默认 `SITE_DOMAIN=:80`，用 [http://localhost](http://localhost) 访问（HTTP）。不要写成 `localhost`，否则 Caddy 只在容器内环回地址监听，宿主机进不去。
 - 生产把 `.env` 里的 `SITE_DOMAIN` 改成真实域名（不要带 `http://`），Caddy 会尝试自动签发 HTTPS。需要 80/443 对公网开放，并填写 `CADDY_EMAIL`。
+- `SITE_NAME`、`AUTHOR_NAME`、`SITE_URL` 会作为 **镜像构建参数** 打进预渲染页（首页、关于）。改这三项后必须 `docker compose up --build`，只重启容器不会更新首页站名。密码不要作为 build arg。
 
 停止：
 

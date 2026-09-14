@@ -301,8 +301,8 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 | 证书失败 | `dig A coolxu.com` 是否等于本机 IP；安全组 80/443；是否开了 CDN 代理；`CADDY_EMAIL` 是否为邮箱 |
 | 构建被杀 / OOM | `free -h`，加 swap 后重新 `docker compose up --build -d` |
 | 后台保存/上传 Permission denied | `content`、`public/uploads`、`data` 是否 uid 1001 |
-| 打开站点仍是旧站名 | `.env` 的 `SITE_NAME` 是否带引号；是否 `compose up` 后没重建/没读到 env（改 `.env` 后 `sudo docker compose up -d --force-recreate`） |
-| sitemap 仍是 localhost | `SITE_URL` 是否为 `https://coolxu.com` |
+| 打开站点仍是旧站名 | `.env` 的 `SITE_NAME` 是否带引号；**只 recreate 不够**，必须 `sudo docker compose up --build -d`（首页在镜像构建时打进 HTML） |
+| robots/sitemap 仍是 localhost | `.env` 的 `SITE_URL` 是否为 `https://coolxu.com`，然后重新 `--build` |
 | 登录 cookie 异常 | `SITE_URL` 必须以 `https://` 开头 |
 | git clone 失败 | 仓库是否私有；改 SSH deploy key |
 
@@ -310,7 +310,7 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 
 ## 日常（可选，非首次上线）
 
-更新代码（仍不要改 `content/` 里未打算发布的稿）：
+更新代码（仍不要改 `content/` 里未打算发布的稿，不要手改 Dockerfile / compose）：
 
 ```bash
 cd /opt/etblog
@@ -318,7 +318,52 @@ git pull --ff-only
 sudo docker compose up --build -d
 ```
 
-停止（保留数据卷与绑定目录）：
+首页站名、关于页标题、`robots.txt` 的 sitemap 地址在 **镜像构建** 时写入。改 `SITE_NAME` / `SITE_URL` 或拉到含构建参数的新代码后，必须 `--build`，不能只 `up -d --force-recreate`。
+
+---
+
+## 步骤 10 — 已上线站点：重建以写入站名
+
+首次部署若首页仍是「个人博客」、页脚是「作者」、`/robots.txt` 里 sitemap 是 `http://localhost:3000/...`，说明构建时没打进站点变量。不要改文章。按下面做：
+
+```bash
+cd /opt/etblog
+git fetch origin
+git pull --ff-only
+grep -E '^SITE_NAME=|^AUTHOR_NAME=|^SITE_URL=' .env
+```
+
+`.env` 必须仍是：
+
+```bash
+SITE_NAME="CoolXu's Blog"
+AUTHOR_NAME=coolxu
+SITE_URL=https://coolxu.com
+```
+
+然后重建应用镜像（Caddy 证书卷不要 `down -v`）：
+
+```bash
+cd /opt/etblog
+sudo docker compose up --build -d
+```
+
+成功标准（在 VPS 上 curl，或让人类刷新首页并强制跳过缓存）：
+
+```bash
+curl -s https://coolxu.com/ | grep -o '<title>[^<]*</title>'
+curl -s https://coolxu.com/robots.txt
+curl -sI https://coolxu.com/about | head -n 5
+```
+
+- 首页 `<title>` 为 `CoolXu's Blog`（不是「个人博客」）
+- 页脚或正文可见 `coolxu`（不是单独一个「作者」）
+- `robots.txt` 的 Sitemap 为 `https://coolxu.com/sitemap.xml`
+- 关于页文档标题含 `CoolXu's Blog`
+
+---
+
+## 停止（保留数据卷与绑定目录）
 
 ```bash
 cd /opt/etblog

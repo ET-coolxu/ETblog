@@ -37,3 +37,4 @@
 3. [搜索、SEO、暗色模式与访问统计](./archive/2026-08-27-search-seo-stats.md)（已完成）
 4. [后台文章编辑与图片上传](./archive/2026-08-27-admin-posts.md)（已完成）
 5. [第一版上线清单](./archive/2026-09-11-go-live.md)（文档已完成；VPS 执行见 [vps-go-live](../vps-go-live.md)）
+6. [Docker 构建打入站点环境变量](./archive/2026-09-11-docker-site-env-build.md)（已完成）
