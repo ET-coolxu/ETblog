@@ -2,7 +2,7 @@
 title: 第一版实现 TODO
 status: 进行中
 created: 2026-08-27
-updated: 2026-09-11
+updated: 2026-09-14
 related:
   - docs/requirements/v1.md
 ---
@@ -91,9 +91,9 @@ related:
 - [x] 登录 / 登出：`ADMIN_PASSWORD` + 可选 `ADMIN_USER` + httpOnly session
 - [x] 未登录访问 `/admin/*`（除 login）重定向到登录页；错误密码笼统提示
 - [x] `/admin` 文章列表（含草稿状态）；入口：写文章、统计
-- [x] `/admin/posts/new`：创建时设定 slug；分栏预览；保存草稿 / 发布
+- [x] `/admin/posts/new`：创建时手填 slug，首次保存追加全站序号；分栏预览；保存草稿 / 发布
 - [x] `/admin/posts/[slug]`：编辑；slug 只读；无删除；无关于页编辑
-- [x] 图片上传：png/jpg/jpeg/webp/gif，≤5MB，禁 svg；写入 `public/uploads/{yyyy}/{mm}/` 并插入 Markdown
+- [x] 图片上传：png/jpg/jpeg/webp/gif，≤5MB，禁 svg；写入 `public/uploads/{yyyy}/{mm}/`；正文插入 `![图片](...)`；封面可上传或填 https
 - [x] 保存后 `revalidatePath`，前台不重建即可看到已发布变更
 - [x] `/admin/stats`：需登录；总 PV、分文 PV、热门 Top 10
 - [x] 浏览器走通：登录失败 → 成功 → 草稿对访客不可见 → 发布可见含图 → 再编辑前台更新
@@ -112,6 +112,25 @@ related:
 - [ ] 域名 DNS 指向 VPS，Caddy 自动签发 HTTPS
 - [ ] 全新 VPS 安装 Docker / Compose，数据卷持久化并跑通
 - [x] 确认示例文章可以公开（本阶段不动文章）
+
+---
+
+## 增量 · 编辑器 slug / 封面 / 插图 alt
+
+提示词：[editor-slug-cover](./agent-prompts/archive/2026-09-14-editor-slug-cover.md)
+
+- [x] 新建首次保存写成 `{手填}-{下一序号}`；旧文不改名、编辑不重新编号
+- [x] 封面选图上传 + `asCover` 放行 https（拒 `//`、`http://`、`javascript:`、`data:`）
+- [x] 正文插图 alt 占位「图片」，磁盘命名不改
+
+---
+
+## 增量 · https 封面显示与编辑器预览
+
+提示词：[https-cover-display](./agent-prompts/archive/2026-09-14-https-cover-display.md)
+
+- [x] https 封面在列表/正文能显示（热链保护下不带跨站 Referer）
+- [x] 后台封面合法路径或 https 时立刻预览；加载失败中文说明
 
 ---
 
