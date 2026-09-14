@@ -55,17 +55,19 @@ export async function createPostAction(
     return { error: "请先登录。" };
   }
 
-  const slug = String(formData.get("slug") ?? "")
+  const hand = String(formData.get("slug") ?? "")
     .trim()
     .toLowerCase();
-  const input = inputFromForm(formData, slug);
+  const input = inputFromForm(formData, hand);
   const result = await savePost(input, "create");
   if (!result.ok) {
     return { error: result.error };
   }
 
-  revalidateAfterSave(input);
-  redirect(`/admin/posts/${input.slug}`);
+  // 首次保存已追加全站序号，必须按最终 slug 刷新缓存并跳转
+  const saved = { ...input, slug: result.slug };
+  revalidateAfterSave(saved);
+  redirect(`/admin/posts/${result.slug}`);
 }
 
 export async function updatePostAction(

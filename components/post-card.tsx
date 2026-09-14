@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CoverImage } from "@/components/cover-image";
 import { formatPostDate, tagHref, type PostMeta } from "@/lib/posts";
 
 export function PostCard({ post }: { post: PostMeta }) {
@@ -6,12 +7,7 @@ export function PostCard({ post }: { post: PostMeta }) {
     <article className="border-l border-rule pl-6">
       {post.cover ? (
         <Link href={`/posts/${post.slug}`} className="mb-3 block">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.cover}
-            alt=""
-            className="max-h-40 w-full object-cover"
-          />
+          <CoverImage src={post.cover} className="max-h-40 w-full object-cover" />
         </Link>
       ) : null}
       <p className="text-sm text-muted">{formatPostDate(post.date)}</p>

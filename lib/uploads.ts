@@ -57,13 +57,67 @@ function safeBaseName(original: string): string {
   return cleaned || "image";
 }
 
-function resolveUploadPath(yyyy: string, mm: string, filename: string): string | null {
-  const filePath = path.resolve(UPLOADS_ROOT, yyyy, mm, filename);
+const SERVE_TYPES: Record<string, string> = {
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+};
+
+/**
+ * 把 `public/uploads` 下的相对路径解析成绝对路径。
+ * 含 `..`、空段或越出目录时返回 null，禁止读目录外的文件。
+ */
+function resolveUploadRelative(relativePath: string): string | null {
+  const normalized = relativePath.replaceAll("\\", "/").replace(/^\/+/, "");
+  if (!normalized || normalized.includes("\0")) {
+    return null;
+  }
+  const segments = normalized.split("/");
+  if (segments.some((segment) => segment === "" || segment === "." || segment === "..")) {
+    return null;
+  }
+
+  const filePath = path.resolve(UPLOADS_ROOT, ...segments);
   const relative = path.relative(UPLOADS_ROOT, filePath);
   if (relative.startsWith("..") || path.isAbsolute(relative)) {
     return null;
   }
   return filePath;
+}
+
+function resolveUploadPath(yyyy: string, mm: string, filename: string): string | null {
+  return resolveUploadRelative(`${yyyy}/${mm}/${filename}`);
+}
+
+export type ServedUpload =
+  | { ok: true; bytes: Buffer; contentType: string }
+  | { ok: false };
+
+/**
+ * 按 `/uploads/` 后的相对路径读取已保存的图片。
+ * 只提供白名单扩展名；文件不存在或路径非法时失败，供公开路由使用。
+ */
+export async function readUploadedImage(relativePath: string): Promise<ServedUpload> {
+  const filePath = resolveUploadRelative(relativePath);
+  if (!filePath) {
+    return { ok: false };
+  }
+
+  const ext = path.extname(filePath).toLowerCase();
+  const contentType = SERVE_TYPES[ext];
+  if (!contentType) {
+    return { ok: false };
+  }
+
+  try {
+    const bytes = await fs.readFile(filePath);
+    return { ok: true, bytes, contentType };
+  } catch {
+    return { ok: false };
+  }
 }
 
 export async function saveUploadedImage(file: File): Promise<UploadResult> {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { after } from "next/server";
 import { notFound } from "next/navigation";
+import { CoverImage } from "@/components/cover-image";
 import { TableOfContents } from "@/components/table-of-contents";
 import { hasAdminSession } from "@/lib/auth";
 import { extractToc, renderMarkdown } from "@/lib/markdown";
@@ -91,10 +92,8 @@ export default async function PostPage({ params }: PostPageProps) {
             </ul>
           ) : null}
           {post.cover ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <CoverImage
               src={post.cover}
-              alt=""
               className="mt-8 max-h-72 w-full object-cover"
             />
           ) : null}

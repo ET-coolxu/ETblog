@@ -12,6 +12,7 @@ import {
   previewMarkdownAction,
   type SaveState,
 } from "@/app/admin/(dashboard)/posts/actions";
+import { asCover } from "@/lib/cover";
 
 export type PostEditorValues = {
   slug: string;
@@ -32,6 +33,39 @@ type PostEditorProps = {
 
 const fieldClass =
   "mt-1 w-full border-b border-rule bg-transparent py-2 text-ink outline-none placeholder:text-muted";
+
+/** 合法封面立刻预览；外链加载失败换成中文说明，避免裂图 */
+function CoverPreview({ value }: { value: string }) {
+  const cover = asCover(value);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [cover]);
+
+  if (!cover) {
+    return null;
+  }
+
+  if (failed) {
+    return (
+      <p className="mt-3 text-sm text-muted" role="status">
+        封面图无法加载若是外链，对方站点可能禁止引用
+      </p>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={cover}
+      alt="封面预览"
+      referrerPolicy="no-referrer"
+      onError={() => setFailed(true)}
+      className="mt-3 max-h-40 w-full object-cover"
+    />
+  );
+}
 
 export function PostEditor({ mode, action, initial }: PostEditorProps) {
   const [state, formAction, pending] = useActionState(action, {} satisfies SaveState);
@@ -63,7 +97,23 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
     };
   }, [values.body]);
 
-  async function uploadFiles(files: FileList | File[]) {
+  async function uploadOne(file: File): Promise<string | null> {
+    const payload = new FormData();
+    payload.set("file", file);
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: payload,
+      credentials: "same-origin",
+    });
+    const data = (await response.json()) as { url?: string; error?: string };
+    if (!response.ok || !data.url) {
+      setUploadError(data.error ?? "上传失败");
+      return null;
+    }
+    return data.url;
+  }
+
+  async function uploadBodyFiles(files: FileList | File[]) {
     const list = [...files];
     if (list.length === 0) {
       return;
@@ -73,28 +123,36 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
     setUploading(true);
     try {
       for (const file of list) {
-        const body = new FormData();
-        body.set("file", file);
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body,
-          credentials: "same-origin",
-        });
-        const data = (await response.json()) as { url?: string; error?: string };
-        if (!response.ok || !data.url) {
-          setUploadError(data.error ?? "上传失败。");
+        const url = await uploadOne(file);
+        if (!url) {
           return;
         }
-        insertImage(data.url, file.name.replace(/\.[^.]+$/, "") || "图片");
+        insertImage(url);
       }
     } catch {
-      setUploadError("上传失败。");
+      setUploadError("上传失败");
     } finally {
       setUploading(false);
     }
   }
 
-  function insertImage(url: string, alt: string) {
+  async function uploadCoverFile(file: File) {
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const url = await uploadOne(file);
+      if (url) {
+        setValues((current) => ({ ...current, cover: url }));
+      }
+    } catch {
+      setUploadError("上传失败");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function insertImage(url: string) {
+    const alt = "图片";
     const snippet = `![${alt}](${url})`;
     const textarea = bodyRef.current;
     if (!textarea) {
@@ -109,11 +167,13 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
     const end = textarea.selectionEnd;
     const current = textarea.value;
     const next = `${current.slice(0, start)}${snippet}${current.slice(end)}`;
-    const caret = start + snippet.length;
+    // 选中占位 alt，方便立刻改成具体说明
+    const altStart = start + 2;
+    const altEnd = altStart + alt.length;
     setValues((current) => ({ ...current, body: next }));
     requestAnimationFrame(() => {
       textarea.focus();
-      textarea.setSelectionRange(caret, caret);
+      textarea.setSelectionRange(altStart, altEnd);
     });
   }
 
@@ -121,7 +181,7 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
     event.preventDefault();
     setDragging(false);
     if (event.dataTransfer.files.length > 0) {
-      void uploadFiles(event.dataTransfer.files);
+      void uploadBodyFiles(event.dataTransfer.files);
     }
   }
 
@@ -135,7 +195,7 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
       return;
     }
     event.preventDefault();
-    void uploadFiles(images);
+    void uploadBodyFiles(images);
   }
 
   return (
@@ -157,7 +217,7 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
             className={`${fieldClass} ${mode === "edit" ? "text-muted" : ""}`}
           />
           <p className="mt-2 text-xs text-muted">
-            {mode === "create" ? "创建后不可更改。" : "创建时已确定，不可更改。"}
+            {mode === "create" ? "仅小写字母、数字和连字符" : "创建时已确定，不可更改"}
           </p>
         </div>
         <div>
@@ -216,21 +276,43 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
           onChange={(event) => setValues((current) => ({ ...current, summary: event.target.value }))}
           className="mt-1 w-full border-b border-rule bg-transparent py-2 text-ink outline-none placeholder:text-muted"
         />
-        <p className="mt-2 text-xs text-muted">留空则发布时用正文前约 120 字。</p>
+        <p className="mt-2 text-xs text-muted">留空则发布时用正文前约 120 字</p>
       </div>
 
       <div>
-        <label htmlFor="cover" className="block text-sm text-muted">
-          封面路径
-        </label>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <label htmlFor="cover" className="text-sm text-muted">
+            封面
+          </label>
+          <label className="cursor-pointer text-sm text-pine hover:text-ink">
+            {uploading ? "上传中…" : "选择图片"}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="sr-only"
+              disabled={uploading}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) {
+                  void uploadCoverFile(file);
+                }
+                event.target.value = "";
+              }}
+            />
+          </label>
+        </div>
         <input
           id="cover"
           name="cover"
           value={values.cover}
           onChange={(event) => setValues((current) => ({ ...current, cover: event.target.value }))}
-          placeholder="/uploads/2026/09/cover.webp"
+          placeholder="/uploads/2026/09/cover.webp 或 https://"
           className={fieldClass}
         />
+        <CoverPreview value={values.cover} />
+        <p className="mt-2 text-xs text-muted">
+          可上传或填写站内路径、https 外链
+        </p>
       </div>
 
       <label className="flex items-center gap-2 text-sm text-ink">
@@ -272,14 +354,16 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
               disabled={uploading}
               onChange={(event) => {
                 if (event.target.files) {
-                  void uploadFiles(event.target.files);
+                  void uploadBodyFiles(event.target.files);
                 }
                 event.target.value = "";
               }}
             />
           </label>
         </div>
-        <p className="mt-2 text-xs text-muted">可拖拽或粘贴图片，插入 `![说明](/uploads/...)`。</p>
+        <p className="mt-2 text-xs text-muted">
+          可拖拽或粘贴图片插入后说明默认为「图片」，可改成具体描述
+        </p>
         <div className="mt-4 grid gap-6 lg:grid-cols-2">
           <textarea
             ref={bodyRef}
@@ -294,7 +378,7 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
             {previewHtml ? (
               <div className="markdown" dangerouslySetInnerHTML={{ __html: previewHtml }} />
             ) : (
-              <p className="text-sm text-muted">预览将显示在这里。</p>
+              <p className="text-sm text-muted">预览显示</p>
             )}
           </div>
         </div>

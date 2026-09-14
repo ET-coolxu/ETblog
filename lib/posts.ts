@@ -2,6 +2,9 @@ import { cache } from "react";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { asCover } from "@/lib/cover";
+
+export { asCover };
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -39,7 +42,7 @@ export type SavePostInput = {
   body: string;
 };
 
-export type SavePostResult = { ok: true } | { ok: false; error: string };
+export type SavePostResult = { ok: true; slug: string } | { ok: false; error: string };
 
 export type TagCount = {
   tag: string;
@@ -93,19 +96,6 @@ function asDate(value: unknown): string | undefined {
   }
 
   return undefined;
-}
-
-function asCover(value: unknown): string | undefined {
-  if (typeof value !== "string") {
-    return undefined;
-  }
-
-  const cover = value.trim();
-  if (!cover.startsWith("/") || cover.startsWith("//") || cover.includes("://")) {
-    return undefined;
-  }
-
-  return cover;
 }
 
 export function plainTextFromMarkdown(markdown: string): string {
@@ -297,14 +287,91 @@ export const getAdminPost = cache(async (slug: string): Promise<AdminPost | null
   return readPostFile(slug);
 });
 
+const SLUG_NUMERIC_SUFFIX = /-(\d+)$/;
+
+/**
+ * 扫描 `content/posts/*.md` 文件名，取尾部 `-{数字}` 的最大值加一。
+ * 没有带数字后缀的旧文不占用序号；没有则从 1 起。不另建 ID 表。
+ */
+export async function nextPostNumericId(): Promise<number> {
+  let names: string[];
+  try {
+    names = await fs.readdir(POSTS_DIR);
+  } catch {
+    return 1;
+  }
+
+  let max = 0;
+  for (const name of names) {
+    if (!name.endsWith(".md")) {
+      continue;
+    }
+
+    const match = name.slice(0, -3).match(SLUG_NUMERIC_SUFFIX);
+    if (!match) {
+      continue;
+    }
+
+    const n = Number(match[1]);
+    if (Number.isSafeInteger(n) && n > max) {
+      max = n;
+    }
+  }
+
+  return max + 1;
+}
+
+/**
+ * 把作者手填的 slug 接上全站下一序号，得到 `{hand}-{n}`。
+ * 仅用于新建首次保存；不按前缀试探空闲名，也不改已有文件名。
+ */
+export async function allocateCreateSlug(
+  hand: string,
+): Promise<{ ok: true; slug: string } | { ok: false; error: string }> {
+  const trimmed = hand.trim().toLowerCase();
+  if (!isValidSlug(trimmed)) {
+    return { ok: false, error: "slug 只能包含小写字母、数字和连字符。" };
+  }
+  if (trimmed === "new") {
+    return { ok: false, error: "slug 不能使用 new。" };
+  }
+
+  let n = await nextPostNumericId();
+  // 若 {hand}-{n} 恰好已存在，继续加一，仍走全站序号而不是按前缀试探
+  for (let attempt = 0; attempt < 1000; attempt += 1) {
+    const slug = `${trimmed}-${n}`;
+    const filePath = resolvePostFile(slug);
+    if (!filePath) {
+      return { ok: false, error: "slug 不合法。" };
+    }
+    if (!(await fileExists(filePath))) {
+      return { ok: true, slug };
+    }
+    n += 1;
+  }
+
+  return { ok: false, error: "无法分配可用的 slug 序号。" };
+}
+
+/**
+ * 把文章写入 `content/posts/{slug}.md`。
+ * 新建时把手填 slug 追加全站序号；更新不改文件名、不重新编号。
+ */
 export async function savePost(
   input: SavePostInput,
   mode: "create" | "update",
 ): Promise<SavePostResult> {
-  if (!isValidSlug(input.slug)) {
+  let slug = input.slug.trim().toLowerCase();
+
+  if (mode === "create") {
+    const allocated = await allocateCreateSlug(slug);
+    if (!allocated.ok) {
+      return allocated;
+    }
+    slug = allocated.slug;
+  } else if (!isValidSlug(slug)) {
     return { ok: false, error: "slug 只能包含小写字母、数字和连字符。" };
-  }
-  if (input.slug === "new") {
+  } else if (slug === "new") {
     return { ok: false, error: "slug 不能使用 new。" };
   }
 
@@ -318,7 +385,7 @@ export async function savePost(
     return { ok: false, error: "日期格式应为 YYYY-MM-DD。" };
   }
 
-  const filePath = resolvePostFile(input.slug);
+  const filePath = resolvePostFile(slug);
   if (!filePath) {
     return { ok: false, error: "slug 不合法。" };
   }
@@ -340,7 +407,11 @@ export async function savePost(
   if (summary) {
     data.summary = summary;
   }
-  const cover = asCover(input.cover.trim());
+  const rawCover = input.cover.trim();
+  const cover = asCover(rawCover);
+  if (rawCover && !cover) {
+    return { ok: false, error: "封面须为站内路径或 https 地址。" };
+  }
   if (cover) {
     data.cover = cover;
   }
@@ -356,7 +427,7 @@ export async function savePost(
 
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, markdown, "utf8");
-  return { ok: true };
+  return { ok: true, slug };
 }
 
 export const getAboutSource = cache(async (): Promise<string | null> => {
