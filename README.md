@@ -6,7 +6,7 @@
 
 当前已完成公开阅读、搜索、暗色模式、RSS/sitemap、访问统计，以及后台登录、发文和图片上传。
 
-**生产上线（coolxu.com）**：自动化运维助手请完整执行 [docs/vps-go-live.md](docs/vps-go-live.md)，不要只读本节摘要。日常更新：把改动推进 **`main`**（或在 Actions 里 Run workflow），由 GitHub 构建镜像；不要默认在 VPS 上 `docker compose up --build`。
+**生产上线（coolxu.com）**：自动化运维助手请完整执行 [docs/vps-go-live.md](docs/vps-go-live.md)，不要只读本节摘要。日常更新：功能 PR 合入 **`test`** → CI 构建通过 → 再合入 **`main`**（或在 Actions 里对 `main` Run workflow），由 GitHub 构建镜像；不要默认在 VPS 上 `docker compose up --build`。GHCR 上线复盘见 [docs/2026-09-15-ghcr-go-live-retrospective.md](docs/2026-09-15-ghcr-go-live-retrospective.md)。
 
 ## 本地开发
 
@@ -74,7 +74,7 @@ docker compose down
 
 ### 日常更新（GHCR）
 
-触发：push 到 **`main`**，或仓库 Actions → **Deploy to GHCR and VPS** → Run workflow。未推进 `main` 的本地改动不会上线。线上曾跟 `test` 分支，自动化只跟 `main`。
+触发：功能 PR 合入 **`test`**（Actions 只做 Docker / `next build`，不 SSH）→ 验证后再把 `test` 合入 **`main`**（推荐走 PR），或仓库 Actions → **Deploy to GHCR and VPS** → 对 **`main`** Run workflow。未合入 `main` 的改动不会上线。VPS 上 git HEAD 可能仍像旧 `test`，应用以 GHCR 镜像为准。
 
 GitHub 仓库 **Settings → Secrets and variables → Actions** 需要：
 
@@ -104,7 +104,7 @@ app/(site)/                 公开站点（阅读、搜索）
 app/admin/                  后台（登录、写文章、统计）
 app/api/upload/             后台图片上传
 app/feed.xml/               RSS
-.github/workflows/          GHCR 构建与 VPS 部署
+.github/workflows/          test 上 Docker 构建校验；main 推 GHCR 并部署 VPS
 scripts/                    VPS 拉镜像脚本
 content/posts/              文章 Markdown
 content/pages/              关于页等
