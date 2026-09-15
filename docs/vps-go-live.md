@@ -6,6 +6,8 @@
 
 人类把本文件发给你时，默认你能：SSH 进 VPS、改云厂商安全组、改域名 DNS。若某一能力没有，停在该步并说明缺什么。
 
+**日常更新不要走本文件的 `git pull` + `--build`。** 代码推进 GitHub `main`（或 Actions 里手动 Run）后，由 GitHub 构建镜像，VPS 只拉 GHCR。首次装机仍按下列步骤 0–9。线上仓库曾跟 `test` 分支，自动化只触发 `main`。
+
 ---
 
 ## 常量（不要改）
@@ -34,6 +36,7 @@ CONTAINER_UID=1001
 - 不要修改 `content/posts/`、`content/pages/` 里任何文件（含示例文章、草稿、`test.md`、关于页）。
 - 不要 `docker compose down -v`（会删 Caddy 证书卷）。
 - 不要把宿主机 **3000** 端口映射到公网；compose 里已是 `expose`，不要改成 `ports: "3000:3000"`。
+- 不要 `git reset --hard`，不要对 `/opt/etblog` 整库 `git pull` 来覆盖后台写过的 `content/`。
 - 不要 `git add .env` 或提交 `.env`。
 - 不要把生产密码写回仓库的 `.env.example`。
 - 不要在 DNS 未指向本机时执行「启动 Compose」。
@@ -301,35 +304,63 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 | 证书失败 | `dig A coolxu.com` 是否等于本机 IP；安全组 80/443；是否开了 CDN 代理；`CADDY_EMAIL` 是否为邮箱 |
 | 构建被杀 / OOM | `free -h`，加 swap 后重新 `docker compose up --build -d` |
 | 后台保存/上传 Permission denied | `content`、`public/uploads`、`data` 是否 uid 1001 |
-| 打开站点仍是旧站名 | `.env` 的 `SITE_NAME` 是否带引号；**只 recreate 不够**，必须 `sudo docker compose up --build -d`（首页在镜像构建时打进 HTML） |
-| robots/sitemap 仍是 localhost | `.env` 的 `SITE_URL` 是否为 `https://coolxu.com`，然后重新 `--build` |
+| 打开站点仍是旧站名 | 日常看 Actions 是否把 `SITE_NAME` 等 ARG 打进镜像；**只 recreate 不够**。应急才在 VPS `up --build` |
+| robots/sitemap 仍是 localhost | 同上：构建期 `SITE_URL` 必须是 `https://coolxu.com` |
+| Actions 绿勾但线上没动 | 部署 job 是否因缺 Secrets 失败；VPS 能否 `docker login ghcr.io` |
+| GHCR pull 拒绝 | `GHCR_PULL_TOKEN` 是否有 `read:packages`；镜像名是否小写 `ghcr.io/et-coolxu/etblog` |
 | 登录 cookie 异常 | `SITE_URL` 必须以 `https://` 开头 |
 | git clone 失败 | 仓库是否私有；改 SSH deploy key |
 
 ---
 
-## 日常（可选，非首次上线）
+## 日常更新（GHCR，优先）
 
-更新代码（仍不要改 `content/` 里未打算发布的稿，不要手改 Dockerfile / compose）：
+人类把改动推进 GitHub **`main`**，或在仓库 Actions 里手动 **Run workflow**（工作流名：Deploy to GHCR and VPS）。未 push 的本地改动不会上线。
+
+助手**不要**默认在 VPS 执行 `git pull` 再 `--build`。那会在小内存机器上 `next build`，容易 OOM，也会用 Git 碰到 `content/`。
+
+VPS 侧由 Actions SSH 调用 `scripts/vps-deploy-from-ghcr.sh`：登录 GHCR → 只 checkout 该 SHA 的 `docker-compose.yml` / `Caddyfile` / 该脚本 → `docker compose pull app` → `up -d --no-build`。应用代码来自镜像；运行时仍读本机 `.env`。
+
+### 首次启用 GHCR（一次性，人类在 GitHub 填 Secrets）
+
+仓库 Settings → Secrets and variables → Actions：
+
+| 类型 | 名 | 值 |
+|---|---|---|
+| Secret | `VPS_HOST` | `117.55.235.105` 或 `coolxu.com` |
+| Secret | `VPS_USER` | 现为 `root` |
+| Secret | `VPS_SSH_KEY` | Actions **专用**私钥 |
+| Secret | `GHCR_PULL_TOKEN` | 能 `read:packages` 的 PAT |
+| Variable（可选） | `SITE_NAME`、`AUTHOR_NAME`、`SITE_URL` | 缺省 `CoolXu's Blog` / `coolxu` / `https://coolxu.com` |
+
+VPS：把对应公钥写入 `~/.ssh/authorized_keys`（不要把登录密码写进仓库）。确认 `main` 已含要上线的提交（含以前跟 `test` 的修复须先合并）。`/opt/etblog` 仍需能 `git fetch`（只取 compose/Caddy，不是为了同步文章）。
+
+回滚：在 VPS 上对旧 SHA 跑同一脚本（`IMAGE_TAG=<旧 sha> GHCR_PULL_TOKEN=... bash scripts/vps-deploy-from-ghcr.sh`），或在 Actions 对旧 commit 手动 Run（若该 SHA 的镜像还在 GHCR）。
+
+### 应急（Actions 不可用时才在 VPS 构建）
+
+仍不要改 `content/` 里未打算发布的稿，不要 `down -v`，不要映射 3000，不要 `git reset --hard`：
 
 ```bash
 cd /opt/etblog
-git pull --ff-only
+git fetch origin
+# 若只要 compose 定义：git checkout origin/main -- docker-compose.yml Caddyfile
 sudo docker compose up --build -d
 ```
 
-首页站名、关于页标题、`robots.txt` 的 sitemap 地址在 **镜像构建** 时写入。改 `SITE_NAME` / `SITE_URL` 或拉到含构建参数的新代码后，必须 `--build`，不能只 `up -d --force-recreate`。
+OOM 时先加 swap（见步骤 1）。首页站名在 **镜像构建** 时写入；只 `up -d --force-recreate` 不够。
 
 ---
 
 ## 步骤 10 — 已上线站点：重建以写入站名
 
-首次部署若首页仍是「个人博客」、页脚是「作者」、`/robots.txt` 里 sitemap 是 `http://localhost:3000/...`，说明构建时没打进站点变量。不要改文章。按下面做：
+若 GHCR 工作流已启用：把含 Dockerfile ARG 的提交推进 `main`（或手动 Run），确认 Actions 构建参数是 `CoolXu's Blog` / `coolxu` / `https://coolxu.com`。不要在 VPS `reset --hard`。
+
+首次部署若首页仍是「个人博客」、页脚是「作者」、`/robots.txt` 里 sitemap 是 `http://localhost:3000/...`，且 Actions 还不可用，再按下面在 VPS 应急重建。不要改文章。
 
 ```bash
 cd /opt/etblog
-git fetch origin
-git pull --ff-only
+# 应急重建不要整库 pull，以免覆盖 content/
 grep -E '^SITE_NAME=|^AUTHOR_NAME=|^SITE_URL=' .env
 ```
 

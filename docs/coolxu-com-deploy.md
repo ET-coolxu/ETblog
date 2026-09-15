@@ -17,7 +17,8 @@
 | 域名注册商 / DNS | 西部数码（West.cn / myhostadmin） |
 | 系统 | AlmaLinux 8.9 x86_64 |
 | 应用目录 | `/opt/etblog` |
-| Git | `https://github.com/ET-coolxu/ETblog.git`，分支 **`test`**，当时 HEAD **`8a5ed36`** |
+| Git | `https://github.com/ET-coolxu/ETblog.git`，**上线时**分支 **`test`**、HEAD **`8a5ed36`**。**现在日常跟 `main`**（Actions → GHCR），不必再 `checkout test` |
+| 应用镜像 | `ghcr.io/et-coolxu/etblog`（小写）；VPS 日常 `pull`，不在机器上 `next build` |
 | 反向代理 / TLS | Caddy 2（容器），Let's Encrypt |
 | 应用 | Next.js 容器 `etblog-app`（对内 3000，**不对公网映射 3000**） |
 
@@ -191,15 +192,42 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 
 ## 5. 日常运维
 
-### 更新代码
+### 更新代码（优先：GitHub Actions + GHCR）
+
+把改动合并进 **`main` 并 push**，或打开仓库 Actions → **Deploy to GHCR and VPS** → Run workflow。不要依赖 VPS 上的 `git pull` + `--build`（CloudCone 内存紧，容易 OOM）。未 push 的本地改动不会上线。
+
+上线时 Git 跟的是 **`test`**。自动化只触发 `main`：启用前把要上线的提交（含后来的上传/封面修复）合并进 `main`。VPS 工作区 **不要** `git reset --hard`，以免覆盖后台写过的 `content/`。宿主机 HEAD 停在旧分支没关系，应用以镜像为准。
+
+Actions SSH 会跑 `scripts/vps-deploy-from-ghcr.sh`：`docker login ghcr.io` → 只 checkout 该 SHA 的 `docker-compose.yml` / `Caddyfile` / 脚本 → `IMAGE_TAG=<sha> docker compose pull app` → `up -d --no-build`。
+
+### 首次启用（一次性）
+
+1. 确认 `main` 已含当前要上线的代码。  
+2. GitHub **Settings → Secrets and variables → Actions**：
+
+| 类型 | 名 | 说明 |
+|---|---|---|
+| Secret | `VPS_HOST` | `117.55.235.105` 或 `coolxu.com` |
+| Secret | `VPS_USER` | 现为 `root` |
+| Secret | `VPS_SSH_KEY` | Actions 专用私钥 |
+| Secret | `GHCR_PULL_TOKEN` | `read:packages` 的 PAT（私有仓镜像默认私有） |
+| Variable（可选） | `SITE_NAME` / `AUTHOR_NAME` / `SITE_URL` | 缺省 `CoolXu's Blog` / `coolxu` / `https://coolxu.com` |
+
+3. VPS 把对应公钥写入 root 的 `authorized_keys`。不要把现有登录密码写进仓库。  
+4. 第一次看 Actions：build 是否 push 成功、deploy 是否 SSH 拉起新容器；再到写文章页传一张图。Secrets 不齐时部署 job 会失败并列出缺项（镜像可能已在 GHCR，线上未动）。
+
+回滚：对旧 SHA 设置 `IMAGE_TAG` 再跑脚本（镜像还在 GHCR 的前提下）。
+
+### 应急（仅 Actions 不可用）
 
 ```bash
 cd /opt/etblog
-git pull --ff-only
+git fetch origin
+# 不要 git reset --hard，不要整库 pull 覆盖 content/
 docker compose up --build -d
 ```
 
-仍不要随意改 `content/` 里未打算发布的稿；不要 `docker compose down -v`（会删 Caddy 证书卷）。
+OOM 时加/用 swap。仍不要 `docker compose down -v`（会删 Caddy 证书卷），不要映射 3000。
 
 ### 停止（保留数据）
 
@@ -242,11 +270,11 @@ docker compose logs --tail=100 caddy
 | Ubuntu/Debian + `apt` | AlmaLinux 8.9 + `dnf` |
 | `get.docker.com` 一键装 | AlmaLinux 被脚本拒绝 → Docker CE CentOS 源 |
 | `ufw` | 未使用；面板亦无安全组 UI |
-| Git 优先 `main`/`dev` | 使用 **`test`** |
+| Git 优先 `main`/`dev` | 上线时用 **`test`**；**现在自动部署跟 `main`** |
 | DNS 任意可改面板 | 必须在 **西部数码** 改；CloudCone DNS 区无效 |
 | 海外助手直接改西数 DNS | 可能触发人脸增强实名 → 需本人改 |
 
-禁止项仍适用：不改 `content/posts|pages` 正文、不改 `Caddyfile`/`docker-compose.yml`/`Dockerfile`（除非你另行授权）、不把 3000 暴露公网、不把生产密码写回仓库。
+禁止项仍适用：不改 `content/posts|pages` 正文、不把 3000 暴露公网、不把生产密码写回仓库、不要 `down -v` / `git reset --hard`。`docker-compose.yml` 与 `Caddyfile` 由部署脚本按 SHA checkout，不要手改服务器上的副本。
 
 ---
 
@@ -255,10 +283,11 @@ docker compose logs --tail=100 caddy
 | 现象 | 先查 |
 |---|---|
 | 证书失败 | `dig A coolxu.com` 是否等于本机 IP；80/443 是否通；是否开了 CDN 代理；`CADDY_EMAIL` 是否为邮箱 |
-| 构建 OOM | `free -h`，加/用 swap 后重新 `docker compose up --build -d` |
+| 构建 OOM | 日常应走 Actions，不要在 VPS `--build`；应急才 `free -h` 后加 swap 再 `docker compose up --build -d` |
 | 后台保存/上传 Permission denied | `content`、`public/uploads`、`data` 是否 uid 1001 |
-| 站名/URL 仍像本地 | `.env` 的 `SITE_URL`/`SITE_NAME`；是否需重建镜像使 build-arg/env 生效 |
-| SSH 不上 | CloudCone 实例状态、root 密码/密钥、22 端口 |
+| 站名/URL 仍像本地 | Actions 构建 ARG（`SITE_NAME`/`SITE_URL`）；不是只 recreate。应急才本机 `--build` |
+| Actions 成功构建但站点没变 | 部署 job 是否缺 `VPS_*` / `GHCR_PULL_TOKEN`；VPS 能否拉 `ghcr.io/et-coolxu/etblog` |
+| SSH 不上 | CloudCone 实例状态、root 密码/密钥、22 端口；Actions 用的是否为专用 deploy key |
 
 ---
 

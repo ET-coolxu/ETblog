@@ -40,3 +40,4 @@
 6. [Docker 构建打入站点环境变量](./archive/2026-09-11-docker-site-env-build.md)（已完成）
 7. [编辑器 slug 序号、封面与插图 alt](./archive/2026-09-14-editor-slug-cover.md)（已完成）
 8. [https 封面显示与编辑器预览](./archive/2026-09-14-https-cover-display.md)（已完成）
+9. [GHCR 自动部署](./archive/2026-09-14-ghcr-auto-deploy.md)（已完成；合入 `main` 并填写 Secrets 后才会真正上线）
