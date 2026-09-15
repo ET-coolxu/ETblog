@@ -17,7 +17,8 @@ export async function GET(
     return new NextResponse(null, { status: 404 });
   }
 
-  return new NextResponse(result.bytes, {
+  // Node Buffer（@types/node 22 为 Buffer<ArrayBufferLike>）不能赋给 DOM BodyInit。
+  return new NextResponse(Uint8Array.from(result.bytes), {
     headers: {
       "Content-Type": result.contentType,
       "Cache-Control": "public, max-age=31536000, immutable",
