@@ -23,7 +23,7 @@ alwaysApply: true
 - Tailwind + 自定义设计 token；界面文案全程中文。
 - 渲染：`gray-matter` + `next-mdx-remote/rsc` + `remark-gfm` + Shiki。
 - 搜索用服务端 Flexsearch（须能搜中文）；统计用应用内 SQLite；鉴权为单管理员（环境变量 + httpOnly session）。
-- 部署：Docker Compose + Caddy HTTPS；`content/`、`public/uploads/`、SQLite 目录用数据卷。
+- 部署：Docker Compose + Caddy HTTPS；生产 app 镜像来自 `ghcr.io/et-coolxu/etblog`（GitHub Actions 构建）；`content/`、`public/uploads/`、SQLite 目录用数据卷。VPS 日常只 pull，不在服务器上 `next build`。
 
 ## 实现时不要漏
 
