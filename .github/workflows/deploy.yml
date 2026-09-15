@@ -34,20 +34,21 @@ jobs:
           AUTHOR_NAME_VAR: ${{ vars.AUTHOR_NAME }}
           SITE_URL_VAR: ${{ vars.SITE_URL }}
         run: |
-          # Variables 为空则用生产常量。站名含撇号，用 heredoc 写入 output。
-          SITE_NAME="${SITE_NAME_VAR:-CoolXu's Blog}"
-          AUTHOR_NAME="${AUTHOR_NAME_VAR:-coolxu}"
-          SITE_URL="${SITE_URL_VAR:-https://coolxu.com}"
+          # Variables 经 env 注入。缺省必须单独双引号赋值：
+          # ${var:-CoolXu's Blog} 会让 bash 把撇号当成未闭合单引号（unexpected EOF）。
+          if [ -z "$SITE_NAME_VAR" ]; then SITE_NAME="CoolXu's Blog"; else SITE_NAME="$SITE_NAME_VAR"; fi
+          if [ -z "$AUTHOR_NAME_VAR" ]; then AUTHOR_NAME="coolxu"; else AUTHOR_NAME="$AUTHOR_NAME_VAR"; fi
+          if [ -z "$SITE_URL_VAR" ]; then SITE_URL="https://coolxu.com"; else SITE_URL="$SITE_URL_VAR"; fi
           {
-            echo "site_name<<EOF"
-            echo "$SITE_NAME"
-            echo "EOF"
-            echo "author_name<<EOF"
-            echo "$AUTHOR_NAME"
-            echo "EOF"
-            echo "site_url<<EOF"
-            echo "$SITE_URL"
-            echo "EOF"
+            echo "site_name<<SITE_EOF"
+            printf '%s\n' "$SITE_NAME"
+            echo "SITE_EOF"
+            echo "author_name<<SITE_EOF"
+            printf '%s\n' "$AUTHOR_NAME"
+            echo "SITE_EOF"
+            echo "site_url<<SITE_EOF"
+            printf '%s\n' "$SITE_URL"
+            echo "SITE_EOF"
           } >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
