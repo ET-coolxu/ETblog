@@ -17,7 +17,7 @@
 | 域名注册商 / DNS | 西部数码（West.cn / myhostadmin） |
 | 系统 | AlmaLinux 8.9 x86_64 |
 | 应用目录 | `/opt/etblog` |
-| Git | `https://github.com/ET-coolxu/ETblog.git`，**上线时**分支 **`test`**、HEAD **`8a5ed36`**。**现在日常跟 `main`**（Actions → GHCR），不必再 `checkout test` |
+| Git | `https://github.com/ET-coolxu/ETblog.git`。**上线时**分支 **`test`**、HEAD **`8a5ed36`**。现在：功能 PR 合入 `test` 做 CI 构建；生产 Actions → GHCR 只跟 **`main`**。VPS 工作区不必再 `checkout test`，HEAD 停在旧分支也没关系，应用以镜像为准 |
 | 应用镜像 | `ghcr.io/et-coolxu/etblog`（小写）；VPS 日常 `pull`，不在机器上 `next build` |
 | 反向代理 / TLS | Caddy 2（容器），Let's Encrypt |
 | 应用 | Next.js 容器 `etblog-app`（对内 3000，**不对公网映射 3000**） |
@@ -194,15 +194,15 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 
 ### 更新代码（优先：GitHub Actions + GHCR）
 
-把改动合并进 **`main` 并 push**，或打开仓库 Actions → **Deploy to GHCR and VPS** → Run workflow。不要依赖 VPS 上的 `git pull` + `--build`（CloudCone 内存紧，容易 OOM）。未 push 的本地改动不会上线。
+日常：功能 PR **合入 `test`** → 看 Actions Docker / `next build` 是否通过 → 再把 `test` 合入 **`main`**（推荐走 PR），或打开仓库 Actions → **Deploy to GHCR and VPS** → 对 **`main`** Run workflow。`test` 上的构建 **不** SSH、**不** 覆盖 GHCR `latest`。不要依赖 VPS 上的 `git pull` + `--build`（CloudCone 内存紧，容易 OOM）。未合入 `main` 的改动不会上线。
 
-上线时 Git 跟的是 **`test`**。自动化只触发 `main`：启用前把要上线的提交（含后来的上传/封面修复）合并进 `main`。VPS 工作区 **不要** `git reset --hard`，以免覆盖后台写过的 `content/`。宿主机 HEAD 停在旧分支没关系，应用以镜像为准。
+上线时 Git 跟的是 **`test`**。生产自动化只跟 `main`。VPS 工作区 **不要** `git reset --hard`，以免覆盖后台写过的 `content/`。宿主机 HEAD 停在旧 `test` 没关系，应用以镜像为准。复盘见 `docs/2026-09-15-ghcr-go-live-retrospective.md`。
 
 Actions SSH 会跑 `scripts/vps-deploy-from-ghcr.sh`：`docker login ghcr.io` → 只 checkout 该 SHA 的 `docker-compose.yml` / `Caddyfile` / 脚本 → `IMAGE_TAG=<sha> docker compose pull app` → `up -d --no-build`。
 
 ### 首次启用（一次性）
 
-1. 确认 `main` 已含当前要上线的代码。  
+1. 确认要上线的代码已在 `test` 验证、并已合入 `main`。  
 2. GitHub **Settings → Secrets and variables → Actions**：
 
 | 类型 | 名 | 说明 |
@@ -270,7 +270,7 @@ docker compose logs --tail=100 caddy
 | Ubuntu/Debian + `apt` | AlmaLinux 8.9 + `dnf` |
 | `get.docker.com` 一键装 | AlmaLinux 被脚本拒绝 → Docker CE CentOS 源 |
 | `ufw` | 未使用；面板亦无安全组 UI |
-| Git 优先 `main`/`dev` | 上线时用 **`test`**；**现在自动部署跟 `main`** |
+| Git 优先 `main`/`dev` | 上线时用 **`test`**；现在 CI 构建跟 `test`，**自动部署只跟 `main`** |
 | DNS 任意可改面板 | 必须在 **西部数码** 改；CloudCone DNS 区无效 |
 | 海外助手直接改西数 DNS | 可能触发人脸增强实名 → 需本人改 |
 
@@ -286,7 +286,7 @@ docker compose logs --tail=100 caddy
 | 构建 OOM | 日常应走 Actions，不要在 VPS `--build`；应急才 `free -h` 后加 swap 再 `docker compose up --build -d` |
 | 后台保存/上传 Permission denied | `content`、`public/uploads`、`data` 是否 uid 1001 |
 | 站名/URL 仍像本地 | Actions 构建 ARG（`SITE_NAME`/`SITE_URL`）；不是只 recreate。应急才本机 `--build` |
-| Actions 成功构建但站点没变 | 部署 job 是否缺 `VPS_*` / `GHCR_PULL_TOKEN`；VPS 能否拉 `ghcr.io/et-coolxu/etblog` |
+| Actions 成功构建但站点没变 | 是否还停在 `test`（不 SSH 是预期）；部署 job 是否缺 `VPS_*` / `GHCR_PULL_TOKEN`；VPS 能否拉 `ghcr.io/et-coolxu/etblog` |
 | SSH 不上 | CloudCone 实例状态、root 密码/密钥、22 端口；Actions 用的是否为专用 deploy key |
 
 ---

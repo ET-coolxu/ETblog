@@ -6,7 +6,7 @@
 
 人类把本文件发给你时，默认你能：SSH 进 VPS、改云厂商安全组、改域名 DNS。若某一能力没有，停在该步并说明缺什么。
 
-**日常更新不要走本文件的 `git pull` + `--build`。** 代码推进 GitHub `main`（或 Actions 里手动 Run）后，由 GitHub 构建镜像，VPS 只拉 GHCR。首次装机仍按下列步骤 0–9。线上仓库曾跟 `test` 分支，自动化只触发 `main`。
+**日常更新不要走本文件的 `git pull` + `--build`。** 流程：功能 PR **合入 `test`** → CI Docker / `next build` 通过（可选人工抽查）→ 再把 `test` 合入 **`main`**（推荐走 PR）→ Actions 构建镜像并 SSH 拉 GHCR。VPS 只 pull。首次装机仍按下列步骤 0–9。宿主机 Git HEAD 可能仍停在旧 `test`，应用以镜像为准，不要用 `git reset --hard` 去对齐。
 
 ---
 
@@ -306,7 +306,7 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 | 后台保存/上传 Permission denied | `content`、`public/uploads`、`data` 是否 uid 1001 |
 | 打开站点仍是旧站名 | 日常看 Actions 是否把 `SITE_NAME` 等 ARG 打进镜像；**只 recreate 不够**。应急才在 VPS `up --build` |
 | robots/sitemap 仍是 localhost | 同上：构建期 `SITE_URL` 必须是 `https://coolxu.com` |
-| Actions 绿勾但线上没动 | 部署 job 是否因缺 Secrets 失败；VPS 能否 `docker login ghcr.io` |
+| Actions 绿勾但线上没动 | 是否只合入了 `test`（构建绿、部署 job 跳过是预期）；部署 job 是否因缺 Secrets 失败；VPS 能否 `docker login ghcr.io` |
 | GHCR pull 拒绝 | `GHCR_PULL_TOKEN` 是否有 `read:packages`；镜像名是否小写 `ghcr.io/et-coolxu/etblog` |
 | 登录 cookie 异常 | `SITE_URL` 必须以 `https://` 开头 |
 | git clone 失败 | 仓库是否私有；改 SSH deploy key |
@@ -315,7 +315,7 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 
 ## 日常更新（GHCR，优先）
 
-人类把改动推进 GitHub **`main`**，或在仓库 Actions 里手动 **Run workflow**（工作流名：Deploy to GHCR and VPS）。未 push 的本地改动不会上线。
+人类把改动经 PR 合入 GitHub **`test`**，确认 Actions 里 Docker / `next build` 通过后，再把 `test` 合入 **`main`**（推荐走 PR）。也可在仓库 Actions 里对 **`main`** 手动 **Run workflow**（工作流名：Deploy to GHCR and VPS）。push 到 `test` 只会构建，**不会** SSH。未合入 `main` 的改动不会上线。
 
 助手**不要**默认在 VPS 执行 `git pull` 再 `--build`。那会在小内存机器上 `next build`，容易 OOM，也会用 Git 碰到 `content/`。
 
@@ -333,7 +333,7 @@ VPS 侧由 Actions SSH 调用 `scripts/vps-deploy-from-ghcr.sh`：登录 GHCR �
 | Secret | `GHCR_PULL_TOKEN` | 能 `read:packages` 的 PAT |
 | Variable（可选） | `SITE_NAME`、`AUTHOR_NAME`、`SITE_URL` | 缺省 `CoolXu's Blog` / `coolxu` / `https://coolxu.com` |
 
-VPS：把对应公钥写入 `~/.ssh/authorized_keys`（不要把登录密码写进仓库）。确认 `main` 已含要上线的提交（含以前跟 `test` 的修复须先合并）。`/opt/etblog` 仍需能 `git fetch`（只取 compose/Caddy，不是为了同步文章）。
+VPS：把对应公钥写入 `~/.ssh/authorized_keys`（不要把登录密码写进仓库）。确认要上线的提交已先在 `test` 验证、再合入 `main`。`/opt/etblog` 仍需能 `git fetch`（只取 compose/Caddy，不是为了同步文章）。宿主机 HEAD 看起来像旧 `test` 没关系，应用以 GHCR 镜像为准。
 
 回滚：在 VPS 上对旧 SHA 跑同一脚本（`IMAGE_TAG=<旧 sha> GHCR_PULL_TOKEN=... bash scripts/vps-deploy-from-ghcr.sh`），或在 Actions 对旧 commit 手动 Run（若该 SHA 的镜像还在 GHCR）。
 
@@ -354,7 +354,7 @@ OOM 时先加 swap（见步骤 1）。首页站名在 **镜像构建** 时写入
 
 ## 步骤 10 — 已上线站点：重建以写入站名
 
-若 GHCR 工作流已启用：把含 Dockerfile ARG 的提交推进 `main`（或手动 Run），确认 Actions 构建参数是 `CoolXu's Blog` / `coolxu` / `https://coolxu.com`。不要在 VPS `reset --hard`。
+若 GHCR 工作流已启用：把含 Dockerfile ARG 的提交经 `test` 验证后合入 `main`（或对 `main` 手动 Run），确认 Actions 构建参数是 `CoolXu's Blog` / `coolxu` / `https://coolxu.com`。不要在 VPS `reset --hard`。
 
 首次部署若首页仍是「个人博客」、页脚是「作者」、`/robots.txt` 里 sitemap 是 `http://localhost:3000/...`，且 Actions 还不可用，再按下面在 VPS 应急重建。不要改文章。
 
