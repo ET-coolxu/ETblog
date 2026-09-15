@@ -1,0 +1,124 @@
+# 推到 main 或手动 Run：在 GitHub 构建镜像推 GHCR，再 SSH 到 VPS 只拉镜像重启。
+name: Deploy to GHCR and VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-coolxu
+  # 排队而非取消，避免 SSH 半途停掉留下不一致容器。
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/et-coolxu/etblog
+
+jobs:
+  build:
+    name: Build and push GHCR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 解析站点构建参数
+        id: site
+        env:
+          SITE_NAME_VAR: ${{ vars.SITE_NAME }}
+          AUTHOR_NAME_VAR: ${{ vars.AUTHOR_NAME }}
+          SITE_URL_VAR: ${{ vars.SITE_URL }}
+        run: |
+          # Variables 为空则用生产常量。站名含撇号，用 heredoc 写入 output。
+          SITE_NAME="${SITE_NAME_VAR:-CoolXu's Blog}"
+          AUTHOR_NAME="${AUTHOR_NAME_VAR:-coolxu}"
+          SITE_URL="${SITE_URL_VAR:-https://coolxu.com}"
+          {
+            echo "site_name<<EOF"
+            echo "$SITE_NAME"
+            echo "EOF"
+            echo "author_name<<EOF"
+            echo "$AUTHOR_NAME"
+            echo "EOF"
+            echo "site_url<<EOF"
+            echo "$SITE_URL"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          provenance: false
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          build-args: |
+            SITE_NAME=${{ steps.site.outputs.site_name }}
+            AUTHOR_NAME=${{ steps.site.outputs.author_name }}
+            SITE_URL=${{ steps.site.outputs.site_url }}
+
+  deploy:
+    name: SSH pull on VPS
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查部署 Secrets
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+        run: |
+          missing=()
+          [ -n "$VPS_HOST" ] || missing+=(VPS_HOST)
+          [ -n "$VPS_USER" ] || missing+=(VPS_USER)
+          [ -n "$VPS_SSH_KEY" ] || missing+=(VPS_SSH_KEY)
+          [ -n "$GHCR_PULL_TOKEN" ] || missing+=(GHCR_PULL_TOKEN)
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "镜像已推到 GHCR，但线上不会更新：缺少 Secrets ${missing[*]}。"
+            echo "请到 Settings → Secrets and variables → Actions 填写后，再 Run workflow。"
+            exit 1
+          fi
+
+      - name: SSH 部署到 VPS
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+          GHCR_USERNAME: ${{ github.repository_owner }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          # 把 tag 与拉包 token 注入远端环境；不要在 script 里 echo token。
+          envs: IMAGE_TAG,GHCR_PULL_TOKEN,GHCR_USERNAME
+          command_timeout: 15m
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd /opt/etblog
+            git fetch origin
+            if ! git cat-file -e "${IMAGE_TAG}^{commit}" 2>/dev/null; then
+              git fetch origin "${IMAGE_TAG}"
+            fi
+            # VPS 上可能还没有本脚本；先按 SHA 取出再执行。
+            git checkout "${IMAGE_TAG}" -- scripts/vps-deploy-from-ghcr.sh
+            bash scripts/vps-deploy-from-ghcr.sh

@@ -1,5 +1,7 @@
 services:
   app:
+    # 生产由 Actions 推到 GHCR；本地仍可 --build。IMAGE_TAG 默认 latest。
+    image: ghcr.io/et-coolxu/etblog:${IMAGE_TAG:-latest}
     build:
       context: .
       args:

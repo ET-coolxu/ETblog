@@ -1,0 +1,2 @@
+# 强制 shell 脚本为 LF，避免 VPS 上 shebang 变成 /bin/bash^M
+scripts/*.sh text eol=lf
