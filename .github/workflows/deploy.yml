@@ -1,16 +1,24 @@
-# 推到 main 或手动 Run：在 GitHub 构建镜像推 GHCR，再 SSH 到 VPS 只拉镜像重启。
+# main：构建并推 GHCR，再 SSH 到 VPS 只拉镜像重启。
+# test（push）以及向 test/main 开的 PR：只做 Docker / next build，不推 latest、不 SSH。
+# workflow_dispatch 选 main：仍走完整部署。
 name: Deploy to GHCR and VPS
 
 on:
   push:
     branches:
       - main
+      - test
+  pull_request:
+    branches:
+      - test
+      - main
   workflow_dispatch:
 
 concurrency:
-  group: deploy-coolxu
-  # 排队而非取消，避免 SSH 半途停掉留下不一致容器。
-  cancel-in-progress: false
+  # main 部署单独排队且不取消，避免 SSH 半途停掉留下不一致容器。
+  # test / PR 用各自 ref，避免挡住生产；可取消旧构建。
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -18,14 +26,24 @@ permissions:
 
 env:
   IMAGE: ghcr.io/et-coolxu/etblog
+  # 仅 main 上的 push / 手动 Run 才推包并部署；test 与 PR 只验证构建。
+  PUSH_AND_DEPLOY: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
 
 jobs:
   build:
-    name: Build and push GHCR
+    name: Docker / next build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: 标明本 run 是否上线
+        run: |
+          if [ "${{ env.PUSH_AND_DEPLOY }}" = "true" ]; then
+            echo "本 run：构建并推 GHCR，随后 SSH 部署。"
+          else
+            echo "本 run：只验证 Docker / next build，不推 latest、不 SSH。"
+          fi
 
       - name: 解析站点构建参数
         id: site
@@ -34,23 +52,25 @@ jobs:
           AUTHOR_NAME_VAR: ${{ vars.AUTHOR_NAME }}
           SITE_URL_VAR: ${{ vars.SITE_URL }}
         run: |
-          # Variables 为空则用生产常量。站名含撇号，用 heredoc 写入 output。
-          SITE_NAME="${SITE_NAME_VAR:-CoolXu's Blog}"
-          AUTHOR_NAME="${AUTHOR_NAME_VAR:-coolxu}"
-          SITE_URL="${SITE_URL_VAR:-https://coolxu.com}"
+          # Variables 经 env 注入。缺省必须单独双引号赋值：
+          # ${var:-CoolXu's Blog} 会让 bash 把撇号当成未闭合单引号（unexpected EOF）。
+          if [ -z "$SITE_NAME_VAR" ]; then SITE_NAME="CoolXu's Blog"; else SITE_NAME="$SITE_NAME_VAR"; fi
+          if [ -z "$AUTHOR_NAME_VAR" ]; then AUTHOR_NAME="coolxu"; else AUTHOR_NAME="$AUTHOR_NAME_VAR"; fi
+          if [ -z "$SITE_URL_VAR" ]; then SITE_URL="https://coolxu.com"; else SITE_URL="$SITE_URL_VAR"; fi
           {
-            echo "site_name<<EOF"
-            echo "$SITE_NAME"
-            echo "EOF"
-            echo "author_name<<EOF"
-            echo "$AUTHOR_NAME"
-            echo "EOF"
-            echo "site_url<<EOF"
-            echo "$SITE_URL"
-            echo "EOF"
+            echo "site_name<<SITE_EOF"
+            printf '%s\n' "$SITE_NAME"
+            echo "SITE_EOF"
+            echo "author_name<<SITE_EOF"
+            printf '%s\n' "$AUTHOR_NAME"
+            echo "SITE_EOF"
+            echo "site_url<<SITE_EOF"
+            printf '%s\n' "$SITE_URL"
+            echo "SITE_EOF"
           } >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
+        if: env.PUSH_AND_DEPLOY == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -60,11 +80,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          # test / PR 只构建以拦住 TS 等错误，避免把未验证镜像打成 latest。
+          push: ${{ env.PUSH_AND_DEPLOY == 'true' }}
           platforms: linux/amd64
           provenance: false
           tags: |
@@ -77,6 +98,8 @@ jobs:
 
   deploy:
     name: SSH pull on VPS
+    # 生产部署只跟 main；test 构建失败时本 job 也不会跑。
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     steps:

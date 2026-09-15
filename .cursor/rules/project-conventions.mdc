@@ -23,7 +23,8 @@ alwaysApply: true
 - Tailwind + 自定义设计 token；界面文案全程中文。
 - 渲染：`gray-matter` + `next-mdx-remote/rsc` + `remark-gfm` + Shiki。
 - 搜索用服务端 Flexsearch（须能搜中文）；统计用应用内 SQLite；鉴权为单管理员（环境变量 + httpOnly session）。
-- 部署：Docker Compose + Caddy HTTPS；生产 app 镜像来自 `ghcr.io/et-coolxu/etblog`（GitHub Actions 构建）；`content/`、`public/uploads/`、SQLite 目录用数据卷。VPS 日常只 pull，不在服务器上 `next build`。
+- 部署：Docker Compose + Caddy HTTPS；生产 app 镜像来自 `ghcr.io/et-coolxu/etblog`（GitHub Actions 在 **`main`** 构建并推包）；`content/`、`public/uploads/`、SQLite 目录用数据卷。VPS 日常只 pull，不在服务器上 `next build`。
+- 分支：功能分支开 PR **合入 `test`**；合入后看 CI Docker / `next build` 是否通过（`test` **不** SSH 部署）。验证后再把 `test` 合入 `main`（推荐走 PR）。生产 GHCR + VPS 只跟 `main`。VPS 上 git HEAD 可能仍停在旧 `test`，应用以镜像为准。
 
 ## 实现时不要漏
 
