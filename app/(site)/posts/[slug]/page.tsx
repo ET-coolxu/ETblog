@@ -69,9 +69,14 @@ export default async function PostPage({ params }: PostPageProps) {
   const toc = extractToc(post.body);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-6 py-16">
-      <article>
-        <header className="mx-auto max-w-3xl">
+    <main className="w-full px-6 py-16">
+      {/*
+        宽屏三列：左右 1fr 配重，中间 48rem 阅读栏。
+        标题 / 正文 / 相邻文章都在中间列；目录进左列贴着正文。
+        中间列在 xl 上去掉 mx-auto 并 w-full，否则网格项按内容收缩，标题和正文会对不齐。
+      */}
+      <article className="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,48rem)_minmax(0,1fr)] xl:items-start xl:gap-x-8">
+        <header className="mx-auto max-w-3xl xl:col-start-2 xl:mx-0 xl:w-full">
           <p className="text-sm text-muted">
             {formatPostDate(post.date)}
             <span aria-hidden="true"> · </span>
@@ -99,40 +104,41 @@ export default async function PostPage({ params }: PostPageProps) {
           ) : null}
         </header>
 
+        <TableOfContents items={toc} />
+
         <div
           className={
             toc.length > 0
-              ? "mt-12 lg:grid lg:grid-cols-[13rem_minmax(0,42rem)] lg:justify-center lg:gap-12"
-              : "mx-auto mt-12 max-w-3xl"
+              ? "mx-auto max-w-3xl xl:col-start-2 xl:row-start-2 xl:mx-0 xl:mt-12 xl:w-full"
+              : "mx-auto mt-12 max-w-3xl xl:col-start-2 xl:row-start-2 xl:mx-0 xl:w-full"
           }
         >
-          <TableOfContents items={toc} />
-          <div className="markdown max-w-3xl">{content}</div>
+          <div className="markdown">{content}</div>
         </div>
-      </article>
 
-      <nav
-        aria-label="相邻文章"
-        className="mx-auto mt-16 flex max-w-3xl flex-col gap-4 border-t border-rule pt-8 text-sm sm:flex-row sm:justify-between"
-      >
-        {adjacent.older ? (
-          <Link href={`/posts/${adjacent.older.slug}`} className="text-muted hover:text-ink">
-            <span className="block text-xs text-pine">上一篇</span>
-            {adjacent.older.title}
-          </Link>
-        ) : (
-          <span />
-        )}
-        {adjacent.newer ? (
-          <Link
-            href={`/posts/${adjacent.newer.slug}`}
-            className="text-right text-muted hover:text-ink"
-          >
-            <span className="block text-xs text-pine">下一篇</span>
-            {adjacent.newer.title}
-          </Link>
-        ) : null}
-      </nav>
+        <nav
+          aria-label="相邻文章"
+          className="mx-auto mt-16 flex max-w-3xl flex-col gap-4 border-t border-rule pt-8 text-sm sm:flex-row sm:justify-between xl:col-start-2 xl:row-start-3 xl:mx-0 xl:w-full"
+        >
+          {adjacent.older ? (
+            <Link href={`/posts/${adjacent.older.slug}`} className="text-muted hover:text-ink">
+              <span className="block text-xs text-pine">上一篇</span>
+              {adjacent.older.title}
+            </Link>
+          ) : (
+            <span />
+          )}
+          {adjacent.newer ? (
+            <Link
+              href={`/posts/${adjacent.newer.slug}`}
+              className="text-right text-muted hover:text-ink"
+            >
+              <span className="block text-xs text-pine">下一篇</span>
+              {adjacent.newer.title}
+            </Link>
+          ) : null}
+        </nav>
+      </article>
     </main>
   );
 }

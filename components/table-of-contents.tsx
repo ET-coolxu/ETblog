@@ -30,6 +30,10 @@ function TocList({
   );
 }
 
+/**
+ * 文章目录：窄屏折叠；宽屏作为阅读栏左侧的 sticky 网格子项。
+ * 同时输出两份 DOM，用 `contents` 让它们各自参与正文页三列网格。
+ */
 export function TableOfContents({ items }: { items: TocItem[] }) {
   const [activeId, setActiveId] = useState(items[0]?.id);
 
@@ -70,9 +74,10 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
     return null;
   }
 
+  // contents：折叠目录与侧栏各自成为文章网格的子项，避免包一层后打乱列位置
   return (
-    <>
-      <details className="mb-10 border-l border-rule pl-4 lg:hidden">
+    <div className="contents">
+      <details className="mx-auto mt-12 mb-10 max-w-3xl border-l border-rule pl-4 xl:hidden">
         <summary className="cursor-pointer text-sm text-pine">目录</summary>
         <div className="mt-3">
           <TocList items={items} activeId={activeId} />
@@ -80,11 +85,11 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
       </details>
       <nav
         aria-label="文章目录"
-        className="sticky top-24 hidden self-start border-l border-rule pl-4 lg:block"
+        className="sticky top-24 mt-12 hidden w-52 justify-self-end self-start border-l border-rule pl-4 xl:col-start-1 xl:row-start-2 xl:block"
       >
         <p className="mb-3 text-xs tracking-wide text-pine">目录</p>
         <TocList items={items} activeId={activeId} />
       </nav>
-    </>
+    </div>
   );
 }
