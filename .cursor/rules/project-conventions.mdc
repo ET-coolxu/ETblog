@@ -29,7 +29,7 @@ alwaysApply: true
 ## 实现时不要漏
 
 - 列表 / 搜索 / 标签 / 关于无内容时写中文空状态，不要空白页；关于页缺文件不 500。
-- 访客打开草稿或不存在的 slug：404。
+- 访客打开草稿、存档或不存在的 slug：404。
 - 文档标题：`{页面} · {SITE_NAME}`。RSS 最近 20 篇已发布**全文**；sitemap 含静态页 + 已发布文章；后台 `noindex`。
 - 图片上传：png / jpg / jpeg / webp / gif，单文件 ≤5MB，禁止 svg；接口必须登录。
 - PV：仅访客成功打开已发布正文记 1 次；带管理员 session 的请求不记。
@@ -37,4 +37,4 @@ alwaysApply: true
 ## 禁止
 
 - 不要用 `@next/mdx` 把文章塞进 `app/`（和后台随时发布冲突）。
-- 第一版不做：评论、邮件订阅、多用户、独立 Umami/Postgres、CDN、删除文章、修改 slug、后台编辑关于页。
+- 第一版不做：评论、邮件订阅、多用户、独立 Umami/Postgres、CDN、修改 slug、后台编辑关于页。删除文章须确认：删 Markdown 与该文 PV，不删上传图片、不做回收站。

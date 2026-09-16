@@ -2,7 +2,7 @@
 title: 第一版实现 TODO
 status: 进行中
 created: 2026-08-27
-updated: 2026-09-14
+updated: 2026-09-15
 related:
   - docs/requirements/v1.md
 ---
@@ -92,7 +92,7 @@ related:
 - [x] 未登录访问 `/admin/*`（除 login）重定向到登录页；错误密码笼统提示
 - [x] `/admin` 文章列表（含草稿状态）；入口：写文章、统计
 - [x] `/admin/posts/new`：创建时手填 slug，首次保存追加全站序号；分栏预览；保存草稿 / 发布
-- [x] `/admin/posts/[slug]`：编辑；slug 只读；无删除；无关于页编辑
+- [x] `/admin/posts/[slug]`：编辑；slug 只读；无关于页编辑
 - [x] 图片上传：png/jpg/jpeg/webp/gif，≤5MB，禁 svg；写入 `public/uploads/{yyyy}/{mm}/`；正文插入 `![图片](...)`；封面可上传或填 https
 - [x] 保存后 `revalidatePath`，前台不重建即可看到已发布变更
 - [x] `/admin/stats`：需登录；总 PV、分文 PV、热门 Top 10
@@ -134,6 +134,18 @@ related:
 
 ---
 
+## 增量 · 文章删除与存档
+
+提示词：[post-delete-archive](./agent-prompts/features/2026-09-15-post-delete-archive.md)
+
+- [ ] 已发布可存档；存档对访客 404，不进列表/搜索/RSS/sitemap
+- [ ] 存档不可直接发布，须先改为草稿再发布；已发布可改为草稿
+- [ ] 任意状态可删除：确认后删 Markdown 与该 slug 的 PV；不删 `public/uploads/`
+- [ ] 删除后不保留 slug 黑名单；新建仍按现存文件最大序号 + 1 分配
+- [ ] 后台列表标明草稿 / 已发布 / 已存档；状态变更后 `revalidatePath`
+
+---
+
 ## 第一版明确不做
 
-不要从本 TODO 里加上下列项：评论、邮件订阅、多用户、删除文章、修改 slug、后台编辑关于页、独立 Umami/Postgres、CDN、文章内 JSX、正文原始 HTML。
+不要从本 TODO 里加上下列项：评论、邮件订阅、多用户、修改 slug、后台编辑关于页、独立 Umami/Postgres、CDN、文章内 JSX、正文原始 HTML、删除时的回收站、级联删除上传图片。
