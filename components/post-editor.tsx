@@ -7,12 +7,34 @@ import {
   useState,
   type ClipboardEvent,
   type DragEvent,
+  type MouseEvent,
 } from "react";
+import { useRouter } from "next/navigation";
 import {
   previewMarkdownAction,
   type SaveState,
 } from "@/app/admin/(dashboard)/posts/actions";
 import { asCover } from "@/lib/cover";
+
+export type PostEditorStatus = "draft" | "published" | "archived";
+
+const ARCHIVE_CONFIRM =
+  "存档后访客将无法阅读这篇文章（直链返回 404），且不能直接重新发布，须先改为草稿。已上传的图片不会删除。确定存档吗？";
+const DELETE_CONFIRM =
+  "删除后不可恢复：将删除这篇文章的 Markdown 文件和该文的访问统计，不会删除已上传的图片。确定删除吗？";
+
+/** 新建页没有删除；占位以满足 useActionState 必须无条件调用。 */
+const unusedDeleteAction = async (): Promise<SaveState> => ({
+  error: "无法删除。",
+});
+
+function confirmSubmit(message: string) {
+  return (event: MouseEvent<HTMLButtonElement>) => {
+    if (!window.confirm(message)) {
+      event.preventDefault();
+    }
+  };
+}
 
 export type PostEditorValues = {
   slug: string;
@@ -27,7 +49,10 @@ export type PostEditorValues = {
 
 type PostEditorProps = {
   mode: "create" | "edit";
+  /** 编辑已有文章时的当前状态，决定显示哪些操作；新建页不传。 */
+  status?: PostEditorStatus;
   action: (state: SaveState, formData: FormData) => Promise<SaveState>;
+  deleteAction?: (state: SaveState, formData: FormData) => Promise<SaveState>;
   initial: PostEditorValues;
 };
 
@@ -67,14 +92,32 @@ function CoverPreview({ value }: { value: string }) {
   );
 }
 
-export function PostEditor({ mode, action, initial }: PostEditorProps) {
+export function PostEditor({
+  mode,
+  status = "draft",
+  action,
+  deleteAction = unusedDeleteAction,
+  initial,
+}: PostEditorProps) {
   const [state, formAction, pending] = useActionState(action, {} satisfies SaveState);
+  const [deleteState, deleteFormAction, deleting] = useActionState(
+    deleteAction,
+    {} satisfies SaveState,
+  );
+  const busy = pending || deleting;
+  const router = useRouter();
   const [values, setValues] = useState(initial);
   const [previewHtml, setPreviewHtml] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (state.message) {
+      router.refresh();
+    }
+  }, [state.message, router]);
 
   useEffect(() => {
     const source = values.body;
@@ -394,9 +437,9 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
           {uploadError}
         </p>
       ) : null}
-      {state.error ? (
+      {state.error || deleteState.error ? (
         <p className="text-sm text-pine" role="alert">
-          {state.error}
+          {state.error ?? deleteState.error}
         </p>
       ) : null}
       {state.message ? (
@@ -406,24 +449,93 @@ export function PostEditor({ mode, action, initial }: PostEditorProps) {
       ) : null}
 
       <div className="flex flex-wrap gap-6">
-        <button
-          type="submit"
-          name="intent"
-          value="draft"
-          disabled={pending}
-          className="text-muted hover:text-ink disabled:text-muted"
-        >
-          {pending ? "保存中…" : "保存草稿"}
-        </button>
-        <button
-          type="submit"
-          name="intent"
-          value="publish"
-          disabled={pending}
-          className="text-pine hover:text-ink disabled:text-muted"
-        >
-          {pending ? "保存中…" : "发布"}
-        </button>
+        {mode === "create" || status === "draft" ? (
+          <>
+            <button
+              type="submit"
+              name="intent"
+              value="draft"
+              disabled={busy}
+              className="text-muted hover:text-ink disabled:text-muted"
+            >
+              {pending ? "保存中…" : "保存草稿"}
+            </button>
+            <button
+              type="submit"
+              name="intent"
+              value="publish"
+              disabled={busy}
+              className="text-pine hover:text-ink disabled:text-muted"
+            >
+              {pending ? "保存中…" : "发布"}
+            </button>
+          </>
+        ) : null}
+        {mode === "edit" && status === "published" ? (
+          <>
+            <button
+              type="submit"
+              name="intent"
+              value="publish"
+              disabled={busy}
+              className="text-pine hover:text-ink disabled:text-muted"
+            >
+              {pending ? "保存中…" : "保存"}
+            </button>
+            <button
+              type="submit"
+              name="intent"
+              value="draft"
+              disabled={busy}
+              className="text-muted hover:text-ink disabled:text-muted"
+            >
+              {pending ? "保存中…" : "改为草稿"}
+            </button>
+            <button
+              type="submit"
+              name="intent"
+              value="archive"
+              disabled={busy}
+              onClick={confirmSubmit(ARCHIVE_CONFIRM)}
+              className="text-muted hover:text-ink disabled:text-muted"
+            >
+              {pending ? "保存中…" : "存档"}
+            </button>
+          </>
+        ) : null}
+        {mode === "edit" && status === "archived" ? (
+          <>
+            <button
+              type="submit"
+              name="intent"
+              value="archive"
+              disabled={busy}
+              className="text-pine hover:text-ink disabled:text-muted"
+            >
+              {pending ? "保存中…" : "保存"}
+            </button>
+            <button
+              type="submit"
+              name="intent"
+              value="draft"
+              disabled={busy}
+              className="text-muted hover:text-ink disabled:text-muted"
+            >
+              {pending ? "保存中…" : "改为草稿"}
+            </button>
+          </>
+        ) : null}
+        {mode === "edit" ? (
+          <button
+            type="submit"
+            formAction={deleteFormAction}
+            disabled={busy}
+            onClick={confirmSubmit(DELETE_CONFIRM)}
+            className="text-muted hover:text-ink disabled:text-muted"
+          >
+            {deleting ? "删除中…" : "删除"}
+          </button>
+        ) : null}
       </div>
     </form>
   );

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { updatePostAction } from "@/app/admin/(dashboard)/posts/actions";
+import { deletePostAction, updatePostAction } from "@/app/admin/(dashboard)/posts/actions";
 import { PostEditor } from "@/components/post-editor";
-import { getAdminPost } from "@/lib/posts";
+import { adminPostStatus, getAdminPost } from "@/lib/posts";
 
 type EditPostPageProps = {
   params: Promise<{ slug: string }>;
@@ -26,13 +26,16 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   }
 
   const save = updatePostAction.bind(null, post.slug);
+  const remove = deletePostAction.bind(null, post.slug);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-6 py-16">
       <h1 className="font-serif text-3xl font-semibold text-ink">编辑文章</h1>
       <PostEditor
         mode="edit"
+        status={adminPostStatus(post)}
         action={save}
+        deleteAction={remove}
         initial={{
           slug: post.slug,
           title: post.title,

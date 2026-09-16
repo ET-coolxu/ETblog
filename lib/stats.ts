@@ -98,3 +98,18 @@ export async function getTopPublishedPostViews(limit = 10): Promise<PostViewStat
   const stats = await listPublishedPostViews();
   return stats.slice(0, limit);
 }
+
+/**
+ * 删除指定 slug 的 PV 行。行不存在仍算成功；失败只打日志，不抛给调用方。
+ */
+export function deletePostViews(slug: string): void {
+  if (!slug) {
+    return;
+  }
+
+  try {
+    getStatsDb().prepare("DELETE FROM post_views WHERE slug = ?").run(slug);
+  } catch (error) {
+    console.error("删除文章访问统计失败", error);
+  }
+}

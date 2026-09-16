@@ -2,7 +2,7 @@
 title: 第一版实现 TODO
 status: 进行中
 created: 2026-08-27
-updated: 2026-09-15
+updated: 2026-09-16
 related:
   - docs/requirements/v1.md
 ---
@@ -136,13 +136,13 @@ related:
 
 ## 增量 · 文章删除与存档
 
-提示词：[post-delete-archive](./agent-prompts/features/2026-09-15-post-delete-archive.md)
+提示词：[post-delete-archive](./agent-prompts/archive/2026-09-15-post-delete-archive.md)
 
-- [ ] 已发布可存档；存档对访客 404，不进列表/搜索/RSS/sitemap
-- [ ] 存档不可直接发布，须先改为草稿再发布；已发布可改为草稿
-- [ ] 任意状态可删除：确认后删 Markdown 与该 slug 的 PV；不删 `public/uploads/`
-- [ ] 删除后不保留 slug 黑名单；新建仍按现存文件最大序号 + 1 分配
-- [ ] 后台列表标明草稿 / 已发布 / 已存档；状态变更后 `revalidatePath`
+- [x] 已发布可存档；存档对访客 404，不进列表/搜索/RSS/sitemap
+- [x] 存档不可直接发布，须先改为草稿再发布；已发布可改为草稿
+- [x] 任意状态可删除：确认后删 Markdown 与该 slug 的 PV；不删 `public/uploads/`
+- [x] 删除后不保留 slug 黑名单；新建仍按现存文件最大序号 + 1 分配
+- [x] 后台列表标明草稿 / 已发布 / 已存档；状态变更后 `revalidatePath`
 
 ---
 

@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState } from "@/components/post-card";
-import { formatPostDate, listAdminPosts } from "@/lib/posts";
+import {
+  adminPostStatus,
+  formatPostDate,
+  listAdminPosts,
+  type AdminPostStatus,
+} from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "文章",
+};
+
+const STATUS_LABEL: Record<AdminPostStatus, string> = {
+  draft: "草稿",
+  published: "已发布",
+  archived: "已存档",
 };
 
 export default async function AdminHomePage() {
@@ -26,26 +37,31 @@ export default async function AdminHomePage() {
 
       {posts.length > 0 ? (
         <ul className="mt-10 divide-y divide-rule">
-          {posts.map((post) => (
-            <li key={post.slug} className="flex flex-wrap items-baseline justify-between gap-3 py-5">
-              <div>
-                <Link
-                  href={`/admin/posts/${post.slug}`}
-                  className="font-serif text-xl font-semibold text-ink hover:text-pine"
+          {posts.map((post) => {
+            const status = adminPostStatus(post);
+            return (
+              <li key={post.slug} className="flex flex-wrap items-baseline justify-between gap-3 py-5">
+                <div>
+                  <Link
+                    href={`/admin/posts/${post.slug}`}
+                    className="font-serif text-xl font-semibold text-ink hover:text-pine"
+                  >
+                    {post.title}
+                  </Link>
+                  <p className="mt-1 text-sm text-muted">
+                    {formatPostDate(post.date)}
+                    <span aria-hidden="true"> · </span>
+                    {post.slug}
+                  </p>
+                </div>
+                <span
+                  className={status === "published" ? "text-sm text-pine" : "text-sm text-muted"}
                 >
-                  {post.title}
-                </Link>
-                <p className="mt-1 text-sm text-muted">
-                  {formatPostDate(post.date)}
-                  <span aria-hidden="true"> · </span>
-                  {post.slug}
-                </p>
-              </div>
-              <span className={post.draft ? "text-sm text-muted" : "text-sm text-pine"}>
-                {post.draft ? "草稿" : "已发布"}
-              </span>
-            </li>
-          ))}
+                  {STATUS_LABEL[status]}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <div className="mt-10">

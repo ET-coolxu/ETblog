@@ -1,3 +1,7 @@
+/**
+ * 文章 Markdown 的读写：公开侧只认已发布，后台可读草稿与存档。
+ * 状态只存在 frontmatter，不另存数据库。
+ */
 import { cache } from "react";
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -26,9 +30,17 @@ export type Post = PostMeta & {
   body: string;
 };
 
+export type AdminPostStatus = "draft" | "published" | "archived";
+
 export type AdminPost = Post & {
   draft: boolean;
+  archived: boolean;
 };
+
+/** 磁盘解析结果，含草稿与存档标记；公开列表须再过滤。 */
+type ParsedPost = AdminPost;
+
+export type SavePostIntent = "draft" | "publish" | "archive";
 
 export type SavePostInput = {
   slug: string;
@@ -38,7 +50,7 @@ export type SavePostInput = {
   summary: string;
   cover: string;
   featured: boolean;
-  draft: boolean;
+  intent: SavePostIntent;
   body: string;
 };
 
@@ -53,6 +65,10 @@ export function isValidSlug(slug: string): boolean {
   return SLUG_PATTERN.test(slug);
 }
 
+/**
+ * 把合法 slug 解析成 `content/posts/{slug}.md` 的绝对路径。
+ * 非法字符或路径穿越时返回 null，禁止读写目录外的文件。
+ */
 function resolvePostFile(slug: string): string | null {
   if (!isValidSlug(slug)) {
     return null;
@@ -132,7 +148,7 @@ function toMeta(
   slug: string,
   data: Record<string, unknown>,
   body: string,
-): (PostMeta & { draft: boolean }) | null {
+): (PostMeta & { draft: boolean; archived: boolean }) | null {
   const title = asString(data.title);
   const date = asDate(data.date);
   if (!title || !date) {
@@ -150,13 +166,33 @@ function toMeta(
     cover: asCover(data.cover),
     featured: asBoolean(data.featured),
     draft: asBoolean(data.draft),
+    archived: asBoolean(data.archived),
     readingMinutes: readingMinutesFromBody(body),
   };
 }
 
-async function readPostFile(
-  slug: string,
-): Promise<(Post & { draft: boolean }) | null> {
+/**
+ * 三选一状态。两字段同时为 true 时按存档处理（后台显示已存档，对外不可见）。
+ */
+export function adminPostStatus(post: {
+  draft: boolean;
+  archived: boolean;
+}): AdminPostStatus {
+  if (post.archived) {
+    return "archived";
+  }
+  if (post.draft) {
+    return "draft";
+  }
+  return "published";
+}
+
+/** 公开侧只认非草稿且非存档；两字段都为 true 时也不公开。 */
+function isPubliclyListed(post: { draft: boolean; archived: boolean }): boolean {
+  return !post.draft && !post.archived;
+}
+
+async function readPostFile(slug: string): Promise<ParsedPost | null> {
   const filePath = resolvePostFile(slug);
   if (!filePath) {
     return null;
@@ -175,15 +211,16 @@ async function readPostFile(
     return null;
   }
 
-  const { draft, ...publicMeta } = meta;
+  const { draft, archived, ...publicMeta } = meta;
   return {
     ...publicMeta,
     draft,
+    archived,
     body: parsed.content,
   };
 }
 
-async function listAllParsedPosts(): Promise<(Post & { draft: boolean })[]> {
+async function listAllParsedPosts(): Promise<ParsedPost[]> {
   let names: string[];
   try {
     names = await fs.readdir(POSTS_DIR);
@@ -191,7 +228,7 @@ async function listAllParsedPosts(): Promise<(Post & { draft: boolean })[]> {
     return [];
   }
 
-  const posts: (Post & { draft: boolean })[] = [];
+  const posts: ParsedPost[] = [];
   for (const name of names) {
     if (!name.endsWith(".md")) {
       continue;
@@ -213,25 +250,34 @@ async function listAllParsedPosts(): Promise<(Post & { draft: boolean })[]> {
   });
 }
 
+/**
+ * 已发布文章全文（非草稿且非存档）。搜索、RSS 等公开聚合走这里。
+ */
 export const listPublishedPostContents = cache(async (): Promise<Post[]> => {
   const posts = await listAllParsedPosts();
   return posts
-    .filter((post) => !post.draft)
-    .map(({ draft: _draft, ...post }) => post);
+    .filter(isPubliclyListed)
+    .map(({ draft: _draft, archived: _archived, ...post }) => post);
 });
 
+/**
+ * 已发布文章元数据。首页、列表、标签、sitemap 走这里，不含草稿与存档。
+ */
 export const listPublishedPosts = cache(async (): Promise<PostMeta[]> => {
   const posts = await listPublishedPostContents();
   return posts.map(({ body: _body, ...meta }) => meta);
 });
 
+/**
+ * 按 slug 读取已发布文章。草稿、存档或不存在时返回 null（访客侧应 404）。
+ */
 export const getPublishedPost = cache(async (slug: string): Promise<Post | null> => {
   const post = await readPostFile(slug);
-  if (!post || post.draft) {
+  if (!post || !isPubliclyListed(post)) {
     return null;
   }
 
-  const { draft: _draft, ...published } = post;
+  const { draft: _draft, archived: _archived, ...published } = post;
   return published;
 });
 
@@ -279,10 +325,12 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
+/** 后台文章列表，含草稿、已发布与已存档。 */
 export const listAdminPosts = cache(async (): Promise<AdminPost[]> => {
   return listAllParsedPosts();
 });
 
+/** 后台读取单篇，含草稿与存档；不存在或无法解析时返回 null。 */
 export const getAdminPost = cache(async (slug: string): Promise<AdminPost | null> => {
   return readPostFile(slug);
 });
@@ -354,8 +402,27 @@ export async function allocateCreateSlug(
 }
 
 /**
+ * 按当前磁盘状态校验保存意图。
+ * 禁止已存档直接发布、草稿存档；新建视同草稿。
+ */
+function assertSaveTransition(
+  current: AdminPostStatus | null,
+  intent: SavePostIntent,
+): { ok: true } | { ok: false; error: string } {
+  const status = current ?? "draft";
+  if (status === "archived" && intent === "publish") {
+    return { ok: false, error: "请先改为草稿再发布。" };
+  }
+  if (status === "draft" && intent === "archive") {
+    return { ok: false, error: "草稿不能存档。" };
+  }
+  return { ok: true };
+}
+
+/**
  * 把文章写入 `content/posts/{slug}.md`。
  * 新建时把手填 slug 追加全站序号；更新不改文件名、不重新编号。
+ * 按意图写入三选一状态：发布两者都不写，草稿只写 draft，存档只写 archived。
  */
 export async function savePost(
   input: SavePostInput,
@@ -398,6 +465,20 @@ export async function savePost(
     return { ok: false, error: "找不到这篇文章。" };
   }
 
+  let currentStatus: AdminPostStatus | null = null;
+  if (mode === "update") {
+    const current = await readPostFile(slug);
+    if (!current) {
+      return { ok: false, error: "找不到这篇文章。" };
+    }
+    currentStatus = adminPostStatus(current);
+  }
+
+  const transition = assertSaveTransition(currentStatus, input.intent);
+  if (!transition.ok) {
+    return transition;
+  }
+
   const data: Record<string, unknown> = {
     title,
     date,
@@ -418,8 +499,11 @@ export async function savePost(
   if (input.featured) {
     data.featured = true;
   }
-  if (input.draft) {
+  // 禁止一次写入两个 true：发布两者都不写，草稿/存档只写对应字段
+  if (input.intent === "draft") {
     data.draft = true;
+  } else if (input.intent === "archive") {
+    data.archived = true;
   }
 
   const body = input.body.replace(/^\uFEFF/, "").replace(/\s+$/, "");
@@ -428,6 +512,30 @@ export async function savePost(
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, markdown, "utf8");
   return { ok: true, slug };
+}
+
+/**
+ * 删除 `content/posts/{slug}.md`。
+ * 确认路径在文章目录内后 unlink；找不到文件返回中文错误。不删上传图片。
+ */
+export async function deletePost(
+  slug: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const filePath = resolvePostFile(slug);
+  if (!filePath) {
+    return { ok: false, error: "slug 不合法。" };
+  }
+
+  try {
+    await fs.unlink(filePath);
+    return { ok: true };
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") {
+      return { ok: false, error: "找不到这篇文章。" };
+    }
+    return { ok: false, error: "删除文章失败。" };
+  }
 }
 
 export const getAboutSource = cache(async (): Promise<string | null> => {
