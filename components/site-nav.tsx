@@ -25,7 +25,7 @@ export function SiteNav() {
   return (
     <nav
       aria-label="站点"
-      className="flex flex-wrap items-center justify-end gap-x-6 gap-y-2 text-sm text-muted"
+      className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-muted"
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
         {pageItems.map((item) => (
@@ -38,7 +38,8 @@ export function SiteNav() {
           </Link>
         ))}
       </div>
-      <div className="flex items-center gap-x-4">
+      {/* 搜索/主题单独成组，和页面链接拉开 */}
+      <div className="flex items-center gap-x-4 border-l border-rule pl-5">
         <Link
           href="/search"
           className={searchActive ? "text-ink" : "hover:text-ink"}

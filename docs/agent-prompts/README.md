@@ -43,4 +43,4 @@
 9. [GHCR 自动部署](./archive/2026-09-14-ghcr-auto-deploy.md)（已完成；生产部署只跟 `main`）
 10. [test 验证后再合 main](./archive/2026-09-15-test-then-main-workflow.md)（已完成；功能 PR 先合 `test`。复盘：[GHCR 首次启用](../2026-09-15-ghcr-go-live-retrospective.md)）
 11. [文章删除与存档](./archive/2026-09-15-post-delete-archive.md)
-12. [首页与顶栏视觉刷新（A′）](./optimizations/2026-09-21-homepage-nav-refresh-a-prime.md)（进行中；功能 PR 合 `test`）
+12. [首页与顶栏视觉刷新（A′）](./archive/2026-09-21-homepage-nav-refresh-a-prime.md)（已完成；功能 PR 合 `test`）

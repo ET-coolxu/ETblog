@@ -1,7 +1,7 @@
 ---
 title: 首页与顶栏视觉刷新（A′）
 type: optimization
-status: in-progress
+status: done
 created: 2026-09-21
 updated: 2026-09-21
 related:
@@ -9,6 +9,7 @@ related:
   - components/site-header.tsx
   - components/site-nav.tsx
   - components/site-footer.tsx
+  - components/featured-post.tsx
   - app/(site)/page.tsx
 ---
 
@@ -50,13 +51,13 @@ coolxu.com 现首页在顶栏下先放「笔记」标签 + 站名 + 简介 hero�
 
 ## 验收标准
 
-- [ ] 顶栏：左品牌、右「文章 / 标签 / 关于」+「搜索 / 主题」两组；无头像；滚动时页眉不吸顶
-- [ ] 首页无「笔记」标签与简介 hero；有精选时顶栏下先是大图（或无封面时的标题摘要）再是最新列表
-- [ ] 精选封面全栏宽、圆角 6–8px、无 box-shadow；不是左右分栏
-- [ ] 无精选时只显示最新；全空时中文空状态
-- [ ] 页脚仅作者 + RSS
-- [ ] 首页 → 正文、顶栏链接、搜索、主题切换无回归；暗色下次要文字仍可读
-- [ ] 功能 PR 对 `test` 打开，正文写明 A′ 改了哪些文件，并附真实 UI 截图（托管 artifact，不提交进分支）
+- [x] 顶栏：左品牌、右「文章 / 标签 / 关于」+「搜索 / 主题」两组；无头像；滚动时页眉不吸顶
+- [x] 首页无「笔记」标签与简介 hero；有精选时顶栏下先是大图（或无封面时的标题摘要）再是最新列表
+- [x] 精选封面全栏宽、圆角 6–8px、无 box-shadow；不是左右分栏
+- [x] 无精选时只显示最新；全空时中文空状态
+- [x] 页脚仅作者 + RSS
+- [x] 首页 → 正文、顶栏链接、搜索、主题切换无回归；暗色下次要文字仍可读
+- [x] 功能 PR 对 `test` 打开，正文写明 A′ 改了哪些文件，并附真实 UI 截图（托管 artifact，不提交进分支）
 
 ## 涉及范围
 
