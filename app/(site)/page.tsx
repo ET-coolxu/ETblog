@@ -1,3 +1,4 @@
+import { FeaturedPost } from "@/components/featured-post";
 import { PostCard } from "@/components/post-card";
 import { getSiteConfig } from "@/lib/site";
 import { listPublishedPosts } from "@/lib/posts";
@@ -10,31 +11,26 @@ export default async function HomePage() {
   const latest = posts.filter((post) => !featuredSlugs.has(post.slug)).slice(0, 6);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-20">
-      <div className="border-l border-rule pl-8 sm:pl-10">
-        <p className="text-sm tracking-wide text-pine">笔记</p>
-        <h1 className="mt-3 font-serif text-3xl font-semibold leading-snug text-ink sm:text-4xl">
-          {site.name}
-        </h1>
-        <p className="mt-5 max-w-prose text-base leading-8 text-muted">
-          {site.intro}
-        </p>
-      </div>
+    <main className="mx-auto w-full max-w-3xl px-6 pb-16 pt-8 sm:pb-20">
+      <h1 className="sr-only">{site.name}</h1>
 
       {featured.length > 0 ? (
-        <section className="mt-16" aria-labelledby="featured-heading">
-          <h2 id="featured-heading" className="font-serif text-lg text-ink">
+        <section aria-labelledby="featured-heading">
+          <h2 id="featured-heading" className="sr-only">
             精选
           </h2>
-          <div className="mt-6 space-y-10">
+          <div className="space-y-12">
             {featured.map((post) => (
-              <PostCard key={post.slug} post={post} />
+              <FeaturedPost key={post.slug} post={post} />
             ))}
           </div>
         </section>
       ) : null}
 
-      <section className="mt-16" aria-labelledby="latest-heading">
+      <section
+        className={featured.length > 0 ? "mt-14" : undefined}
+        aria-labelledby="latest-heading"
+      >
         <h2 id="latest-heading" className="font-serif text-lg text-ink">
           最新
         </h2>

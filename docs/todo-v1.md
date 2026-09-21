@@ -2,7 +2,7 @@
 title: 第一版实现 TODO
 status: 进行中
 created: 2026-08-27
-updated: 2026-09-16
+updated: 2026-09-21
 related:
   - docs/requirements/v1.md
 ---
@@ -143,6 +143,16 @@ related:
 - [x] 任意状态可删除：确认后删 Markdown 与该 slug 的 PV；不删 `public/uploads/`
 - [x] 删除后不保留 slug 黑名单；新建仍按现存文件最大序号 + 1 分配
 - [x] 后台列表标明草稿 / 已发布 / 已存档；状态变更后 `revalidatePath`
+
+---
+
+## 增量 · 首页与顶栏视觉刷新（A′）
+
+提示词：[homepage-nav-refresh-a-prime](./agent-prompts/optimizations/2026-09-21-homepage-nav-refresh-a-prime.md)
+
+- [ ] 顶栏 C 式：品牌左，文章/标签/关于 + 搜索/主题右组；不粘滞、无头像
+- [ ] 首页去掉 intro hero；精选全宽封面 + 标题摘要，再纵向最新列表
+- [ ] 页脚仅作者 + RSS（已符合则保持）
 
 ---
 

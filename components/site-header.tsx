@@ -2,6 +2,9 @@ import Link from "next/link";
 import { getSiteConfig } from "@/lib/site";
 import { SiteNav } from "@/components/site-nav";
 
+/**
+ * 前台页眉：左品牌、右导航。跟随文档流，不吸顶。
+ */
 export function SiteHeader() {
   const site = getSiteConfig();
 
