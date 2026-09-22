@@ -10,10 +10,10 @@ export function SiteHeader() {
 
   return (
     <header className="border-b border-rule">
-      <div className="mx-auto flex w-full max-w-site items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
+      <div className="mx-auto flex w-full max-w-site flex-col items-stretch gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-4">
         <Link
           href="/"
-          className="shrink-0 whitespace-nowrap font-serif text-base font-semibold text-ink sm:text-lg"
+          className="shrink-0 self-start whitespace-nowrap font-serif text-base font-semibold text-ink sm:text-lg"
         >
           {site.name}
         </Link>
