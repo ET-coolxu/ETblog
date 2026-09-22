@@ -148,12 +148,12 @@ related:
 
 ## 增量 · 首页与顶栏视觉刷新（A′）
 
-提示词：[homepage-nav-refresh-a-prime](./agent-prompts/archive/2026-09-21-homepage-nav-refresh-a-prime.md)
+提示词：[homepage-a-prime-visual-review](./agent-prompts/archive/2026-09-22-homepage-a-prime-visual-review.md)
 
 - [x] 顶栏 C 式：品牌左，文章/标签/关于 + 搜索/主题右组；不粘滞、无头像
 - [x] 首页去掉 intro hero；精选全宽封面 + 标题摘要，再纵向最新列表
 - [x] 页脚仅作者 + RSS（已符合则保持）
-- [ ] 视觉复审：栏宽 720–800px、可见「精选」、400px 顶栏、最新封面克制
+- [x] 视觉复审：栏宽 720–800px、可见「精选」、400px 顶栏、最新封面克制
 
 ---
 
