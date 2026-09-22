@@ -11,7 +11,7 @@ export default async function TagsPage() {
   const tags = await listTags();
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
+    <main className="mx-auto w-full max-w-site px-4 py-16 sm:px-6">
       <h1 className="font-serif text-3xl font-semibold text-ink">标签</h1>
       {tags.length > 0 ? (
         <ul className="mt-10 space-y-4 border-l border-rule pl-6">

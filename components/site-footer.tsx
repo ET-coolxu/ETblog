@@ -6,7 +6,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-rule">
-      <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-5 text-sm text-muted">
+      <div className="mx-auto flex w-full max-w-site items-center justify-between gap-4 px-4 py-5 text-sm text-muted sm:px-6">
         <p>{site.author}</p>
         <Link href="/feed.xml" className="hover:text-ink">
           RSS

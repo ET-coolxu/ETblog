@@ -25,9 +25,9 @@ export function SiteNav() {
   return (
     <nav
       aria-label="站点"
-      className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-muted"
+      className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-muted sm:gap-x-5 sm:gap-y-2"
     >
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+      <div className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 sm:gap-x-4">
         {pageItems.map((item) => (
           <Link
             key={item.href}
@@ -38,8 +38,8 @@ export function SiteNav() {
           </Link>
         ))}
       </div>
-      {/* 搜索/主题单独成组，和页面链接拉开 */}
-      <div className="flex items-center gap-x-4 border-l border-rule pl-5">
+      {/* 窄屏不用竖线，避免折行后分隔条悬空 */}
+      <div className="flex items-center gap-x-2.5 sm:gap-x-4 sm:border-l sm:border-rule sm:pl-5">
         <Link
           href="/search"
           className={searchActive ? "text-ink" : "hover:text-ink"}

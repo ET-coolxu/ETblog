@@ -11,15 +11,15 @@ export default async function HomePage() {
   const latest = posts.filter((post) => !featuredSlugs.has(post.slug)).slice(0, 6);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 pb-16 pt-8 sm:pb-20">
+    <main className="mx-auto w-full max-w-site px-4 pb-16 pt-8 sm:px-6 sm:pb-20">
       <h1 className="sr-only">{site.name}</h1>
 
       {featured.length > 0 ? (
         <section aria-labelledby="featured-heading">
-          <h2 id="featured-heading" className="sr-only">
+          <h2 id="featured-heading" className="font-serif text-lg text-ink">
             精选
           </h2>
-          <div className="space-y-12">
+          <div className="mt-6 space-y-12">
             {featured.map((post) => (
               <FeaturedPost key={post.slug} post={post} />
             ))}
@@ -37,7 +37,7 @@ export default async function HomePage() {
         {latest.length > 0 ? (
           <div className="mt-6 space-y-10">
             {latest.map((post) => (
-              <PostCard key={post.slug} post={post} />
+              <PostCard key={post.slug} post={post} compact />
             ))}
           </div>
         ) : (

@@ -22,7 +22,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const results = query ? await searchPublishedPosts(query) : [];
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
+    <main className="mx-auto w-full max-w-site px-4 py-16 sm:px-6">
       <h1 className="font-serif text-3xl font-semibold text-ink">搜索</h1>
       <form action="/search" method="get" className="mt-8 flex gap-3" role="search">
         <label htmlFor="search-q" className="sr-only">

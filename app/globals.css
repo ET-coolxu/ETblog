@@ -27,6 +27,8 @@
   --color-muted: var(--muted);
   --color-rule: var(--rule);
   --color-pine: var(--pine);
+  /* 前台内容栏约 800px：比 3xl 略宽，仍保持可读行长 */
+  --container-site: 50rem;
 }
 
 html {

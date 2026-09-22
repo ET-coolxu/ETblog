@@ -31,7 +31,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
   const slice = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
+    <main className="mx-auto w-full max-w-site px-4 py-16 sm:px-6">
       <h1 className="font-serif text-3xl font-semibold text-ink">
         {tag ? `标签：${tag}` : "文章"}
       </h1>

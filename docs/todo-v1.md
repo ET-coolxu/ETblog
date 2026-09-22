@@ -2,7 +2,7 @@
 title: 第一版实现 TODO
 status: 进行中
 created: 2026-08-27
-updated: 2026-09-21
+updated: 2026-09-22
 related:
   - docs/requirements/v1.md
 ---
@@ -153,6 +153,7 @@ related:
 - [x] 顶栏 C 式：品牌左，文章/标签/关于 + 搜索/主题右组；不粘滞、无头像
 - [x] 首页去掉 intro hero；精选全宽封面 + 标题摘要，再纵向最新列表
 - [x] 页脚仅作者 + RSS（已符合则保持）
+- [ ] 视觉复审：栏宽 720–800px、可见「精选」、400px 顶栏、最新封面克制
 
 ---
 
