@@ -3,30 +3,39 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --paper: oklch(0.97 0.008 155);
-  --ink: oklch(0.22 0.02 160);
-  --muted: oklch(0.45 0.02 160);
-  --rule: oklch(0.82 0.02 155);
-  --pine: oklch(0.42 0.06 165);
+  --paper: #fbfbf9;
+  --ink: #222426;
+  --muted: #6e7672;
+  --quiet: #8c948f;
+  --rule: #e5e8e3;
+  --pine: #27503d;
+  --chip: #f4f6f3;
 }
 
 .dark {
-  --paper: oklch(0.18 0.015 160);
-  --ink: oklch(0.93 0.01 155);
-  --muted: oklch(0.72 0.015 155);
-  --rule: oklch(0.32 0.02 160);
-  --pine: oklch(0.72 0.05 165);
+  --paper: #232623;
+  --ink: #f3f4f1;
+  --muted: #a8b0ab;
+  --quiet: #8c948f;
+  --rule: #3a3f3c;
+  --pine: #a4d0b8;
+  --chip: #2c312e;
 }
 
 @theme inline {
-  --font-sans: var(--font-noto-sans), "PingFang SC", "Hiragino Sans GB",
+  --font-sans: var(--font-literata), var(--font-noto-sans), "PingFang SC",
+    "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  --font-serif: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
+    "Noto Serif SC", serif;
+  --font-label: var(--font-inter), var(--font-noto-sans), "PingFang SC",
     "Noto Sans SC", sans-serif;
-  --font-serif: var(--font-noto-serif), "Songti SC", "Noto Serif SC", serif;
   --color-paper: var(--paper);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
+  --color-quiet: var(--quiet);
   --color-rule: var(--rule);
   --color-pine: var(--pine);
+  --color-chip: var(--chip);
 }
 
 html {
