@@ -119,7 +119,8 @@ docker compose version    # 当时 v2.27.0
 | 22 | TCP | SSH |
 | 80 | TCP | HTTP / ACME |
 | 443 | TCP | HTTPS |
-| 443 | UDP | HTTP/3（可选） |
+
+本栈有意只走 HTTP/2：compose **不**发布 UDP 443，HTTP/3 已关闭，以便同机其他服务使用该端口。
 
 **不要**对公网开放 3000。
 
