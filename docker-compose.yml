@@ -28,9 +28,9 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     ports:
+      # 只发布 TCP。UDP 443 留给同机其他服务；本栈走 HTTP/2，不启用 HTTP/3。
       - "80:80"
       - "443:443"
-      - "443:443/udp"
     environment:
       SITE_DOMAIN: "${SITE_DOMAIN:-:80}"
       CADDY_EMAIL: ${CADDY_EMAIL:-admin@localhost}
