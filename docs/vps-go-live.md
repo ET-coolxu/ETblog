@@ -92,7 +92,8 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 | 22 | TCP | SSH |
 | 80 | TCP | HTTP / ACME |
 | 443 | TCP | HTTPS |
-| 443 | UDP | HTTP/3（可选，compose 已映射） |
+
+本栈有意只走 HTTP/2：compose **不**发布 UDP 443，HTTP/3 已关闭。不要为博客放行 `443/udp`，该端口留给同机其他服务。
 
 **不要**放行 3000。
 
@@ -102,7 +103,6 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 sudo ufw allow OpenSSH
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
-sudo ufw allow 443/udp
 sudo ufw --force enable
 sudo ufw status
 ```
