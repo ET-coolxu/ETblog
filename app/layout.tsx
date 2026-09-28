@@ -18,10 +18,11 @@ const serif = Noto_Serif_SC({
   display: "swap",
 });
 
-/** 静态稿的拉丁字体。中文不在这些字库里，会回落到上面的 Noto。 */
+/** 标题与引用的拉丁字体。300 斜体给引用；中文不在字库里，会回落到 Noto Serif。 */
 const display = Newsreader({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
   variable: "--font-newsreader",
   display: "swap",
 });

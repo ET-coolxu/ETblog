@@ -67,41 +67,64 @@ body {
   }
 }
 
+/* 正文排印对齐 Quiet Editorial。关于页与后台预览共用这一层。
+   字体不用 --font-serif / --font-label：@theme inline 不会把它们写成全局变量。 */
 .markdown {
-  font-size: 1.0625rem;
-  line-height: 1.85;
+  font-family: var(--font-inter), var(--font-noto-sans), "PingFang SC",
+    "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.95rem;
+  color: var(--ink);
 }
 
 .markdown > * + * {
-  margin-top: 1.15em;
+  margin-top: 1rem;
 }
 
 .markdown h2,
 .markdown h3 {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  line-height: 1.4;
+  font-family: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
+    "Noto Serif SC", serif;
+  font-weight: 400;
   color: var(--ink);
+  /* 锚点跳转时让开固定顶栏 */
+  scroll-margin-top: 6rem;
 }
 
 .markdown h2 {
-  margin-top: 2.2em;
-  font-size: 1.45rem;
+  font-size: 1.75rem;
+  line-height: 2.4rem;
+  letter-spacing: -0.01em;
+  padding-top: 0.5rem;
+}
+
+/* 段间距规则和这里同优先级，写在后面才不会把标题贴回上一段 */
+.markdown > * + h2 {
+  margin-top: 3rem;
 }
 
 .markdown h3 {
-  margin-top: 1.7em;
-  font-size: 1.2rem;
+  font-size: 1.375rem;
+  line-height: 1.9rem;
 }
 
-.markdown p {
-  max-width: 42rem;
+.markdown > * + h3 {
+  margin-top: 1.75rem;
 }
 
 .markdown a:not(.heading-anchor) {
-  color: var(--pine);
+  color: var(--ink);
   text-decoration: underline;
-  text-underline-offset: 0.18em;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 4px;
+  transition:
+    color 150ms ease,
+    text-decoration-color 150ms ease;
+}
+
+.markdown a:not(.heading-anchor):hover {
+  color: var(--pine);
+  text-decoration-color: var(--pine);
 }
 
 .markdown .heading-anchor {
@@ -115,36 +138,114 @@ body {
 
 .markdown ul,
 .markdown ol {
-  padding-left: 1.4em;
+  font-size: 1rem;
+  line-height: 1.75rem;
 }
 
 .markdown ul {
-  list-style: disc;
-}
-
-.markdown ol {
-  list-style: decimal;
-}
-
-.markdown li + li {
-  margin-top: 0.3em;
-}
-
-.markdown ul.contains-task-list {
   list-style: none;
   padding-left: 0;
 }
 
+.markdown ul > li {
+  position: relative;
+  padding-left: 1.15rem;
+}
+
+.markdown ul > li::before {
+  content: "";
+  position: absolute;
+  top: 0.7rem;
+  left: 0;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: var(--pine);
+  opacity: 0.72;
+}
+
+.markdown ol {
+  list-style: decimal;
+  padding-left: 1.4rem;
+}
+
+.markdown ol ::marker {
+  color: var(--muted);
+}
+
+.markdown li + li {
+  margin-top: 0.5rem;
+}
+
+.markdown li > p {
+  margin: 0;
+}
+
+.markdown ul.contains-task-list {
+  padding-left: 0;
+}
+
+.markdown ul.contains-task-list > li::before {
+  content: none;
+}
+
 .markdown .task-list-item {
   display: flex;
-  gap: 0.5em;
+  gap: 0.5rem;
   align-items: flex-start;
+  padding-left: 0;
+  color: var(--ink);
+}
+
+.markdown .task-list-item:has(input:not(:checked)) {
+  color: var(--muted);
+}
+
+.markdown .task-list-item input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0.3rem 0 0;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  background-color: var(--rule);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 0.85rem;
+}
+
+.markdown .task-list-item input[type="checkbox"]:checked {
+  background-color: var(--pine);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23fbfbf9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* 深色模式的 pine 是浅松绿，勾要用纸色才看得见 */
+html.dark .markdown .task-list-item input[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23232623' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.markdown > * + blockquote,
+.markdown > * + pre,
+.markdown > * + table {
+  margin-top: 1.75rem;
 }
 
 .markdown blockquote {
-  border-left: 2px solid var(--rule);
-  padding-left: 1em;
-  color: var(--muted);
+  margin-bottom: 1.75rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+  background: var(--chip);
+  padding: 0.5rem 1rem;
+  color: var(--ink);
+  font-family: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
+    "Noto Serif SC", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.5rem;
+  line-height: 2.35rem;
+}
+
+.markdown blockquote p {
+  margin: 0;
 }
 
 .markdown hr {
@@ -155,19 +256,40 @@ body {
 .markdown img {
   max-width: 100%;
   height: auto;
+  border-radius: 0.5rem;
 }
 
 .markdown table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
 }
 
 .markdown th,
 .markdown td {
-  border-bottom: 1px solid var(--rule);
-  padding: 0.45em 0.7em;
+  padding: 0.5rem 1rem;
   text-align: left;
+  vertical-align: top;
+}
+
+.markdown th {
+  background: var(--chip);
+  font-family: var(--font-inter), var(--font-noto-sans), "PingFang SC",
+    "Noto Sans SC", sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.markdown td {
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.markdown tbody tr:hover {
+  background: color-mix(in oklab, var(--chip) 55%, transparent);
 }
 
 .markdown del {
@@ -177,17 +299,30 @@ body {
 .markdown :not(pre) > code {
   font-size: 0.9em;
   padding: 0.1em 0.35em;
-  background: color-mix(in oklab, var(--rule) 45%, var(--paper));
+  border-radius: 0.25rem;
+  background: var(--chip);
+}
+
+.markdown pre,
+.markdown table {
+  margin-bottom: 1.75rem;
 }
 
 .markdown pre {
   overflow-x: auto;
+  border-radius: 0.5rem;
   padding: 1rem 1.1rem;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+/* Shiki 把背景写进 style。浅色改成纸色；深色保留原背景，否则浅色主题的字会糊在深底上 */
+html:not(.dark) .markdown pre,
+html:not(.dark) .markdown pre code {
+  background-color: var(--chip) !important;
 }
 
 .markdown pre code {
-  background: none;
   padding: 0;
+  font-size: inherit;
 }
