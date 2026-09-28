@@ -18,11 +18,12 @@ const serif = Noto_Serif_SC({
   display: "swap",
 });
 
-/** 标题与引用的拉丁字体。300 斜体给引用；中文不在字库里，会回落到 Noto Serif。 */
+/** 标题与引用。opsz 让大标题用展示字，而不是把正文字号放大。中文不在字库里。 */
 const display = Newsreader({
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: "variable",
   style: ["normal", "italic"],
+  axes: ["opsz"],
   variable: "--font-newsreader",
   display: "swap",
 });

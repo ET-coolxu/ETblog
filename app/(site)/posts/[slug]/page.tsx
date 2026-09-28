@@ -83,16 +83,16 @@ export default async function PostPage({ params }: PostPageProps) {
               </span>
               <span>{post.readingMinutes} 分钟阅读</span>
             </p>
-            <h1 className="mt-2 font-serif text-[1.75rem] font-normal leading-[2.35rem] tracking-[-0.01em] text-ink md:text-[2.5rem] md:leading-[3.2rem] md:tracking-[-0.015em]">
+            <h1 className="mt-2 font-serif text-[1.75rem] font-normal leading-[2.35rem] tracking-[-0.01em] text-ink [font-optical-sizing:auto] md:text-[2.5rem] md:leading-[3.2rem] md:tracking-[-0.015em]">
               {post.title}
             </h1>
             {post.tags.length > 0 ? (
-              <ul className="mt-4 flex flex-wrap gap-2">
+              <ul className="mt-4 flex flex-wrap items-center gap-2 text-[0.6875rem] leading-4">
                 {post.tags.map((tag) => (
                   <li key={tag}>
                     <Link
                       href={tagHref(tag)}
-                      className="inline-block rounded bg-chip px-2.5 py-0.5 font-label text-[0.6875rem] font-semibold tracking-[0.08em] text-muted transition-colors hover:text-pine"
+                      className="inline-block rounded-xs bg-tag-bg px-2.5 py-0.5 font-label text-[0.6875rem] font-semibold leading-4 tracking-[0.08em] text-tag transition-colors hover:text-pine"
                     >
                       {tag}
                     </Link>

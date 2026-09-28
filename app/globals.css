@@ -3,23 +3,31 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --paper: #fbfbf9;
-  --ink: #222426;
-  --muted: #6e7672;
-  --quiet: #8c948f;
-  --rule: #e5e8e3;
+  --paper: #faf8f5;
+  --ink: #1c1e21;
+  /* 正文比标题软一档，避免整栏一样黑 */
+  --ink-soft: #2b2a27;
+  --muted: #717973;
+  --quiet: #8b9096;
+  --rule: #e8e5df;
   --pine: #27503d;
-  --chip: #f4f6f3;
+  --chip: #f7f5f0;
+  /* 文章标签：稿面的 surface-container / on-surface-variant */
+  --tag-bg: #efeeeb;
+  --tag: #414943;
 }
 
 .dark {
   --paper: #232623;
   --ink: #f3f4f1;
+  --ink-soft: #e4e5e0;
   --muted: #a8b0ab;
   --quiet: #8c948f;
   --rule: #3a3f3c;
   --pine: #a4d0b8;
   --chip: #2c312e;
+  --tag-bg: #343936;
+  --tag: #c5cbc6;
 }
 
 @theme inline {
@@ -27,15 +35,18 @@
     "Hiragino Sans GB", "Noto Sans SC", sans-serif;
   --font-serif: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
     "Noto Serif SC", serif;
-  --font-label: var(--font-inter), var(--font-noto-sans), "PingFang SC",
-    "Noto Sans SC", sans-serif;
+  --font-label: var(--font-inter), "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", var(--font-noto-sans), "Noto Sans SC", sans-serif;
   --color-paper: var(--paper);
   --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
   --color-muted: var(--muted);
   --color-quiet: var(--quiet);
   --color-rule: var(--rule);
   --color-pine: var(--pine);
   --color-chip: var(--chip);
+  --color-tag-bg: var(--tag-bg);
+  --color-tag: var(--tag);
 }
 
 html {
@@ -70,11 +81,11 @@ body {
 /* 正文排印对齐 Quiet Editorial。关于页与后台预览共用这一层。
    字体不用 --font-serif / --font-label：@theme inline 不会把它们写成全局变量。 */
 .markdown {
-  font-family: var(--font-inter), var(--font-noto-sans), "PingFang SC",
-    "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  font-family: var(--font-inter), "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", var(--font-noto-sans), "Noto Sans SC", sans-serif;
   font-size: 1.125rem;
   line-height: 1.95rem;
-  color: var(--ink);
+  color: var(--ink-soft);
 }
 
 .markdown > * + * {
@@ -86,6 +97,7 @@ body {
   font-family: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
     "Noto Serif SC", serif;
   font-weight: 400;
+  font-optical-sizing: auto;
   color: var(--ink);
   /* 锚点跳转时让开固定顶栏 */
   scroll-margin-top: 6rem;
@@ -216,7 +228,7 @@ body {
 
 .markdown .task-list-item input[type="checkbox"]:checked {
   background-color: var(--pine);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23fbfbf9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23faf8f5' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 /* 深色模式的 pine 是浅松绿，勾要用纸色才看得见 */
@@ -239,6 +251,9 @@ html.dark .markdown .task-list-item input[type="checkbox"]:checked {
   font-family: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
     "Noto Serif SC", serif;
   font-style: italic;
+  /* 中文衬线没有斜体字，关掉合成斜体；拉丁仍用 Newsreader 的真斜体 */
+  font-synthesis: none;
+  font-optical-sizing: auto;
   font-weight: 300;
   font-size: 1.5rem;
   line-height: 2.35rem;
