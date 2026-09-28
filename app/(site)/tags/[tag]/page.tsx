@@ -1,38 +1,41 @@
 import type { Metadata } from "next";
-import { EmptyState, PostCard } from "@/components/post-card";
-import { getPublishedPostsByTag } from "@/lib/posts";
+import { POSTS_PAGE_SIZE, parsePageParam, slicePage } from "@/components/pagination";
+import { PostFilterHeader, PostIndexView } from "@/components/post-index";
+import { getPublishedPostsByTag, tagHref } from "@/lib/posts";
 
 type TagPageProps = {
   params: Promise<{ tag: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 export async function generateMetadata({
   params,
 }: TagPageProps): Promise<Metadata> {
   const { tag } = await params;
-  const decoded = decodeURIComponent(tag);
-  return { title: decoded };
+  return { title: `标签：${decodeURIComponent(tag)}` };
 }
 
-export default async function TagPage({ params }: TagPageProps) {
-  const { tag } = await params;
+export default async function TagPage({ params, searchParams }: TagPageProps) {
+  const [{ tag }, { page: pageParam }] = await Promise.all([params, searchParams]);
   const decoded = decodeURIComponent(tag);
   const posts = await getPublishedPostsByTag(decoded);
+  const { pageCount, currentPage, slice } = slicePage(posts, parsePageParam(pageParam), POSTS_PAGE_SIZE);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
-      <h1 className="font-serif text-3xl font-semibold text-ink">{decoded}</h1>
-      {posts.length > 0 ? (
-        <div className="mt-10 space-y-10">
-          {posts.map((post) => (
-            <PostCard key={post.slug} post={post} />
-          ))}
-        </div>
-      ) : (
-        <div className="mt-10">
-          <EmptyState>没有带「{decoded}」标签的已发布文章。</EmptyState>
-        </div>
-      )}
-    </main>
+    <PostIndexView
+      header={<PostFilterHeader tag={decoded} count={posts.length} />}
+      posts={slice}
+      activeTag={decoded}
+      empty={`没有带「${decoded}」标签的已发布文章。`}
+      page={currentPage}
+      pageCount={pageCount}
+      hrefFor={(nextPage) => tagPageHref(decoded, nextPage)}
+    />
   );
+}
+
+/** 标签页翻页。第 1 页不带 query，避免 `/tags/x?page=1`。 */
+function tagPageHref(tag: string, page: number): string {
+  const path = tagHref(tag);
+  return page > 1 ? `${path}?page=${page}` : path;
 }

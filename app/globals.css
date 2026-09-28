@@ -15,6 +15,19 @@
   /* 文章标签：稿面的 surface-container / on-surface-variant */
   --tag-bg: #efeeeb;
   --tag: #414943;
+  /* 列表 / 标签筛选只在这两页用，数值来自 stitch 浅色屏 */
+  --list-ink: #1c1b19;
+  --list-muted: #706e6b;
+  --list-dim: #a3a09a;
+  --list-line: #e2dfd8;
+  /* 列表内容区用稿面纸色。站内纸色更暖，芯片若直接垫上去会发灰 */
+  --list-surface: #fbfbf9;
+  --list-chip: #f5f4ef;
+  --list-chip-hover: #f1ede9;
+  --list-accent: #3a674f;
+  --list-mint: #bceecf;
+  --list-mint-ink: #224f39;
+  --list-on-ink: #fbfbf9;
 }
 
 .dark {
@@ -28,6 +41,17 @@
   --chip: #2c312e;
   --tag-bg: #343936;
   --tag: #c5cbc6;
+  --list-ink: var(--ink);
+  --list-muted: var(--muted);
+  --list-dim: var(--quiet);
+  --list-line: var(--rule);
+  --list-surface: var(--paper);
+  --list-chip: var(--chip);
+  --list-chip-hover: #3a3f3c;
+  --list-accent: var(--pine);
+  --list-mint: #31493d;
+  --list-mint-ink: #c5e6d4;
+  --list-on-ink: var(--paper);
 }
 
 @theme inline {
@@ -37,6 +61,19 @@
     "Noto Serif SC", serif;
   --font-label: var(--font-inter), "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", var(--font-noto-sans), "Noto Sans SC", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+  --color-list-ink: var(--list-ink);
+  --color-list-muted: var(--list-muted);
+  --color-list-dim: var(--list-dim);
+  --color-list-line: var(--list-line);
+  --color-list-surface: var(--list-surface);
+  --color-list-chip: var(--list-chip);
+  --color-list-chip-hover: var(--list-chip-hover);
+  --color-list-accent: var(--list-accent);
+  --color-list-mint: var(--list-mint);
+  --color-list-mint-ink: var(--list-mint-ink);
+  --color-list-on-ink: var(--list-on-ink);
   --color-paper: var(--paper);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
@@ -76,6 +113,21 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* 只给文章列表用，不改全站 --font-serif / --font-label，顶栏和页脚不受影响。
+   网页字体必须写在系统字体前面：Windows 上雅黑、宋体一出现就会截住后面的 Noto。
+   雅黑没有字重 500，笔画又被 ClearType 吸成方头，所以比稿面的 Noto 硬。
+   光学尺寸关掉：稿面的 Newsreader 没有打开 opsz，停在默认正文切才圆。 */
+.list-serif {
+  font-family: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
+    "Noto Serif SC", serif;
+  font-optical-sizing: none;
+}
+
+.list-sans {
+  font-family: var(--font-inter), var(--font-noto-sans), "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
 }
 
 /* 正文排印对齐 Quiet Editorial。关于页与后台预览共用这一层。

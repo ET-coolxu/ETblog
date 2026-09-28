@@ -9,7 +9,8 @@ export default function SiteLayout({
   return (
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
-      <div className="flex-1 pt-16">{children}</div>
+      {/* 纵向 flex，文章列表才能把稿面纸色铺满页眉和页脚之间 */}
+      <div className="flex flex-1 flex-col pt-16">{children}</div>
       <SiteFooter />
     </div>
   );
