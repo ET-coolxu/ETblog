@@ -1,11 +1,11 @@
 ---
 name: agent-prompts
-description: 在 docs/agent-prompts 中创建、更新、归档并执行提示词。用户提出新需求、优化、架构更新、修 bug，或要写/改/发送提示词时使用。
+description: 为核心功能与逻辑在 docs/agent-prompts 中创建、更新、归档并执行提示词。新能力、行为、数据读写、鉴权、架构、逻辑缺陷，或用户要写/改/发送提示词时使用。文案、样式、格式等简单修改不要用本技能。
 ---
 
 # Agent Prompts
 
-提示词文件是任务的唯一说明：发给 AI 实现，也用来存档和改需求。
+提示词文件是核心功能与逻辑的任务说明：发给 AI 实现，也用来存档和改需求。何时要写，以 `.cursor/rules/agent-prompts.mdc` 为准。文案、样式、格式、不改行为的小补丁直接改代码，不要建提示词。
 
 ## 目录
 
@@ -52,7 +52,7 @@ docs/agent-prompts/
 4. 对照 `.cursor/rules/project-conventions.mdc`，冲突的需求写进「约束」或「非目标」。
 5. 写完把 `status` 改为 `ready`，把路径告诉用户，说明可以 `@` 该文件发给 AI。
 
-聊天里出现的需求、验收、范围变更：立刻写回提示词，再继续改代码。
+已有提示词的任务若在聊天里改了需求、验收或范围：立刻写回该文件，再继续改代码。
 
 ### 4. 按提示词实现
 
@@ -71,4 +71,4 @@ docs/agent-prompts/
 
 `draft` → `ready` → `in-progress` → `done`（随后移入 `archive/`）
 
-不要把任务文件放进 `_templates/`。不要只在对话里改需求。
+不要把任务文件放进 `_templates/`。走提示词的需求不要只在对话里改。
