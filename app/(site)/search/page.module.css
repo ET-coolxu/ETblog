@@ -1,0 +1,33 @@
+.form {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.form .input {
+  width: auto;
+  min-width: 0;
+  flex: 1;
+  margin-top: 0;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: transparent;
+  padding-block: var(--space-2);
+  color: var(--ink);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  margin-top: var(--space-10);
+}
+
+.submit {
+  flex-shrink: 0;
+}

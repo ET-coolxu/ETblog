@@ -7,6 +7,7 @@ import {
   getTotalPageViews,
   listPublishedPostViews,
 } from "@/lib/stats";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "访问统计",
@@ -20,27 +21,25 @@ export default async function AdminStatsPage() {
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
-      <h1 className="font-serif text-3xl font-semibold text-ink">访问统计</h1>
-      <p className="mt-4 text-sm text-muted">仅统计访客打开已发布正文的次数，管理员访问不计入。</p>
+    <main className="page">
+      <h1 className="doc-title">访问统计</h1>
+      <p className={styles.intro}>仅统计访客打开已发布正文的次数，管理员访问不计入。</p>
 
-      <p className="mt-10 font-serif text-2xl text-ink">
-        总浏览 {total} 次
-      </p>
+      <p className={styles.total}>总浏览 {total} 次</p>
 
-      <section className="mt-12">
-        <h2 className="font-serif text-xl font-semibold text-ink">热门文章</h2>
+      <section className={styles.section}>
+        <h2 className={styles.heading}>热门文章</h2>
         {top.length > 0 ? (
-          <ol className="mt-6 space-y-4">
+          <ol className={styles.rank}>
             {top.map((item, index) => (
-              <li key={item.slug} className="flex items-baseline justify-between gap-4">
-                <span>
-                  <span className="mr-3 text-sm text-muted">{index + 1}</span>
-                  <Link href={`/posts/${item.slug}`} className="hover:text-pine">
+              <li key={item.slug} className={styles.rankItem}>
+                <span className={styles.rankMain}>
+                  <span className={styles.index}>{index + 1}</span>
+                  <Link href={`/posts/${item.slug}`} className={styles.title}>
                     {item.title}
                   </Link>
                 </span>
-                <span className="shrink-0 text-sm text-muted">{item.views} 次</span>
+                <span className={styles.count}>{item.views} 次</span>
               </li>
             ))}
           </ol>
@@ -51,27 +50,27 @@ export default async function AdminStatsPage() {
         )}
       </section>
 
-      <section className="mt-12">
-        <h2 className="font-serif text-xl font-semibold text-ink">各篇文章</h2>
+      <section className={styles.section}>
+        <h2 className={styles.heading}>各篇文章</h2>
         {all.length > 0 ? (
-          <table className="mt-6 w-full text-left text-sm">
+          <table className={styles.table}>
             <thead>
-              <tr className="border-b border-rule text-muted">
-                <th className="py-2 font-normal">文章</th>
-                <th className="py-2 font-normal">日期</th>
-                <th className="py-2 text-right font-normal">浏览</th>
+              <tr className={styles.head}>
+                <th className={styles.headCell}>文章</th>
+                <th className={styles.headCell}>日期</th>
+                <th className={`${styles.headCell} ${styles.right}`}>浏览</th>
               </tr>
             </thead>
             <tbody>
               {all.map((item) => (
-                <tr key={item.slug} className="border-b border-rule">
-                  <td className="py-3 pr-4">
-                    <Link href={`/admin/posts/${item.slug}`} className="hover:text-pine">
+                <tr key={item.slug} className={styles.line}>
+                  <td className={styles.cell}>
+                    <Link href={`/admin/posts/${item.slug}`} className={styles.title}>
                       {item.title}
                     </Link>
                   </td>
-                  <td className="py-3 pr-4 text-muted">{formatPostDate(item.date)}</td>
-                  <td className="py-3 text-right tabular-nums">{item.views}</td>
+                  <td className={`muted ${styles.cell}`}>{formatPostDate(item.date)}</td>
+                  <td className={`${styles.cell} ${styles.right}`}>{item.views}</td>
                 </tr>
               ))}
             </tbody>

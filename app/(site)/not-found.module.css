@@ -1,0 +1,5 @@
+.lede {
+  margin-top: var(--space-4);
+  line-height: var(--leading-7);
+  color: var(--muted);
+}

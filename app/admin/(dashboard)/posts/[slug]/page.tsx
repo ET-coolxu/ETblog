@@ -29,8 +29,8 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   const remove = deletePostAction.bind(null, post.slug);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 py-16">
-      <h1 className="font-serif text-3xl font-semibold text-ink">编辑文章</h1>
+    <main className="page-wide">
+      <h1 className="doc-title">编辑文章</h1>
       <PostEditor
         mode="edit"
         status={adminPostStatus(post)}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import styles from "./pagination.module.css";
 
 /** 文章索引每页条数。`/posts` 与标签页共用。 */
 export const POSTS_PAGE_SIZE = 10;
@@ -45,10 +46,10 @@ export function Pagination({
   return (
     <nav
       aria-label="文章分页"
-      className="list-sans flex items-center justify-between pt-10 pb-2 text-[13px] leading-5"
+      className={styles.nav}
     >
       <PageControl href={hrefFor(page - 1)} disabled={page <= 1} direction="prev" />
-      <span className="font-mono text-[13px] leading-[22px] text-list-muted">
+      <span className={styles.pages}>
         {page} / {pageCount}
       </span>
       <PageControl href={hrefFor(page + 1)} disabled={page >= pageCount} direction="next" />
@@ -66,11 +67,11 @@ function PageControl({
   direction: "prev" | "next";
 }) {
   const label = direction === "prev" ? "上一页" : "下一页";
-  const className = "inline-flex items-center gap-1";
+  const className = styles.control;
 
   if (disabled) {
     return (
-      <span className={`${className} cursor-default text-list-dim select-none`}>
+      <span className={`${className} ${styles.disabled}`}>
         {direction === "prev" ? <Arrow direction={direction} /> : null}
         {label}
         {direction === "next" ? <Arrow direction={direction} /> : null}
@@ -79,7 +80,7 @@ function PageControl({
   }
 
   return (
-    <Link href={href} className={`${className} text-list-muted transition-colors hover:text-list-ink`}>
+    <Link href={href} className={`${className} ${styles.link}`}>
       {direction === "prev" ? <Arrow direction={direction} /> : null}
       {label}
       {direction === "next" ? <Arrow direction={direction} /> : null}
@@ -89,7 +90,7 @@ function PageControl({
 
 function Arrow({ direction }: { direction: "prev" | "next" }) {
   return (
-    <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
+    <svg viewBox="0 0 24 24" className="icon" aria-hidden>
       <path
         d={direction === "prev" ? "M19 12H5M11 6l-6 6 6 6" : "M5 12h14M13 6l6 6-6 6"}
         fill="none"

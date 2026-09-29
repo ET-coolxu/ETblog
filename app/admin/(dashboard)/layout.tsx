@@ -1,6 +1,7 @@
 import { requireAdminSession } from "@/lib/auth";
 import { getSiteConfig } from "@/lib/site";
 import { AdminHeader } from "@/components/admin-header";
+import styles from "./layout.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +14,9 @@ export default async function AdminDashboardLayout({
   const site = getSiteConfig();
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className={styles.frame}>
       <AdminHeader siteName={site.name} />
-      <div className="flex-1">{children}</div>
+      <div className={styles.main}>{children}</div>
     </div>
   );
 }

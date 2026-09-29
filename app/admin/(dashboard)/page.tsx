@@ -7,6 +7,7 @@ import {
   listAdminPosts,
   type AdminPostStatus,
 } from "@/lib/posts";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "文章",
@@ -22,41 +23,36 @@ export default async function AdminHomePage() {
   const posts = await listAdminPosts();
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <h1 className="font-serif text-3xl font-semibold text-ink">文章</h1>
-        <div className="flex gap-4 text-sm">
-          <Link href="/admin/posts/new" className="text-pine hover:text-ink">
+    <main className="page">
+      <div className={`spread ${styles.head}`}>
+        <h1 className="doc-title">文章</h1>
+        <div className={styles.actions}>
+          <Link href="/admin/posts/new" className="link">
             写文章
           </Link>
-          <Link href="/admin/stats" className="text-muted hover:text-ink">
+          <Link href="/admin/stats" className="link-quiet">
             统计
           </Link>
         </div>
       </div>
 
       {posts.length > 0 ? (
-        <ul className="mt-10 divide-y divide-rule">
+        <ul className={`divided ${styles.list}`}>
           {posts.map((post) => {
             const status = adminPostStatus(post);
             return (
-              <li key={post.slug} className="flex flex-wrap items-baseline justify-between gap-3 py-5">
+              <li key={post.slug} className={styles.row}>
                 <div>
-                  <Link
-                    href={`/admin/posts/${post.slug}`}
-                    className="font-serif text-xl font-semibold text-ink hover:text-pine"
-                  >
+                  <Link href={`/admin/posts/${post.slug}`} className={styles.title}>
                     {post.title}
                   </Link>
-                  <p className="mt-1 text-sm text-muted">
+                  <p className={styles.meta}>
                     {formatPostDate(post.date)}
                     <span aria-hidden="true"> · </span>
                     {post.slug}
                   </p>
                 </div>
-                <span
-                  className={status === "published" ? "text-sm text-pine" : "text-sm text-muted"}
-                >
+                <span className={status === "published" ? styles.published : styles.draft}>
                   {STATUS_LABEL[status]}
                 </span>
               </li>

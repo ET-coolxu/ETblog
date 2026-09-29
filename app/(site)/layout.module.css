@@ -1,0 +1,13 @@
+.frame {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+/* 纵向 flex，文章列表才能把稿面纸色铺满页眉和页脚之间 */
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-top: var(--header-h);
+}

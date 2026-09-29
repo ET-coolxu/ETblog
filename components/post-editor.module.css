@@ -1,0 +1,170 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-top: var(--space-10);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.editor {
+  position: relative;
+}
+
+.split {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+}
+
+.area,
+.preview {
+  min-height: 28rem;
+  width: 100%;
+  border: 1px solid var(--rule);
+  padding: var(--space-3);
+}
+
+.area {
+  resize: vertical;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-7);
+  color: var(--ink);
+  outline: none;
+}
+
+.preview {
+  overflow: auto;
+}
+
+.drop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--pine);
+  background: color-mix(in oklab, var(--paper) 80%, transparent);
+  font-size: var(--text-sm);
+  color: var(--pine);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.quiet,
+.primary {
+  font-size: var(--text-sm);
+  transition: color var(--ease);
+}
+
+.quiet {
+  color: var(--muted);
+}
+
+.primary {
+  color: var(--pine);
+}
+
+.quiet:hover,
+.primary:hover {
+  color: var(--ink);
+}
+
+.quiet:disabled,
+.primary:disabled {
+  color: var(--muted);
+}
+
+.cover {
+  margin-top: var(--space-3);
+  max-height: 10rem;
+  width: 100%;
+  object-fit: cover;
+}
+
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.field {
+  width: 100%;
+  margin-top: var(--space-1);
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: transparent;
+  padding-block: var(--space-2);
+  color: var(--ink);
+  outline: none;
+}
+
+.field::placeholder {
+  color: var(--muted);
+}
+
+.hint {
+  margin-top: var(--space-2);
+  font-size: var(--text-hint);
+  line-height: var(--leading-4);
+  color: var(--muted);
+}
+
+.note {
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.alert {
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--pine);
+}
+
+.dim {
+  color: var(--muted);
+}
+
+.pick {
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 原来的 lg 断点，正文和预览并排 */
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+  }
+}

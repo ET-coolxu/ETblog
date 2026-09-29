@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import styles from "./not-found.module.css";
 
 export const metadata: Metadata = {
   title: "未找到",
@@ -9,15 +10,13 @@ export const metadata: Metadata = {
 
 export default function RootNotFound() {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className={styles.frame}>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-24">
-        <h1 className="font-serif text-2xl text-ink">没有找到这个页面</h1>
-        <p className="mt-4 leading-7 text-muted">
-          可能是链接写错了，或这是一篇尚未发布的草稿。
-        </p>
+      <main className={`page-tall ${styles.main}`}>
+        <h1 className="font-serif text-2xl">没有找到这个页面</h1>
+        <p className={styles.lede}>可能是链接写错了，或这是一篇尚未发布的草稿。</p>
         <p className="mt-6">
-          <Link href="/" className="text-pine hover:text-ink">
+          <Link href="/" className="link">
             回到首页
           </Link>
         </p>

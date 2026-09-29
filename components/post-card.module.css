@@ -1,0 +1,52 @@
+.card {
+  border-left: 1px solid var(--rule);
+  padding-left: var(--space-6);
+}
+
+.cover {
+  display: block;
+  margin-bottom: var(--space-3);
+}
+
+.coverImage {
+  max-height: 10rem;
+  width: 100%;
+  object-fit: cover;
+}
+
+.date {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.title {
+  margin-top: var(--space-1);
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+}
+
+.title a {
+  transition: color var(--ease);
+}
+
+.title a:hover {
+  color: var(--pine);
+}
+
+.summary {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-7);
+  color: var(--muted);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+}

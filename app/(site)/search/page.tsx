@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { EmptyState, PostCard } from "@/components/post-card";
 import { searchPublishedPosts } from "@/lib/search";
+import styles from "./page.module.css";
 
 type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
@@ -22,9 +23,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const results = query ? await searchPublishedPosts(query) : [];
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
-      <h1 className="font-serif text-3xl font-semibold text-ink">搜索</h1>
-      <form action="/search" method="get" className="mt-8 flex gap-3" role="search">
+    <main className="page">
+      <h1 className="doc-title">搜索</h1>
+      <form action="/search" method="get" className={styles.form} role="search">
         <label htmlFor="search-q" className="sr-only">
           搜索关键词
         </label>
@@ -35,16 +36,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           defaultValue={query}
           placeholder="搜索标题、摘要或正文"
           autoComplete="off"
-          className="min-w-0 flex-1 border-b border-rule bg-transparent py-2 text-ink outline-none placeholder:text-muted"
+          className={styles.input}
         />
-        <button type="submit" className="shrink-0 text-pine hover:text-ink">
+        <button type="submit" className={`link ${styles.submit}`}>
           搜索
         </button>
       </form>
 
       {query ? (
         results.length > 0 ? (
-          <div className="mt-10 space-y-10">
+          <div className={styles.results}>
             {results.map((post) => (
               <PostCard key={post.slug} post={post} />
             ))}
@@ -55,7 +56,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
         )
       ) : (
-        <p className="mt-10 text-muted">输入关键词，搜索已发布文章的标题、摘要和正文。</p>
+        <p className="mt-10 muted">输入关键词，搜索已发布文章的标题、摘要和正文。</p>
       )}
     </main>
   );

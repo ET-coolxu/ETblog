@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { TocItem } from "@/lib/markdown";
+import styles from "./table-of-contents.module.css";
 
 const ActiveIdContext = createContext<string | undefined>(undefined);
 
@@ -55,30 +56,19 @@ function TocLinks({ items }: { items: TocItem[] }) {
   const activeId = useContext(ActiveIdContext);
 
   return (
-    <ol className="space-y-2.5 font-label text-[0.8125rem] font-medium leading-5">
+    <ol className={styles.list}>
       {items.map((item) => {
         const active = item.id === activeId;
 
         return (
-          <li key={item.id} className={item.depth === 3 ? "pl-3" : undefined}>
+          <li key={item.id} className={item.depth === 3 ? styles.nested : undefined}>
             <a
               href={`#${item.id}`}
               aria-current={active ? "location" : undefined}
-              className={
-                active
-                  ? "flex items-center text-pine"
-                  : "flex items-center text-muted transition-colors hover:text-ink"
-              }
+              className={active ? styles.current : styles.link}
             >
-              <span
-                aria-hidden="true"
-                className={
-                  active
-                    ? "mr-2.5 h-3.5 w-0.5 shrink-0 rounded-full bg-pine"
-                    : "mr-2.5 h-3.5 w-0.5 shrink-0 rounded-full bg-transparent"
-                }
-              />
-              <span className="truncate">{item.text}</span>
+              <span aria-hidden="true" className={active ? styles.markOn : styles.mark} />
+              <span className={styles.text}>{item.text}</span>
             </a>
           </li>
         );
@@ -103,10 +93,9 @@ export function PostReadingFrame({
 
   return (
     <ActiveIdContext.Provider value={activeId}>
-      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,760px)_minmax(0,1fr)] xl:items-start xl:gap-x-8">
+      <div className={styles.frame}>
         {items.length > 0 ? <TocRail items={items} /> : null}
-        {/* 无目录时也要钉在中间列，否则唯一的网格项会落到左列 */}
-        <div className="mx-auto w-full max-w-[760px] xl:col-start-2 xl:row-start-1 xl:mx-0">
+        <div className={styles.column}>
           {children}
         </div>
       </div>
@@ -123,11 +112,11 @@ export function TocDetails({ items }: { items: TocItem[] }) {
   }
 
   return (
-    <details className="mt-10 border-t border-rule pt-4 xl:hidden">
-      <summary className="cursor-pointer font-label text-[0.8125rem] font-medium tracking-[0.04em] text-muted">
+    <details className={styles.details}>
+      <summary className={styles.summary}>
         目录
       </summary>
-      <div className="mt-4">
+      <div className={styles.panel}>
         <TocLinks items={items} />
       </div>
     </details>
@@ -139,9 +128,9 @@ export function TocDetails({ items }: { items: TocItem[] }) {
  */
 function TocRail({ items }: { items: TocItem[] }) {
   return (
-    <aside className="sticky top-28 hidden w-[190px] justify-self-end self-start xl:col-start-1 xl:row-start-1 xl:block">
-      <nav aria-label="文章目录" className="pt-2">
-        <p className="mb-4 font-label text-[0.8125rem] font-medium tracking-[0.08em] text-muted">
+    <aside className={styles.rail}>
+      <nav aria-label="文章目录" className={styles.railNav}>
+        <p className={styles.railLabel}>
           目录
         </p>
         <TocLinks items={items} />

@@ -82,7 +82,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body
-        className={`${sans.variable} ${serif.variable} ${display.variable} ${text.variable} ${label.variable} ${mono.variable} min-h-dvh bg-paper font-sans text-ink antialiased`}
+        className={`${sans.variable} ${serif.variable} ${display.variable} ${text.variable} ${label.variable} ${mono.variable}`}
       >
         <ThemeProvider>{children}</ThemeProvider>
       </body>

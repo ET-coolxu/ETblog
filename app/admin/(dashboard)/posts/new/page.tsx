@@ -16,8 +16,8 @@ function todayIso(): string {
 
 export default function NewPostPage() {
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 py-16">
-      <h1 className="font-serif text-3xl font-semibold text-ink">写文章</h1>
+    <main className="page-wide">
+      <h1 className="doc-title">写文章</h1>
       <PostEditor
         mode="create"
         action={createPostAction}

@@ -1,0 +1,259 @@
+/* 正文排印。关于页与后台预览共用这一层。选择器必须是全局类，MDX 产出的 HTML 不走 CSS Modules。 */
+
+.markdown {
+  font-family: var(--font-label);
+  font-size: var(--text-prose);
+  line-height: var(--leading-prose);
+  color: var(--ink-soft);
+}
+
+.markdown > * + * {
+  margin-top: var(--space-4);
+}
+
+.markdown h2,
+.markdown h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  color: var(--ink);
+  /* 锚点跳转时让开固定顶栏 */
+  scroll-margin-top: var(--space-24);
+}
+
+.markdown h2 {
+  font-size: var(--text-h2);
+  line-height: var(--leading-h2);
+  letter-spacing: var(--tracking-title);
+  padding-top: var(--space-2);
+}
+
+/* 段间距规则和这里同优先级，写在后面才不会把标题贴回上一段 */
+.markdown > * + h2 {
+  margin-top: var(--space-12);
+}
+
+.markdown h3 {
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+}
+
+.markdown > * + h3 {
+  margin-top: var(--space-7);
+}
+
+.markdown a:not(.heading-anchor) {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 4px;
+  transition:
+    color var(--ease),
+    text-decoration-color var(--ease);
+}
+
+.markdown a:not(.heading-anchor):hover {
+  color: var(--pine);
+  text-decoration-color: var(--pine);
+}
+
+.markdown .heading-anchor {
+  color: inherit;
+  text-decoration: none;
+}
+
+.markdown .heading-anchor:hover {
+  color: var(--pine);
+}
+
+.markdown ul,
+.markdown ol {
+  font-size: var(--text-base);
+  line-height: var(--leading-7);
+}
+
+.markdown ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.markdown ul > li {
+  position: relative;
+  padding-left: 1.15rem;
+}
+
+.markdown ul > li::before {
+  content: "";
+  position: absolute;
+  top: 0.7rem;
+  left: 0;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--radius-full);
+  background: var(--pine);
+  opacity: 0.72;
+}
+
+.markdown ol {
+  list-style: decimal;
+  padding-left: 1.4rem;
+}
+
+.markdown ol ::marker {
+  color: var(--muted);
+}
+
+.markdown li + li {
+  margin-top: var(--space-2);
+}
+
+.markdown li > p {
+  margin: 0;
+}
+
+.markdown ul.contains-task-list {
+  padding-left: 0;
+}
+
+.markdown ul.contains-task-list > li::before {
+  content: none;
+}
+
+.markdown .task-list-item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding-left: 0;
+  color: var(--ink);
+}
+
+.markdown .task-list-item:has(input:not(:checked)) {
+  color: var(--muted);
+}
+
+.markdown .task-list-item input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0.3rem 0 0;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  background-color: var(--rule);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 0.85rem;
+}
+
+.markdown .task-list-item input[type="checkbox"]:checked {
+  background-color: var(--pine);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23faf8f5' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* 深色模式的 pine 是浅松绿，勾要用纸色才看得见 */
+html.dark .markdown .task-list-item input[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23232623' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.markdown > * + blockquote,
+.markdown > * + pre,
+.markdown > * + table {
+  margin-top: var(--space-7);
+}
+
+.markdown blockquote {
+  margin-bottom: var(--space-7);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--chip);
+  padding: var(--space-2) var(--space-4);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-style: italic;
+  /* 中文衬线没有斜体字，关掉合成斜体；拉丁仍用 Newsreader 的真斜体 */
+  font-synthesis: none;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-size: var(--text-quote);
+  line-height: var(--leading-quote);
+}
+
+.markdown blockquote p {
+  margin: 0;
+}
+
+.markdown hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+}
+
+.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  line-height: 1.5rem;
+}
+
+.markdown th,
+.markdown td {
+  padding: var(--space-2) var(--space-4);
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdown th {
+  background: var(--chip);
+  font-family: var(--font-list);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-chip);
+  color: var(--ink);
+}
+
+.markdown td {
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.markdown tbody tr:hover {
+  background: color-mix(in oklab, var(--chip) 55%, transparent);
+}
+
+.markdown del {
+  color: var(--muted);
+}
+
+.markdown :not(pre) > code {
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius);
+  background: var(--chip);
+}
+
+.markdown pre,
+.markdown table {
+  margin-bottom: var(--space-7);
+}
+
+.markdown pre {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) 1.1rem;
+  font-size: var(--text-sm);
+  line-height: 1.5rem;
+}
+
+/* Shiki 把背景写进 style。浅色改成纸色；深色保留原背景，否则浅色主题的字会糊在深底上 */
+html:not(.dark) .markdown pre,
+html:not(.dark) .markdown pre code {
+  background-color: var(--chip) !important;
+}
+
+.markdown pre code {
+  padding: 0;
+  font-size: inherit;
+}

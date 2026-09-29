@@ -1,0 +1,31 @@
+.header {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in oklab, var(--paper) 90%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.bar {
+  display: flex;
+  height: var(--header-h);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.brand {
+  flex-shrink: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+  transition: color var(--ease);
+}
+
+.brand:hover {
+  color: var(--pine);
+}

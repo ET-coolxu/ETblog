@@ -11,8 +11,8 @@ export default async function AboutPage() {
   const source = await getAboutSource();
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-16">
-      <h1 className="font-serif text-3xl font-semibold text-ink">关于</h1>
+    <main className="page">
+      <h1 className="doc-title">关于</h1>
       {source ? (
         <div className="markdown mt-10">{await renderMarkdown(source)}</div>
       ) : (

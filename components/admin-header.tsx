@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/admin/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
+import styles from "./admin-header.module.css";
 
 const navItems = [
   { href: "/admin", label: "文章", match: "exact" as const },
@@ -22,32 +23,32 @@ export function AdminHeader({ siteName }: { siteName: string }) {
   const pathname = usePathname();
 
   return (
-    <header className="border-b border-rule">
-      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <Link href="/admin" className="font-serif text-lg font-semibold text-ink">
+    <header className={styles.header}>
+      <div className={styles.bar}>
+        <div className={styles.brandGroup}>
+          <Link href="/admin" className={styles.brand}>
             {siteName}
-            <span className="ml-2 text-sm font-normal text-muted">后台</span>
+            <span className={styles.badge}>后台</span>
           </Link>
-          <nav aria-label="后台" className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+          <nav aria-label="后台" className={styles.nav}>
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={isActive(pathname, item.href, item.match) ? "text-ink" : "hover:text-ink"}
+                className={isActive(pathname, item.href, item.match) ? styles.current : styles.item}
               >
                 {item.label}
               </Link>
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-x-4 text-sm text-muted">
-          <Link href="/" className="hover:text-ink">
+        <div className={styles.tools}>
+          <Link href="/" className={styles.tool}>
             前台
           </Link>
           <ThemeToggle />
           <form action={logoutAction}>
-            <button type="submit" className="hover:text-ink">
+            <button type="submit" className={styles.tool}>
               登出
             </button>
           </form>

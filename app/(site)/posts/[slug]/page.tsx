@@ -13,6 +13,7 @@ import {
   tagHref,
 } from "@/lib/posts";
 import { recordPostView } from "@/lib/stats";
+import styles from "./page.module.css";
 
 type PostPageProps = {
   params: Promise<{ slug: string }>;
@@ -69,31 +70,23 @@ export default async function PostPage({ params }: PostPageProps) {
   const toc = extractToc(post.body);
 
   return (
-    <main className="w-full px-5 py-12 md:px-10">
-      {/*
-        阅读栏固定 760px 并居中。xl 起目录在左列，只占配重空白，不改变中间列宽度。
-      */}
+    <main className={styles.main}>
       <PostReadingFrame items={toc}>
         <article>
           <header>
-            <p className="flex items-center gap-2 font-label text-[0.8125rem] font-medium leading-5 tracking-[0.04em] text-muted">
+            <p className={styles.meta}>
               <time dateTime={post.date}>{formatPostDate(post.date)}</time>
-              <span className="text-quiet" aria-hidden="true">
+              <span className="quiet" aria-hidden="true">
                 ·
               </span>
               <span>{post.readingMinutes} 分钟阅读</span>
             </p>
-            <h1 className="mt-2 font-serif text-[1.75rem] font-normal leading-[2.35rem] tracking-[-0.01em] text-ink [font-optical-sizing:auto] md:text-[2.5rem] md:leading-[3.2rem] md:tracking-[-0.015em]">
-              {post.title}
-            </h1>
+            <h1 className={styles.title}>{post.title}</h1>
             {post.tags.length > 0 ? (
-              <ul className="mt-4 flex flex-wrap items-center gap-2 text-[0.6875rem] leading-4">
+              <ul className={styles.tags}>
                 {post.tags.map((tag) => (
                   <li key={tag}>
-                    <Link
-                      href={tagHref(tag)}
-                      className="inline-block rounded-xs bg-tag-bg px-2.5 py-0.5 font-label text-[0.6875rem] font-semibold leading-4 tracking-[0.08em] text-tag transition-colors hover:text-pine"
-                    >
+                    <Link href={tagHref(tag)} className={styles.tag}>
                       {tag}
                     </Link>
                   </li>
@@ -101,50 +94,29 @@ export default async function PostPage({ params }: PostPageProps) {
               </ul>
             ) : null}
             {post.cover ? (
-              <div className="mt-7 aspect-video overflow-hidden rounded-lg bg-chip">
-                <CoverImage
-                  src={post.cover}
-                  alt={post.title}
-                  className="h-full w-full object-cover"
-                />
+              <div className={styles.cover}>
+                <CoverImage src={post.cover} alt={post.title} className={styles.coverImage} />
               </div>
             ) : null}
           </header>
 
           <TocDetails items={toc} />
 
-          <div className="markdown mt-12">{content}</div>
+          <div className={`markdown ${styles.body}`}>{content}</div>
 
-          <nav
-            aria-label="相邻文章"
-            className="mt-12 flex flex-col gap-4 pt-12 sm:flex-row sm:items-start sm:justify-between"
-          >
+          <nav aria-label="相邻文章" className={styles.adjacent}>
             {adjacent.older ? (
-              <Link
-                href={`/posts/${adjacent.older.slug}`}
-                className="group flex w-fit max-w-xs flex-col rounded p-2 transition-colors hover:bg-chip"
-              >
-                <span className="mb-1 block font-label text-[0.6875rem] font-semibold tracking-[0.08em] text-muted transition-colors group-hover:text-pine">
-                  ← 上一篇
-                </span>
-                <span className="text-ink transition-colors group-hover:text-pine">
-                  {adjacent.older.title}
-                </span>
+              <Link href={`/posts/${adjacent.older.slug}`} className={styles.prev}>
+                <span className={styles.jump}>← 上一篇</span>
+                <span className={styles.jumpTitle}>{adjacent.older.title}</span>
               </Link>
             ) : (
               <span />
             )}
             {adjacent.newer ? (
-              <Link
-                href={`/posts/${adjacent.newer.slug}`}
-                className="group flex w-fit max-w-xs flex-col self-end rounded p-2 text-right transition-colors hover:bg-chip"
-              >
-                <span className="mb-1 block font-label text-[0.6875rem] font-semibold tracking-[0.08em] text-muted transition-colors group-hover:text-pine">
-                  下一篇 →
-                </span>
-                <span className="text-ink transition-colors group-hover:text-pine">
-                  {adjacent.newer.title}
-                </span>
+              <Link href={`/posts/${adjacent.newer.slug}`} className={styles.next}>
+                <span className={styles.jump}>下一篇 →</span>
+                <span className={styles.jumpTitle}>{adjacent.newer.title}</span>
               </Link>
             ) : null}
           </nav>

@@ -1,0 +1,97 @@
+.intro {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.total {
+  margin-top: var(--space-10);
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  color: var(--ink);
+}
+
+.section {
+  margin-top: var(--space-12);
+}
+
+.heading {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rank {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.rankItem,
+.rankMain {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.rankMain {
+  justify-content: flex-start;
+}
+
+.index {
+  margin-right: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.count {
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.table {
+  width: 100%;
+  margin-top: var(--space-6);
+  text-align: left;
+  font-size: var(--text-sm);
+}
+
+.head,
+.line {
+  border-bottom: 1px solid var(--rule);
+}
+
+.head {
+  color: var(--muted);
+}
+
+.cell,
+.headCell {
+  padding-block: var(--space-2);
+  font-weight: 400;
+}
+
+.cell {
+  padding-block: var(--space-3);
+  padding-right: var(--space-4);
+}
+
+.right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.title {
+  transition: color var(--ease);
+}
+
+.title:hover {
+  color: var(--pine);
+}

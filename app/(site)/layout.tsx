@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import styles from "./layout.module.css";
 
 export default function SiteLayout({
   children,
@@ -7,10 +8,9 @@ export default function SiteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className={styles.frame}>
       <SiteHeader />
-      {/* 纵向 flex，文章列表才能把稿面纸色铺满页眉和页脚之间 */}
-      <div className="flex flex-1 flex-col pt-16">{children}</div>
+      <div className={styles.main}>{children}</div>
       <SiteFooter />
     </div>
   );

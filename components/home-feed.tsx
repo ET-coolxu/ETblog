@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CoverImage } from "@/components/cover-image";
 import { EmptyState } from "@/components/post-card";
 import { tagHref, type PostMeta } from "@/lib/posts";
+import styles from "./home-feed.module.css";
 
 const LATEST_LIMIT = 6;
 
@@ -20,9 +21,9 @@ export function HomeFeed({ posts }: { posts: PostMeta[] }) {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className={styles.feed}>
       {lead ? (
-        <section className="pb-12" aria-labelledby="featured-heading">
+        <section className={styles.featured} aria-labelledby="featured-heading">
           <SectionHeading
             id="featured-heading"
             title="精选"
@@ -31,7 +32,7 @@ export function HomeFeed({ posts }: { posts: PostMeta[] }) {
           />
           <FeaturedLead post={lead} />
           {restFeatured.length > 0 ? (
-            <div className="divide-y divide-rule">
+            <div className="divided">
               {restFeatured.map((post) => (
                 <FeaturedItem key={post.slug} post={post} />
               ))}
@@ -40,7 +41,7 @@ export function HomeFeed({ posts }: { posts: PostMeta[] }) {
         </section>
       ) : null}
 
-      <section className={lead ? "pt-4" : undefined} aria-labelledby="latest-heading">
+      <section className={lead ? styles.latestSection : undefined} aria-labelledby="latest-heading">
         <SectionHeading
           id="latest-heading"
           title="最新"
@@ -48,22 +49,17 @@ export function HomeFeed({ posts }: { posts: PostMeta[] }) {
           kicker="Chronological"
         />
         {latest.length > 0 ? (
-          <div className="divide-y divide-rule">
+          <div className="divided">
             {latest.map((post) => (
               <LatestItem key={post.slug} post={post} />
             ))}
           </div>
         ) : (
-          <p className="py-8 text-muted">暂时没有更多已发布的文章。</p>
+          <p className={styles.empty}>暂时没有更多已发布的文章。</p>
         )}
-        <div className="mt-4 flex flex-col items-start justify-between gap-4 border-t border-rule pt-12 sm:flex-row sm:items-center">
-          <p className="font-label text-[11px] font-semibold tracking-wide text-quiet">
-            当前显示 {latest.length} / {posts.length} 篇
-          </p>
-          <Link
-            href="/posts"
-            className="inline-flex items-center gap-1 rounded-sm bg-chip px-4 py-1 font-label text-[13px] font-medium text-pine transition-colors hover:text-ink"
-          >
+        <div className={styles.footer}>
+          <p className={styles.kicker}>当前显示 {latest.length} / {posts.length} 篇</p>
+          <Link href="/posts" className={styles.more}>
             查看全部文章
             <ArrowIcon />
           </Link>
@@ -85,16 +81,14 @@ function SectionHeading({
   kicker: string;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-rule pb-4">
-      <div className="flex items-baseline gap-1">
-        <h2 id={id} className="font-serif text-2xl font-normal tracking-tight text-ink">
+    <div className={styles.heading}>
+      <div className={styles.headingMain}>
+        <h2 id={id} className={styles.sectionTitle}>
           {title}
         </h2>
-        <span className="font-label text-[11px] font-semibold tracking-widest text-quiet">{count}</span>
+        <span className={styles.kicker}>{count}</span>
       </div>
-      <span className="font-label text-[11px] font-semibold tracking-widest text-quiet uppercase">
-        {kicker}
-      </span>
+      <span className={`${styles.kicker} ${styles.kickerUpper}`}>{kicker}</span>
     </div>
   );
 }
@@ -103,29 +97,18 @@ function FeaturedLead({ post }: { post: PostMeta }) {
   const href = `/posts/${post.slug}`;
 
   return (
-    <article className="group border-b border-rule pt-7 pb-12">
+    <article className={styles.lead}>
       {post.cover ? (
-        <Link href={href} className="mb-4 block overflow-hidden rounded-lg bg-chip">
-          <CoverImage
-            src={post.cover}
-            alt=""
-            className="aspect-21/9 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.01]"
-          />
+        <Link href={href} className={styles.cover}>
+          <CoverImage src={post.cover} alt="" className={styles.coverImage} />
         </Link>
       ) : null}
       <PostMetaLine post={post} />
-      <h3 className="mt-2 font-serif text-3xl font-normal leading-tight tracking-tight text-ink transition-colors group-hover:text-pine">
-        <Link href={href} className="decoration-rule underline-offset-4 hover:underline">
-          {post.title}
-        </Link>
+      <h3 className={styles.leadTitle}>
+        <Link href={href}>{post.title}</Link>
       </h3>
-      {post.summary ? (
-        <p className="mt-3 text-base leading-relaxed text-muted">{post.summary}</p>
-      ) : null}
-      <Link
-        href={href}
-        className="mt-4 inline-flex items-center gap-1 font-label text-[13px] font-medium text-pine hover:text-ink"
-      >
+      {post.summary ? <p className={styles.summary}>{post.summary}</p> : null}
+      <Link href={href} className={styles.read}>
         阅读全文
         <ArrowIcon />
       </Link>
@@ -137,14 +120,12 @@ function FeaturedItem({ post }: { post: PostMeta }) {
   const href = `/posts/${post.slug}`;
 
   return (
-    <article className="group -mx-2 rounded-lg px-2 py-7 transition-colors hover:bg-chip/70">
+    <article className={styles.row}>
       <PostMetaLine post={post} />
-      <h3 className="mt-1 font-serif text-2xl font-normal leading-snug text-ink transition-colors group-hover:text-pine">
+      <h3 className={styles.rowTitle}>
         <Link href={href}>{post.title}</Link>
       </h3>
-      {post.summary ? (
-        <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted">{post.summary}</p>
-      ) : null}
+      {post.summary ? <p className={styles.rowSummary}>{post.summary}</p> : null}
     </article>
   );
 }
@@ -154,24 +135,22 @@ function LatestItem({ post }: { post: PostMeta }) {
   const tag = post.tags[0];
 
   return (
-    <article className="group -mx-2 flex flex-col gap-2 rounded-lg px-2 py-7 transition-colors hover:bg-chip/70 sm:flex-row sm:gap-7">
-      <div className="shrink-0 sm:w-32 sm:pt-1">
-        <time dateTime={post.date} className="block font-label text-[11px] font-semibold tracking-wide text-quiet">
+    <article className={styles.latest}>
+      <div className={styles.latestMeta}>
+        <time dateTime={post.date} className={styles.date}>
           {post.date}
         </time>
         {tag ? (
-          <Link href={tagHref(tag)} className="mt-0.5 block font-label text-[11px] font-semibold text-pine hover:text-ink">
+          <Link href={tagHref(tag)} className={styles.latestTag}>
             {tag}
           </Link>
         ) : null}
       </div>
-      <div className="min-w-0 flex-1">
-        <h3 className="font-serif text-xl font-medium leading-snug text-ink transition-colors group-hover:text-pine">
+      <div className={styles.latestBody}>
+        <h3 className={styles.latestTitle}>
           <Link href={href}>{post.title}</Link>
         </h3>
-        {post.summary ? (
-          <p className="mt-1 text-sm leading-relaxed text-muted">{post.summary}</p>
-        ) : null}
+        {post.summary ? <p className={styles.latestSummary}>{post.summary}</p> : null}
       </div>
     </article>
   );
@@ -179,15 +158,11 @@ function LatestItem({ post }: { post: PostMeta }) {
 
 function PostMetaLine({ post }: { post: PostMeta }) {
   return (
-    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-label text-[11px] font-medium tracking-wide text-quiet">
+    <p className={styles.meta}>
       <time dateTime={post.date}>{editorialDate(post.date)}</time>
       {post.tags.length > 0 ? <span aria-hidden>·</span> : null}
       {post.tags.map((tag) => (
-        <Link
-          key={tag}
-          href={tagHref(tag)}
-          className="rounded-sm bg-chip px-1.5 py-0.5 font-medium text-pine hover:text-ink"
-        >
+        <Link key={tag} href={tagHref(tag)} className={styles.metaTag}>
           {tag}
         </Link>
       ))}
@@ -205,7 +180,7 @@ function editorialDate(isoDate: string): string {
 
 function ArrowIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
+    <svg viewBox="0 0 24 24" className="icon" aria-hidden>
       <path
         d="M5 12h14M13 6l6 6-6 6"
         fill="none"

@@ -1,0 +1,21 @@
+.button {
+  display: inline-flex;
+  border-radius: var(--radius);
+  padding: var(--space-1-5);
+  color: var(--muted);
+  transition: color var(--ease);
+}
+
+.button:hover {
+  color: var(--ink);
+}
+
+.button:disabled {
+  cursor: wait;
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+.slot {
+  width: 1.125rem;
+  height: 1.125rem;
+}

@@ -1,0 +1,38 @@
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-10);
+  padding-bottom: var(--space-2);
+  font-family: var(--font-list);
+  font-size: var(--text-xs);
+  line-height: var(--leading-5);
+}
+
+.pages {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: var(--leading-archive);
+  color: var(--list-muted);
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.disabled {
+  cursor: default;
+  user-select: none;
+  color: var(--list-dim);
+}
+
+.link {
+  color: var(--list-muted);
+  transition: color var(--ease);
+}
+
+.link:hover {
+  color: var(--list-ink);
+}

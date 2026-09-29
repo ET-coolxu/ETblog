@@ -1,0 +1,15 @@
+.frame {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+}
+
+.lede {
+  margin-top: var(--space-4);
+  line-height: var(--leading-7);
+  color: var(--muted);
+}

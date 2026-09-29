@@ -1,0 +1,37 @@
+.footer {
+  background: var(--paper);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-block: var(--space-12);
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  color: var(--quiet);
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.rss {
+  transition: color var(--ease);
+}
+
+.rss:hover {
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .inner {
+    flex-direction: row;
+  }
+}

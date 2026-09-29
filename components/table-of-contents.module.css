@@ -1,0 +1,132 @@
+.frame {
+  display: block;
+}
+
+.column {
+  width: 100%;
+  max-width: var(--reading);
+  margin-inline: auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: var(--leading-5);
+}
+
+.nested {
+  padding-left: var(--space-3);
+}
+
+.link,
+.current {
+  display: flex;
+  align-items: center;
+  transition: color var(--ease);
+}
+
+.link {
+  color: var(--muted);
+}
+
+.link:hover {
+  color: var(--ink);
+}
+
+.current {
+  color: var(--pine);
+}
+
+.mark,
+.markOn {
+  margin-right: var(--space-2-5);
+  height: 0.875rem;
+  width: 2px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+}
+
+.mark {
+  background: transparent;
+}
+
+.markOn {
+  background: var(--pine);
+}
+
+.text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.details {
+  margin-top: var(--space-10);
+  border-top: 1px solid var(--rule);
+  padding-top: var(--space-4);
+}
+
+.summary {
+  cursor: pointer;
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-chip);
+  color: var(--muted);
+}
+
+.panel {
+  margin-top: var(--space-4);
+}
+
+.rail {
+  display: none;
+}
+
+.railNav {
+  padding-top: var(--space-2);
+}
+
+.railLabel {
+  margin-bottom: var(--space-4);
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-tag);
+  color: var(--muted);
+}
+
+@media (min-width: 1280px) {
+  .frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 760px) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-8);
+  }
+
+  /* 无目录时也要钉在中间列，否则唯一的网格项会落到左列 */
+  .column {
+    grid-column: 2;
+    grid-row: 1;
+    margin-inline: 0;
+  }
+
+  .details {
+    display: none;
+  }
+
+  .rail {
+    position: sticky;
+    top: var(--space-28);
+    display: block;
+    width: var(--toc-w);
+    justify-self: end;
+    align-self: start;
+    grid-column: 1;
+    grid-row: 1;
+  }
+}

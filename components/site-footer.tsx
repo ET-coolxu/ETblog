@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { getSiteConfig } from "@/lib/site";
+import styles from "./site-footer.module.css";
 
 export function SiteFooter() {
   const site = getSiteConfig();
 
   return (
-    <footer className="bg-paper">
-      <div className="mx-auto flex max-w-3xl flex-col items-center justify-between gap-2 px-5 py-12 font-label text-[11px] font-semibold tracking-wide text-quiet sm:flex-row md:px-4">
-        <p className="flex items-center gap-1.5">
+    <footer className={styles.footer}>
+      <div className={`shell ${styles.inner}`}>
+        <p className={styles.line}>
           <span>{site.author}</span>
           <span aria-hidden>·</span>
-          <Link href="/feed.xml" className="hover:text-muted">
+          <Link href="/feed.xml" className={styles.rss}>
             RSS
           </Link>
           <span aria-hidden>·</span>

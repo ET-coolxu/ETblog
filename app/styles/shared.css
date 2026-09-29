@@ -1,0 +1,122 @@
+/* 全站栏宽、排列，以及多页共用的衬线大标题。只服务一个组件的样式放在该组件的 module.css。 */
+
+.shell,
+.page,
+.page-wide,
+.page-tall {
+  width: 100%;
+  margin-inline: auto;
+}
+
+/* 顶栏、页脚、首页、文章列表：窄屏 20px，768px 起 16px */
+.shell {
+  max-width: var(--column);
+  padding-inline: var(--space-5);
+}
+
+@media (min-width: 768px) {
+  .shell {
+    padding-inline: var(--space-4);
+  }
+}
+
+/* 关于、标签、搜索、后台窄页 */
+.page {
+  max-width: var(--column);
+  padding: var(--space-16) var(--space-6);
+}
+
+.page-wide {
+  max-width: var(--column-wide);
+  padding: var(--space-16) var(--space-6);
+}
+
+.page-tall {
+  max-width: var(--column);
+  padding: var(--space-24) var(--space-6);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.spread {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hairline {
+  height: 1px;
+  background: var(--list-line);
+}
+
+.divided > * + * {
+  border-top: 1px solid var(--rule);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.quiet {
+  color: var(--quiet);
+}
+
+.link {
+  color: var(--pine);
+  transition: color var(--ease);
+}
+
+.link:hover {
+  color: var(--ink);
+}
+
+.link:disabled {
+  color: var(--muted);
+}
+
+.link-quiet {
+  color: var(--muted);
+  transition: color var(--ease);
+}
+
+.link-quiet:hover {
+  color: var(--ink);
+}
+
+/* 关于、标签、搜索、后台的衬线大标题 */
+.doc-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  line-height: 2.25rem;
+  color: var(--ink);
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.icon-md {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { loginAction, type LoginState } from "@/app/admin/login/actions";
+import styles from "./login-form.module.css";
 
 const initialState: LoginState = {};
 
@@ -9,9 +10,9 @@ export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
-    <form action={formAction} className="mt-10 space-y-6">
+    <form action={formAction} className={styles.form}>
       <div>
-        <label htmlFor="username" className="block text-sm text-muted">
+        <label htmlFor="username" className={styles.label}>
           用户名
         </label>
         <input
@@ -20,11 +21,11 @@ export function LoginForm() {
           type="text"
           autoComplete="username"
           required
-          className="mt-1 w-full border-b border-rule bg-transparent py-2 text-ink outline-none"
+          className={styles.field}
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm text-muted">
+        <label htmlFor="password" className={styles.label}>
           密码
         </label>
         <input
@@ -33,19 +34,15 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="mt-1 w-full border-b border-rule bg-transparent py-2 text-ink outline-none"
+          className={styles.field}
         />
       </div>
       {state.error ? (
-        <p className="text-sm text-pine" role="alert">
+        <p className={styles.alert} role="alert">
           {state.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="text-pine hover:text-ink disabled:text-muted"
-      >
+      <button type="submit" disabled={pending} className="link">
         {pending ? "登录中…" : "登录"}
       </button>
     </form>

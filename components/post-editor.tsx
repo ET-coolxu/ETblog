@@ -15,6 +15,7 @@ import {
   type SaveState,
 } from "@/app/admin/(dashboard)/posts/actions";
 import { asCover } from "@/lib/cover";
+import styles from "./post-editor.module.css";
 
 export type PostEditorStatus = "draft" | "published" | "archived";
 
@@ -56,9 +57,6 @@ type PostEditorProps = {
   initial: PostEditorValues;
 };
 
-const fieldClass =
-  "mt-1 w-full border-b border-rule bg-transparent py-2 text-ink outline-none placeholder:text-muted";
-
 /** 合法封面立刻预览；外链加载失败换成中文说明，避免裂图 */
 function CoverPreview({ value }: { value: string }) {
   const cover = asCover(value);
@@ -74,7 +72,7 @@ function CoverPreview({ value }: { value: string }) {
 
   if (failed) {
     return (
-      <p className="mt-3 text-sm text-muted" role="status">
+      <p className={`${styles.note} mt-3`} role="status">
         封面图无法加载若是外链，对方站点可能禁止引用
       </p>
     );
@@ -87,7 +85,7 @@ function CoverPreview({ value }: { value: string }) {
       alt="封面预览"
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
-      className="mt-3 max-h-40 w-full object-cover"
+      className={styles.cover}
     />
   );
 }
@@ -242,10 +240,10 @@ export function PostEditor({
   }
 
   return (
-    <form action={formAction} className="mt-10 space-y-8">
-      <div className="grid gap-6 sm:grid-cols-2">
+    <form action={formAction} className={styles.form}>
+      <div className={styles.grid}>
         <div>
-          <label htmlFor="slug" className="block text-sm text-muted">
+          <label htmlFor="slug" className={styles.label}>
             slug
           </label>
           <input
@@ -257,14 +255,14 @@ export function PostEditor({
             required
             pattern="[a-z0-9-]+"
             title="仅小写字母、数字和连字符"
-            className={`${fieldClass} ${mode === "edit" ? "text-muted" : ""}`}
+            className={mode === "edit" ? `${styles.field} ${styles.dim}` : styles.field}
           />
-          <p className="mt-2 text-xs text-muted">
+          <p className={styles.hint}>
             {mode === "create" ? "仅小写字母、数字和连字符" : "创建时已确定，不可更改"}
           </p>
         </div>
         <div>
-          <label htmlFor="date" className="block text-sm text-muted">
+          <label htmlFor="date" className={styles.label}>
             日期
           </label>
           <input
@@ -274,13 +272,13 @@ export function PostEditor({
             required
             value={values.date}
             onChange={(event) => setValues((current) => ({ ...current, date: event.target.value }))}
-            className={fieldClass}
+            className={styles.field}
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="title" className="block text-sm text-muted">
+        <label htmlFor="title" className={styles.label}>
           标题
         </label>
         <input
@@ -289,12 +287,12 @@ export function PostEditor({
           required
           value={values.title}
           onChange={(event) => setValues((current) => ({ ...current, title: event.target.value }))}
-          className={fieldClass}
+          className={styles.field}
         />
       </div>
 
       <div>
-        <label htmlFor="tags" className="block text-sm text-muted">
+        <label htmlFor="tags" className={styles.label}>
           标签
         </label>
         <input
@@ -303,12 +301,12 @@ export function PostEditor({
           value={values.tags}
           onChange={(event) => setValues((current) => ({ ...current, tags: event.target.value }))}
           placeholder="用逗号分隔，例如：笔记，Markdown"
-          className={fieldClass}
+          className={styles.field}
         />
       </div>
 
       <div>
-        <label htmlFor="summary" className="block text-sm text-muted">
+        <label htmlFor="summary" className={styles.label}>
           摘要
         </label>
         <textarea
@@ -317,17 +315,17 @@ export function PostEditor({
           rows={3}
           value={values.summary}
           onChange={(event) => setValues((current) => ({ ...current, summary: event.target.value }))}
-          className="mt-1 w-full border-b border-rule bg-transparent py-2 text-ink outline-none placeholder:text-muted"
+          className={styles.field}
         />
-        <p className="mt-2 text-xs text-muted">留空则发布时用正文前约 120 字</p>
+        <p className={styles.hint}>留空则发布时用正文前约 120 字</p>
       </div>
 
       <div>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <label htmlFor="cover" className="text-sm text-muted">
+        <div className={styles.row}>
+          <label htmlFor="cover" className={styles.note}>
             封面
           </label>
-          <label className="cursor-pointer text-sm text-pine hover:text-ink">
+          <label className={`link text-sm ${styles.pick}`}>
             {uploading ? "上传中…" : "选择图片"}
             <input
               type="file"
@@ -350,15 +348,13 @@ export function PostEditor({
           value={values.cover}
           onChange={(event) => setValues((current) => ({ ...current, cover: event.target.value }))}
           placeholder="/uploads/2026/09/cover.webp 或 https://"
-          className={fieldClass}
+          className={styles.field}
         />
         <CoverPreview value={values.cover} />
-        <p className="mt-2 text-xs text-muted">
-          可上传或填写站内路径、https 外链
-        </p>
+        <p className={styles.hint}>可上传或填写站内路径、https 外链</p>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-ink">
+      <label className={styles.check}>
         <input
           type="checkbox"
           name="featured"
@@ -381,13 +377,13 @@ export function PostEditor({
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        className="relative"
+        className={styles.editor}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <label htmlFor="body" className="text-sm text-muted">
+        <div className={styles.row}>
+          <label htmlFor="body" className={styles.note}>
             正文（Markdown）
           </label>
-          <label className="cursor-pointer text-sm text-pine hover:text-ink">
+          <label className={`link text-sm ${styles.pick}`}>
             {uploading ? "上传中…" : "选择图片"}
             <input
               type="file"
@@ -404,10 +400,8 @@ export function PostEditor({
             />
           </label>
         </div>
-        <p className="mt-2 text-xs text-muted">
-          可拖拽或粘贴图片插入后说明默认为「图片」，可改成具体描述
-        </p>
-        <div className="mt-4 grid gap-6 lg:grid-cols-2">
+        <p className={styles.hint}>可拖拽或粘贴图片插入后说明默认为「图片」，可改成具体描述</p>
+        <div className={styles.split}>
           <textarea
             ref={bodyRef}
             id="body"
@@ -415,40 +409,36 @@ export function PostEditor({
             value={values.body}
             onChange={(event) => setValues((current) => ({ ...current, body: event.target.value }))}
             onPaste={onPaste}
-            className="min-h-112 w-full resize-y border border-rule bg-transparent p-3 font-mono text-sm leading-7 text-ink outline-none"
+            className={styles.area}
           />
-          <div className="min-h-112 overflow-auto border border-rule p-3">
+          <div className={styles.preview}>
             {previewHtml ? (
               <div className="markdown" dangerouslySetInnerHTML={{ __html: previewHtml }} />
             ) : (
-              <p className="text-sm text-muted">预览显示</p>
+              <p className={styles.note}>预览显示</p>
             )}
           </div>
         </div>
-        {dragging ? (
-          <div className="absolute inset-0 flex items-center justify-center border border-dashed border-pine bg-paper/80 text-sm text-pine">
-            松开以上传图片
-          </div>
-        ) : null}
+        {dragging ? <div className={styles.drop}>松开以上传图片</div> : null}
       </div>
 
       {uploadError ? (
-        <p className="text-sm text-pine" role="alert">
+        <p className={styles.alert} role="alert">
           {uploadError}
         </p>
       ) : null}
       {state.error || deleteState.error ? (
-        <p className="text-sm text-pine" role="alert">
+        <p className={styles.alert} role="alert">
           {state.error ?? deleteState.error}
         </p>
       ) : null}
       {state.message ? (
-        <p className="text-sm text-muted" role="status">
+        <p className={styles.note} role="status">
           {state.message}
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-6">
+      <div className={styles.actions}>
         {mode === "create" || status === "draft" ? (
           <>
             <button
@@ -456,7 +446,7 @@ export function PostEditor({
               name="intent"
               value="draft"
               disabled={busy}
-              className="text-muted hover:text-ink disabled:text-muted"
+              className={styles.quiet}
             >
               {pending ? "保存中…" : "保存草稿"}
             </button>
@@ -465,7 +455,7 @@ export function PostEditor({
               name="intent"
               value="publish"
               disabled={busy}
-              className="text-pine hover:text-ink disabled:text-muted"
+              className={styles.primary}
             >
               {pending ? "保存中…" : "发布"}
             </button>
@@ -478,7 +468,7 @@ export function PostEditor({
               name="intent"
               value="publish"
               disabled={busy}
-              className="text-pine hover:text-ink disabled:text-muted"
+              className={styles.primary}
             >
               {pending ? "保存中…" : "保存"}
             </button>
@@ -487,7 +477,7 @@ export function PostEditor({
               name="intent"
               value="draft"
               disabled={busy}
-              className="text-muted hover:text-ink disabled:text-muted"
+              className={styles.quiet}
             >
               {pending ? "保存中…" : "改为草稿"}
             </button>
@@ -497,7 +487,7 @@ export function PostEditor({
               value="archive"
               disabled={busy}
               onClick={confirmSubmit(ARCHIVE_CONFIRM)}
-              className="text-muted hover:text-ink disabled:text-muted"
+              className={styles.quiet}
             >
               {pending ? "保存中…" : "存档"}
             </button>
@@ -510,7 +500,7 @@ export function PostEditor({
               name="intent"
               value="archive"
               disabled={busy}
-              className="text-pine hover:text-ink disabled:text-muted"
+              className={styles.primary}
             >
               {pending ? "保存中…" : "保存"}
             </button>
@@ -519,7 +509,7 @@ export function PostEditor({
               name="intent"
               value="draft"
               disabled={busy}
-              className="text-muted hover:text-ink disabled:text-muted"
+              className={styles.quiet}
             >
               {pending ? "保存中…" : "改为草稿"}
             </button>
@@ -531,7 +521,7 @@ export function PostEditor({
             formAction={deleteFormAction}
             disabled={busy}
             onClick={confirmSubmit(DELETE_CONFIRM)}
-            className="text-muted hover:text-ink disabled:text-muted"
+            className={styles.quiet}
           >
             {deleting ? "删除中…" : "删除"}
           </button>
