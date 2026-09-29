@@ -16,11 +16,11 @@ updated: 2026-09-29
 
 实现任务：
 
-1. [后台壳](../agent-prompts/architecture/2026-09-29-admin-v2-shell.md)
-2. [登录](../agent-prompts/optimizations/2026-09-29-admin-v2-login.md)
-3. [文章总览](../agent-prompts/features/2026-09-29-admin-v2-overview.md)
-4. [编辑器](../agent-prompts/optimizations/2026-09-29-admin-v2-editor.md)
-5. [统计](../agent-prompts/features/2026-09-29-admin-v2-stats.md)
+1. [后台壳](../agent-prompts/archive/2026-09-29-admin-v2-shell.md)
+2. [登录](../agent-prompts/archive/2026-09-29-admin-v2-login.md)
+3. [文章总览](../agent-prompts/archive/2026-09-29-admin-v2-overview.md)
+4. [编辑器](../agent-prompts/archive/2026-09-29-admin-v2-editor.md)
+5. [统计](../agent-prompts/archive/2026-09-29-admin-v2-stats.md)
 
 按这个顺序做。壳落地后，其余页才套新壳。
 
