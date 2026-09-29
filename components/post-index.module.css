@@ -2,7 +2,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  background: var(--list-surface);
 }
 
 .main {
@@ -107,7 +106,7 @@
 .metaRow {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-3);
   margin-bottom: var(--space-1);
 }
@@ -158,14 +157,16 @@
   color: var(--list-on-ink);
 }
 
-/* 日期行里的小标签。z-index 盖过整行点击层，点标签不会进正文 */
+/* 日期行高 20px。芯片拉到同一高度并垂直居中，避免基线对齐把底色压成一条 */
 .pill,
 .pillActive {
   position: relative;
   z-index: 10;
-  display: inline-block;
-  line-height: var(--leading-none);
-  padding: var(--space-0-5) var(--space-1-5) 0;
+  display: inline-flex;
+  align-items: center;
+  height: var(--leading-5);
+  padding-inline: var(--space-1-5);
+  line-height: var(--leading-4);
 }
 
 .pill {
@@ -185,7 +186,6 @@
 .meta {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  line-height: var(--leading-none);
 }
 
 .date {
@@ -198,8 +198,8 @@
 }
 
 .tags {
-  display: inline-flex;
-  align-items: baseline;
+  display: flex;
+  align-items: center;
   gap: var(--space-1-5);
 }
 

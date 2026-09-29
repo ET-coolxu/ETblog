@@ -4,7 +4,7 @@
   flex-direction: column;
 }
 
-/* 纵向 flex，文章列表才能把稿面纸色铺满页眉和页脚之间 */
+/* 纵向 flex，短页面时页脚仍贴在视口底部 */
 .main {
   display: flex;
   flex: 1;

@@ -19,8 +19,6 @@
   --list-muted: #706e6b;
   --list-dim: #a3a09a;
   --list-line: #e2dfd8;
-  /* 列表内容区用稿面纸色。站内纸色更暖，芯片若直接垫上去会发灰 */
-  --list-surface: #fbfbf9;
   --list-chip: #f5f4ef;
   --list-chip-hover: #f1ede9;
   --list-accent: #3a674f;
@@ -137,7 +135,6 @@ body {
   --list-muted: var(--muted);
   --list-dim: var(--quiet);
   --list-line: var(--rule);
-  --list-surface: var(--paper);
   --list-chip: var(--chip);
   --list-chip-hover: #3a3f3c;
   --list-accent: var(--pine);

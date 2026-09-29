@@ -117,15 +117,13 @@ function PostIndexItem({ post, activeTag }: { post: PostMeta; activeTag?: string
               <span className={`${styles.meta} ${styles.dim}`} aria-hidden>
                 /
               </span>
-              <ul className={styles.tags}>
+              <div className={styles.tags}>
                 {post.tags.map((tag) => (
-                  <li key={tag}>
-                    <Link href={tagHref(tag)} className={tag === activeTag ? styles.pillActive : styles.pill}>
-                      #{tag}
-                    </Link>
-                  </li>
+                  <Link key={tag} href={tagHref(tag)} className={tag === activeTag ? styles.pillActive : styles.pill}>
+                    #{tag}
+                  </Link>
                 ))}
-              </ul>
+              </div>
             </>
           ) : null}
         </div>
