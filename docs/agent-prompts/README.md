@@ -2,7 +2,7 @@
 
 这里存放发给 AI 的任务提示词，也是需求存档。核心功能与逻辑改代码前先有对应文件。文案、样式、格式等简单修改不必写提示词。
 
-产品说明以 [docs/requirements/v1.md](../requirements/v1.md) 为准。改需求先改 PRD，再改对应提示词。
+公开站以 [docs/requirements/v1.md](../requirements/v1.md) 为准。后台工作台以 [docs/requirements/v2-admin.md](../requirements/v2-admin.md) 为准。改需求先改 PRD，再改对应提示词。
 
 ## 怎么用
 
@@ -26,6 +26,16 @@
 ## status
 
 `draft` → `ready` → `in-progress` → `done`
+
+## 后台 V2
+
+按顺序 `@` 下面的文件。说明见 [后台工作台 V2](../requirements/v2-admin.md)。
+
+1. [侧栏壳](./architecture/2026-09-29-admin-v2-shell.md)
+2. [登录分栏](./optimizations/2026-09-29-admin-v2-login.md)
+3. [文章总览](./features/2026-09-29-admin-v2-overview.md)
+4. [编辑器工作面](./optimizations/2026-09-29-admin-v2-editor.md)
+5. [统计](./features/2026-09-29-admin-v2-stats.md)
 
 ## 第一版发送顺序
 
