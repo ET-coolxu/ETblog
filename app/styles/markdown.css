@@ -1,4 +1,4 @@
-/* 正文排印。关于页与后台预览共用这一层。选择器必须是全局类，MDX 产出的 HTML 不走 CSS Modules。 */
+/* 文章正文排印。后台预览共用这一层。选择器必须是全局类，MDX 产出的 HTML 不走 CSS Modules。 */
 
 .markdown {
   font-family: var(--font-label);
