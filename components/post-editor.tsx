@@ -9,6 +9,7 @@ import {
   type DragEvent,
   type MouseEvent,
 } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   previewMarkdownAction,
@@ -23,6 +24,12 @@ const ARCHIVE_CONFIRM =
   "存档后访客将无法阅读这篇文章（直链返回 404），且不能直接重新发布，须先改为草稿。已上传的图片不会删除。确定存档吗？";
 const DELETE_CONFIRM =
   "删除后不可恢复：将删除这篇文章的 Markdown 文件和该文的访问统计，不会删除已上传的图片。确定删除吗？";
+
+const STATUS_LABEL: Record<PostEditorStatus, string> = {
+  draft: "草稿",
+  published: "已发布",
+  archived: "存档",
+};
 
 /** 新建页没有删除；占位以满足 useActionState 必须无条件调用。 */
 const unusedDeleteAction = async (): Promise<SaveState> => ({
@@ -50,12 +57,27 @@ export type PostEditorValues = {
 
 type PostEditorProps = {
   mode: "create" | "edit";
-  /** 编辑已有文章时的当前状态，决定显示哪些操作；新建页不传。 */
+  /** 编辑已有文章时的已保存状态，决定按钮和状态 pill；不随未提交操作变化。 */
   status?: PostEditorStatus;
   action: (state: SaveState, formData: FormData) => Promise<SaveState>;
   deleteAction?: (state: SaveState, formData: FormData) => Promise<SaveState>;
   initial: PostEditorValues;
 };
+
+/** 收起文稿栏时仍把字段交出去。hidden 不参与浏览器必填校验，避免藏起来的控件拦住提交。 */
+function HiddenMeta({ values }: { values: PostEditorValues }) {
+  return (
+    <>
+      <input type="hidden" name="slug" value={values.slug} />
+      <input type="hidden" name="date" value={values.date} />
+      <input type="hidden" name="title" value={values.title} />
+      <input type="hidden" name="tags" value={values.tags} />
+      <input type="hidden" name="summary" value={values.summary} />
+      <input type="hidden" name="cover" value={values.cover} />
+      {values.featured ? <input type="hidden" name="featured" value="on" /> : null}
+    </>
+  );
+}
 
 /** 合法封面立刻预览；外链加载失败换成中文说明，避免裂图 */
 function CoverPreview({ value }: { value: string }) {
@@ -90,6 +112,10 @@ function CoverPreview({ value }: { value: string }) {
   );
 }
 
+/**
+ * 后台写作面：顶栏操作、可收起的文稿栏、Markdown 与预览。
+ * 按钮按已保存状态显示；收起只藏文稿栏，刷新后默认展开。
+ */
 export function PostEditor({
   mode,
   status = "draft",
@@ -105,11 +131,13 @@ export function PostEditor({
   const busy = pending || deleting;
   const router = useRouter();
   const [values, setValues] = useState(initial);
+  const [metaOpen, setMetaOpen] = useState(true);
   const [previewHtml, setPreviewHtml] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const saveLabel = pending ? "保存中…" : "";
 
   useEffect(() => {
     if (state.message) {
@@ -208,7 +236,6 @@ export function PostEditor({
     const end = textarea.selectionEnd;
     const current = textarea.value;
     const next = `${current.slice(0, start)}${snippet}${current.slice(end)}`;
-    // 选中占位 alt，方便立刻改成具体说明
     const altStart = start + 2;
     const altEnd = altStart + alt.length;
     setValues((current) => ({ ...current, body: next }));
@@ -239,293 +266,352 @@ export function PostEditor({
     void uploadBodyFiles(images);
   }
 
+  const showDraftActions = mode === "create" || status === "draft";
+  const showPublishedActions = mode === "edit" && status === "published";
+  const showArchivedActions = mode === "edit" && status === "archived";
+  const showDelete = mode === "edit" && status !== "draft";
+
   return (
     <form action={formAction} className={styles.form}>
-      <div className={styles.grid}>
-        <div>
-          <label htmlFor="slug" className={styles.label}>
-            slug
-          </label>
-          <input
-            id="slug"
-            name="slug"
-            value={values.slug}
-            onChange={(event) => setValues((current) => ({ ...current, slug: event.target.value }))}
-            readOnly={mode === "edit"}
-            required
-            pattern="[a-z0-9-]+"
-            title="仅小写字母、数字和连字符"
-            className={mode === "edit" ? `${styles.field} ${styles.dim}` : styles.field}
-          />
-          <p className={styles.hint}>
-            {mode === "create" ? "仅小写字母、数字和连字符" : "创建时已确定，不可更改"}
-          </p>
+      <div className={styles.bar}>
+        <div className={styles.barLead}>
+          <Link href="/admin" className={styles.back}>
+            ← 文章
+          </Link>
+          <span className={styles.sep} aria-hidden>
+            |
+          </span>
+          <span className={styles.barTitle}>{values.title.trim() || "未命名"}</span>
+          {mode === "edit" ? (
+            <span className={`${styles.pill} ${styles[status]}`}>{STATUS_LABEL[status]}</span>
+          ) : null}
         </div>
-        <div>
-          <label htmlFor="date" className={styles.label}>
-            日期
-          </label>
-          <input
-            id="date"
-            name="date"
-            type="date"
-            required
-            value={values.date}
-            onChange={(event) => setValues((current) => ({ ...current, date: event.target.value }))}
-            className={styles.field}
-          />
+        <div className={styles.barActions}>
+          {showDraftActions ? (
+            <>
+              <button
+                type="submit"
+                name="intent"
+                value="draft"
+                disabled={busy}
+                className={styles.secondary}
+              >
+                {saveLabel || "保存草稿"}
+              </button>
+              <button
+                type="submit"
+                name="intent"
+                value="publish"
+                disabled={busy}
+                className={styles.primary}
+              >
+                {saveLabel || "发布"}
+              </button>
+            </>
+          ) : null}
+          {showPublishedActions ? (
+            <>
+              <button
+                type="submit"
+                name="intent"
+                value="publish"
+                disabled={busy}
+                className={styles.primary}
+              >
+                {saveLabel || "保存"}
+              </button>
+              <button
+                type="submit"
+                name="intent"
+                value="draft"
+                disabled={busy}
+                className={styles.secondary}
+              >
+                {saveLabel || "改为草稿"}
+              </button>
+              <button
+                type="submit"
+                name="intent"
+                value="archive"
+                disabled={busy}
+                onClick={confirmSubmit(ARCHIVE_CONFIRM)}
+                className={styles.weak}
+              >
+                {saveLabel || "存档"}
+              </button>
+            </>
+          ) : null}
+          {showArchivedActions ? (
+            <>
+              <button
+                type="submit"
+                name="intent"
+                value="archive"
+                disabled={busy}
+                className={styles.primary}
+              >
+                {saveLabel || "保存"}
+              </button>
+              <button
+                type="submit"
+                name="intent"
+                value="draft"
+                disabled={busy}
+                className={styles.secondary}
+              >
+                {saveLabel || "改为草稿"}
+              </button>
+            </>
+          ) : null}
+          {showDelete && showPublishedActions ? <span className={styles.divider} aria-hidden /> : null}
+          {showDelete ? (
+            <button
+              type="submit"
+              formAction={deleteFormAction}
+              disabled={busy}
+              onClick={confirmSubmit(DELETE_CONFIRM)}
+              className={styles.danger}
+            >
+              {deleting ? "删除中…" : "删除"}
+            </button>
+          ) : null}
         </div>
       </div>
 
-      <div>
-        <label htmlFor="title" className={styles.label}>
-          标题
-        </label>
-        <input
-          id="title"
-          name="title"
-          required
-          value={values.title}
-          onChange={(event) => setValues((current) => ({ ...current, title: event.target.value }))}
-          className={styles.field}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="tags" className={styles.label}>
-          标签
-        </label>
-        <input
-          id="tags"
-          name="tags"
-          value={values.tags}
-          onChange={(event) => setValues((current) => ({ ...current, tags: event.target.value }))}
-          placeholder="用逗号分隔，例如：笔记，Markdown"
-          className={styles.field}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="summary" className={styles.label}>
-          摘要
-        </label>
-        <textarea
-          id="summary"
-          name="summary"
-          rows={3}
-          value={values.summary}
-          onChange={(event) => setValues((current) => ({ ...current, summary: event.target.value }))}
-          className={styles.field}
-        />
-        <p className={styles.hint}>留空则发布时用正文前约 120 字</p>
-      </div>
-
-      <div>
-        <div className={styles.row}>
-          <label htmlFor="cover" className={styles.note}>
-            封面
-          </label>
-          <label className={`link text-sm ${styles.pick}`}>
-            {uploading ? "上传中…" : "选择图片"}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              className="sr-only"
-              disabled={uploading}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) {
-                  void uploadCoverFile(file);
-                }
-                event.target.value = "";
-              }}
-            />
-          </label>
+      {uploadError || state.error || deleteState.error || state.message ? (
+        <div className={styles.feedback}>
+          {uploadError ? (
+            <p className={styles.alert} role="alert">
+              {uploadError}
+            </p>
+          ) : null}
+          {state.error || deleteState.error ? (
+            <p className={styles.alert} role="alert">
+              {state.error ?? deleteState.error}
+            </p>
+          ) : null}
+          {state.message ? (
+            <p className={styles.note} role="status">
+              {state.message}
+            </p>
+          ) : null}
         </div>
-        <input
-          id="cover"
-          name="cover"
-          value={values.cover}
-          onChange={(event) => setValues((current) => ({ ...current, cover: event.target.value }))}
-          placeholder="/uploads/2026/09/cover.webp 或 https://"
-          className={styles.field}
-        />
-        <CoverPreview value={values.cover} />
-        <p className={styles.hint}>可上传或填写站内路径、https 外链</p>
-      </div>
+      ) : null}
 
-      <label className={styles.check}>
-        <input
-          type="checkbox"
-          name="featured"
-          checked={values.featured}
-          onChange={(event) =>
-            setValues((current) => ({ ...current, featured: event.target.checked }))
-          }
-        />
-        设为首页精选
-      </label>
-
-      <div
-        onDragEnter={(event) => {
-          event.preventDefault();
-          setDragging(true);
-        }}
-        onDragOver={(event) => {
-          event.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={onDrop}
-        className={styles.editor}
-      >
-        <div className={styles.row}>
-          <label htmlFor="body" className={styles.note}>
-            正文（Markdown）
-          </label>
-          <label className={`link text-sm ${styles.pick}`}>
-            {uploading ? "上传中…" : "选择图片"}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              multiple
-              className="sr-only"
-              disabled={uploading}
-              onChange={(event) => {
-                if (event.target.files) {
-                  void uploadBodyFiles(event.target.files);
-                }
-                event.target.value = "";
-              }}
-            />
-          </label>
-        </div>
-        <p className={styles.hint}>可拖拽或粘贴图片插入后说明默认为「图片」，可改成具体描述</p>
-        <div className={styles.split}>
-          <textarea
-            ref={bodyRef}
-            id="body"
-            name="body"
-            value={values.body}
-            onChange={(event) => setValues((current) => ({ ...current, body: event.target.value }))}
-            onPaste={onPaste}
-            className={styles.area}
-          />
-          <div className={styles.preview}>
-            {previewHtml ? (
-              <div className="markdown" dangerouslySetInnerHTML={{ __html: previewHtml }} />
-            ) : (
-              <p className={styles.note}>预览显示</p>
-            )}
+      <div className={styles.surface}>
+        <aside className={metaOpen ? styles.meta : styles.metaShut}>
+          <div className={styles.metaHead}>
+            {metaOpen ? <span>文稿信息</span> : null}
+            <button
+              type="button"
+              className={styles.textButton}
+              aria-expanded={metaOpen}
+              onClick={() => setMetaOpen((open) => !open)}
+            >
+              {metaOpen ? "收起" : "展开"}
+            </button>
           </div>
+          {metaOpen ? (
+            <div className={styles.metaBody}>
+              <div>
+                <label htmlFor="slug" className={styles.label}>
+                  slug
+                </label>
+                <input
+                  id="slug"
+                  name="slug"
+                  value={values.slug}
+                  onChange={(event) =>
+                    setValues((current) => ({ ...current, slug: event.target.value }))
+                  }
+                  readOnly={mode === "edit"}
+                  required
+                  pattern="[a-z0-9-]+"
+                  title="仅小写字母、数字和连字符"
+                  className={mode === "edit" ? `${styles.field} ${styles.dim}` : styles.field}
+                />
+                <p className={styles.hint}>
+                  {mode === "create" ? "仅小写字母、数字和连字符" : "创建后不可改"}
+                </p>
+              </div>
+              <div>
+                <label htmlFor="date" className={styles.label}>
+                  日期
+                </label>
+                <input
+                  id="date"
+                  name="date"
+                  type="date"
+                  required
+                  value={values.date}
+                  onChange={(event) =>
+                    setValues((current) => ({ ...current, date: event.target.value }))
+                  }
+                  className={styles.field}
+                />
+              </div>
+              <div>
+                <label htmlFor="title" className={styles.label}>
+                  标题
+                </label>
+                <input
+                  id="title"
+                  name="title"
+                  required
+                  value={values.title}
+                  onChange={(event) =>
+                    setValues((current) => ({ ...current, title: event.target.value }))
+                  }
+                  className={styles.field}
+                />
+              </div>
+              <div>
+                <label htmlFor="tags" className={styles.label}>
+                  标签
+                </label>
+                <input
+                  id="tags"
+                  name="tags"
+                  value={values.tags}
+                  onChange={(event) =>
+                    setValues((current) => ({ ...current, tags: event.target.value }))
+                  }
+                  placeholder="用逗号分隔，例如：笔记，Markdown"
+                  className={styles.field}
+                />
+              </div>
+              <div>
+                <label htmlFor="summary" className={styles.label}>
+                  摘要
+                </label>
+                <textarea
+                  id="summary"
+                  name="summary"
+                  rows={3}
+                  value={values.summary}
+                  onChange={(event) =>
+                    setValues((current) => ({ ...current, summary: event.target.value }))
+                  }
+                  className={styles.field}
+                />
+                <p className={styles.hint}>留空则发布时用正文前约 120 字</p>
+              </div>
+              <div>
+                <label htmlFor="cover" className={styles.label}>
+                  封面
+                </label>
+                <div className={styles.coverRow}>
+                  <input
+                    id="cover"
+                    name="cover"
+                    value={values.cover}
+                    onChange={(event) =>
+                      setValues((current) => ({ ...current, cover: event.target.value }))
+                    }
+                    placeholder="/uploads/… 或 https://"
+                    className={styles.field}
+                  />
+                  <label className={styles.pick}>
+                    {uploading ? "上传中…" : "选择图片"}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/gif"
+                      className="sr-only"
+                      disabled={uploading}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (file) {
+                          void uploadCoverFile(file);
+                        }
+                        event.target.value = "";
+                      }}
+                    />
+                  </label>
+                </div>
+                <CoverPreview value={values.cover} />
+                <p className={styles.hint}>可上传或填写站内路径、https 外链</p>
+              </div>
+              <label className={styles.check}>
+                <input
+                  type="checkbox"
+                  name="featured"
+                  checked={values.featured}
+                  onChange={(event) =>
+                    setValues((current) => ({ ...current, featured: event.target.checked }))
+                  }
+                />
+                精选
+              </label>
+            </div>
+          ) : (
+            <HiddenMeta values={values} />
+          )}
+        </aside>
+
+        <div
+          onDragEnter={(event) => {
+            event.preventDefault();
+            setDragging(true);
+          }}
+          onDragOver={(event) => {
+            event.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+          className={styles.write}
+        >
+          <div className={styles.split}>
+            <div className={styles.pane}>
+              <div className={styles.paneHead}>
+                <span>Markdown</span>
+                <label className={styles.pick}>
+                  {uploading ? "上传中…" : "选择图片"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    multiple
+                    className="sr-only"
+                    disabled={uploading}
+                    onChange={(event) => {
+                      if (event.target.files) {
+                        void uploadBodyFiles(event.target.files);
+                      }
+                      event.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
+              <textarea
+                ref={bodyRef}
+                id="body"
+                name="body"
+                value={values.body}
+                onChange={(event) =>
+                  setValues((current) => ({ ...current, body: event.target.value }))
+                }
+                onPaste={onPaste}
+                spellCheck={false}
+                className={styles.area}
+                aria-label="正文（Markdown）"
+                title="可拖拽或粘贴图片。插入后说明默认为「图片」，可改成具体描述"
+              />
+            </div>
+            <div className={styles.pane}>
+              <div className={styles.paneHead}>
+                <span>预览</span>
+              </div>
+              <div className={styles.preview}>
+                {previewHtml ? (
+                  <div className="markdown" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                ) : (
+                  <p className={styles.note}>预览将显示在这里</p>
+                )}
+              </div>
+            </div>
+          </div>
+          {dragging ? <div className={styles.drop}>松开以上传图片</div> : null}
         </div>
-        {dragging ? <div className={styles.drop}>松开以上传图片</div> : null}
-      </div>
-
-      {uploadError ? (
-        <p className={styles.alert} role="alert">
-          {uploadError}
-        </p>
-      ) : null}
-      {state.error || deleteState.error ? (
-        <p className={styles.alert} role="alert">
-          {state.error ?? deleteState.error}
-        </p>
-      ) : null}
-      {state.message ? (
-        <p className={styles.note} role="status">
-          {state.message}
-        </p>
-      ) : null}
-
-      <div className={styles.actions}>
-        {mode === "create" || status === "draft" ? (
-          <>
-            <button
-              type="submit"
-              name="intent"
-              value="draft"
-              disabled={busy}
-              className={styles.quiet}
-            >
-              {pending ? "保存中…" : "保存草稿"}
-            </button>
-            <button
-              type="submit"
-              name="intent"
-              value="publish"
-              disabled={busy}
-              className={styles.primary}
-            >
-              {pending ? "保存中…" : "发布"}
-            </button>
-          </>
-        ) : null}
-        {mode === "edit" && status === "published" ? (
-          <>
-            <button
-              type="submit"
-              name="intent"
-              value="publish"
-              disabled={busy}
-              className={styles.primary}
-            >
-              {pending ? "保存中…" : "保存"}
-            </button>
-            <button
-              type="submit"
-              name="intent"
-              value="draft"
-              disabled={busy}
-              className={styles.quiet}
-            >
-              {pending ? "保存中…" : "改为草稿"}
-            </button>
-            <button
-              type="submit"
-              name="intent"
-              value="archive"
-              disabled={busy}
-              onClick={confirmSubmit(ARCHIVE_CONFIRM)}
-              className={styles.quiet}
-            >
-              {pending ? "保存中…" : "存档"}
-            </button>
-          </>
-        ) : null}
-        {mode === "edit" && status === "archived" ? (
-          <>
-            <button
-              type="submit"
-              name="intent"
-              value="archive"
-              disabled={busy}
-              className={styles.primary}
-            >
-              {pending ? "保存中…" : "保存"}
-            </button>
-            <button
-              type="submit"
-              name="intent"
-              value="draft"
-              disabled={busy}
-              className={styles.quiet}
-            >
-              {pending ? "保存中…" : "改为草稿"}
-            </button>
-          </>
-        ) : null}
-        {mode === "edit" ? (
-          <button
-            type="submit"
-            formAction={deleteFormAction}
-            disabled={busy}
-            onClick={confirmSubmit(DELETE_CONFIRM)}
-            className={styles.quiet}
-          >
-            {deleting ? "删除中…" : "删除"}
-          </button>
-        ) : null}
       </div>
     </form>
   );

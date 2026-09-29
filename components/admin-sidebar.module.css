@@ -1,0 +1,129 @@
+.aside {
+  display: flex;
+  width: 13.75rem;
+  flex-shrink: 0;
+  flex-direction: column;
+  overflow: auto;
+  border-right: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.brandWrap {
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+
+.badge {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.125rem 0.35rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.nav,
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding-inline: var(--space-3);
+}
+
+.nav {
+  flex: 1;
+}
+
+.tools {
+  border-top: 1px solid var(--rule);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-4);
+}
+
+.toolForm {
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.375rem;
+  border-left: 2px solid transparent;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+  text-align: left;
+  transition: background var(--ease), color var(--ease);
+}
+
+.item:hover {
+  background: var(--chip);
+  color: var(--ink);
+}
+
+.item:disabled {
+  cursor: wait;
+}
+
+.current {
+  background: var(--chip);
+  border-left-color: var(--pine);
+  color: var(--pine);
+  font-weight: 500;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .aside {
+    width: 100%;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .brandWrap {
+    padding-bottom: var(--space-2);
+  }
+
+  .nav,
+  .tools {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 0;
+  }
+
+  .nav {
+    flex: none;
+    padding-bottom: var(--space-2);
+  }
+
+  .tools {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .item {
+    width: auto;
+  }
+}

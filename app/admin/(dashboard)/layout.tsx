@@ -1,10 +1,11 @@
 import { requireAdminSession } from "@/lib/auth";
 import { getSiteConfig } from "@/lib/site";
-import { AdminHeader } from "@/components/admin-header";
+import { AdminSidebar } from "@/components/admin-sidebar";
 import styles from "./layout.module.css";
 
 export const dynamic = "force-dynamic";
 
+/** 登录后的后台框：左栏导航，主区单独滚动。登录页不走这里。 */
 export default async function AdminDashboardLayout({
   children,
 }: Readonly<{
@@ -15,7 +16,7 @@ export default async function AdminDashboardLayout({
 
   return (
     <div className={styles.frame}>
-      <AdminHeader siteName={site.name} />
+      <AdminSidebar siteName={site.name} />
       <div className={styles.main}>{children}</div>
     </div>
   );

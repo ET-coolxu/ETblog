@@ -1,12 +1,14 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-5);
   margin-top: var(--space-10);
+  font-family: var(--font-sans);
 }
 
 .label {
   display: block;
+  margin-bottom: var(--space-1-5);
   font-size: var(--text-sm);
   line-height: var(--leading-5);
   color: var(--muted);
@@ -14,17 +16,42 @@
 
 .field {
   width: 100%;
-  margin-top: var(--space-1);
-  border: 0;
-  border-bottom: 1px solid var(--rule);
-  background: transparent;
-  padding-block: var(--space-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 0.625rem var(--space-3);
   color: var(--ink);
   outline: none;
 }
 
+.field:focus {
+  border-color: var(--pine);
+}
+
 .alert {
+  margin-top: var(--space-2);
   font-size: var(--text-sm);
   line-height: var(--leading-5);
-  color: var(--pine);
+  color: var(--danger);
+}
+
+.submit {
+  width: 100%;
+  margin-top: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--pine);
+  padding: 0.625rem var(--space-4);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--on-pine);
+  transition: background var(--ease);
+}
+
+.submit:hover {
+  background: color-mix(in oklab, var(--pine) 88%, black);
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }

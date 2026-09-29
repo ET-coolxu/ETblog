@@ -1,97 +1,185 @@
+.page {
+  width: 100%;
+  max-width: 68.75rem;
+  padding: var(--space-8);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+
 .intro {
-  margin-top: var(--space-4);
+  margin-top: var(--space-2);
   font-size: var(--text-sm);
   line-height: var(--leading-5);
   color: var(--muted);
 }
 
-.total {
-  margin-top: var(--space-10);
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.kpi {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  padding: var(--space-4);
+}
+
+.kpiLabel {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.kpiValue {
+  margin-top: var(--space-2);
   font-family: var(--font-serif);
-  font-size: var(--text-2xl);
+  font-size: var(--text-3xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
   color: var(--ink);
 }
 
 .section {
-  margin-top: var(--space-12);
+  margin-top: var(--space-8);
 }
 
 .heading {
-  font-family: var(--font-serif);
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: var(--ink);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  color: var(--muted);
 }
 
 .rank {
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+}
+
+.rankItem {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  margin-top: var(--space-6);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--rule);
 }
 
-.rankItem,
-.rankMain {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-4);
+.rankItem:last-child {
+  border-bottom: 0;
 }
 
-.rankMain {
-  justify-content: flex-start;
-}
-
-.index {
-  margin-right: var(--space-3);
-  font-size: var(--text-sm);
-  line-height: var(--leading-5);
-  color: var(--muted);
-}
-
+.index,
 .count {
   flex-shrink: 0;
   font-size: var(--text-sm);
-  line-height: var(--leading-5);
+  font-variant-numeric: tabular-nums;
   color: var(--muted);
+}
+
+.index {
+  width: 1.25rem;
+}
+
+.postTitle {
+  min-width: 0;
+  flex: 1;
+  color: var(--ink);
+  transition: color var(--ease);
+}
+
+.postTitle:hover {
+  color: var(--pine);
+}
+
+.scroll {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
 }
 
 .table {
   width: 100%;
-  margin-top: var(--space-6);
+  min-width: 36rem;
+  border-collapse: collapse;
   text-align: left;
   font-size: var(--text-sm);
 }
 
-.head,
-.line {
+.headCell {
+  padding: 0.625rem var(--space-3);
   border-bottom: 1px solid var(--rule);
-}
-
-.head {
+  background: var(--panel);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-back);
   color: var(--muted);
 }
 
-.cell,
-.headCell {
-  padding-block: var(--space-2);
-  font-weight: 400;
+.line {
+  border-bottom: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.line:last-child {
+  border-bottom: 0;
+}
+
+.line:hover {
+  background: var(--chip);
 }
 
 .cell {
-  padding-block: var(--space-3);
-  padding-right: var(--space-4);
+  padding: var(--space-3);
+  vertical-align: middle;
 }
 
 .right {
   text-align: right;
   font-variant-numeric: tabular-nums;
+  color: var(--muted);
 }
 
-.title {
-  transition: color var(--ease);
+.muted {
+  color: var(--muted);
 }
 
-.title:hover {
+.pill {
+  display: inline-block;
+  border-radius: var(--radius-full);
+  padding: 0.125rem var(--space-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-5);
+}
+
+.published {
+  background: color-mix(in oklab, var(--pine) 12%, var(--panel));
   color: var(--pine);
+}
+
+.draft {
+  background: var(--chip);
+  color: var(--muted);
+}
+
+.archived {
+  background: color-mix(in oklab, var(--chip) 65%, var(--panel));
+  color: var(--quiet);
+}
+
+@media (max-width: 640px) {
+  .kpis {
+    grid-template-columns: 1fr;
+  }
 }
