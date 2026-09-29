@@ -33,7 +33,8 @@ Next.js 是套在 React 外面的**全栈框架**：既负责页面，也负责�
 Blog/
 ├── app/                    ← Next 只把这里当成「页面」
 │   ├── layout.tsx          ← 全站根布局（html / body / 字体）
-│   ├── globals.css         ← 全局样式和设计 token
+│   ├── globals.css         ← 按顺序引入 app/styles/
+│   ├── styles/             ← 主题令牌、公共类、正文排印
 │   ├── icon.svg            ← 浏览器标签图标
 │   ├── (site)/             ← 路由组：括号不出现在 URL 里
 │   │   ├── layout.tsx      ← 公开站的页眉页脚
@@ -49,7 +50,6 @@ Blog/
 ├── public/uploads/         ← 以后放图片，URL 以 /uploads/... 开头
 ├── data/                   ← 以后放 SQLite
 ├── next.config.ts          ← Next 配置
-├── postcss.config.mjs      ← 让 Tailwind 接到构建流程
 ├── tsconfig.json           ← `@/` 路径别名在这里
 ├── .env.example            ← 环境变量清单
 ├── Dockerfile / docker-compose.yml / Caddyfile
@@ -218,7 +218,7 @@ export function generateMetadata(): Metadata {
 
 ### 6.2 `next/font`：字体不靠 `<link>`
 
-根布局顶部用 `Noto_Sans_SC`、`Noto_Serif_SC`。Next 会在构建时拉字体、生成 CSS 变量 `--font-noto-sans` / `--font-noto-serif`，挂到 `<html className=...>` 上。`globals.css` 的 `@theme inline` 再把它们接到 Tailwind 的 `font-sans`、`font-serif`。
+根布局顶部用 `Noto_Sans_SC`、`Noto_Serif_SC` 等。Next 会在构建时拉字体、生成 CSS 变量（如 `--font-noto-sans`），挂到 `<body className=...>` 上。`app/styles/tokens.css` 再把它们收成 `--font-sans`、`--font-serif` 等，组件里用 `var(--font-sans)`。
 
 好处：减少布局抖动，也不用在 HTML 里手写 Google Fonts 外链。
 
@@ -238,40 +238,19 @@ import Link from "next/link";
 
 ---
 
-## 7. 样式：Tailwind v4 + 本项目的 token
+## 7. 样式：主题令牌 + 公共类 + 组件 CSS
 
-构建链很短：
+`app/globals.css` 只按顺序引入 `app/styles/`：
 
-1. `postcss.config.mjs` 启用 `@tailwindcss/postcss`
-2. `app/globals.css` 第一行 `@import "tailwindcss"`
-3. 组件的 `className="mt-3 font-serif text-ink"` 在构建时被扫描，用到的工具类才打进 CSS
+1. `tokens.css`：颜色、字体、间距和字号。深色是 `.dark` 覆盖同一批颜色变量。
+2. `base.css`：页面底、焦点、减弱动效。
+3. `utilities.css`：封闭的间距、字号、字体，以及显示、弹性方向和对齐（如 `mt-4`、`text-sm`、`flex`、`items-center`）。没有任意值，也没有断点和定位。
+4. `shared.css`：栏宽、排列、发丝线、链接、多页共用的衬线大标题、图标尺寸。眉题、芯片、表单写在各自的 `*.module.css`。
+5. `markdown.css`：正文 `.markdown`。
 
-本项目没有 `tailwind.config.js`。自定义颜色写在 CSS 里：
+组件自己的布局写在旁边的 `*.module.css`，用 `import styles from "./组件.module.css"`。颜色写 `var(--ink)` 这类变量，不要在 JSX 里再堆长串类名。
 
-```4:30:app/globals.css
-:root {
-  --paper: oklch(0.97 0.008 155);
-  --ink: oklch(0.22 0.02 160);
-  /* ... */
-}
-
-.dark {
-  --paper: oklch(0.18 0.015 160);
-  /* ... */
-}
-
-@theme inline {
-  --color-paper: var(--paper);
-  --color-ink: var(--ink);
-  /* ... */
-}
-```
-
-`@theme inline` 的作用：让你能写 `bg-paper`、`text-ink`、`border-rule`、`text-pine`，而不只是 `bg-gray-100`。
-
-`@custom-variant dark (&:where(.dark, .dark *));` 表示：只有祖先带 class `dark` 时，`dark:` 前缀才生效。阶段 1 没有往 `<html>` 上加 `dark`，所以现在一直是浅色。阶段 3 会做切换。
-
-首页左侧那条竖线是普通边框，不是 Next 特性：`border-l border-rule`。
+阶段 3 会给 `<html>` 加上 `dark`。没加之前一直是浅色。
 
 ---
 
@@ -363,7 +342,7 @@ const nextConfig: NextConfig = {
 
 ## 12. 和阶段二的衔接
 
-阶段 2 已在现有外壳上增加公开阅读，说明见 [02-阶段二-公开阅读.md](./02-阶段二-公开阅读.md)。骨架侧需要记住的仍是：路由组、layout 嵌套、Server Component、环境变量、Tailwind token。
+阶段 2 已在现有外壳上增加公开阅读，说明见 [02-阶段二-公开阅读.md](./02-阶段二-公开阅读.md)。骨架侧需要记住的仍是：路由组、layout 嵌套、Server Component、环境变量、`app/styles/` 里的主题令牌。
 
 产品行为以 [docs/requirements/v1.md](../requirements/v1.md) 为准。实现清单见 [docs/todo-v1.md](../todo-v1.md)。
 
