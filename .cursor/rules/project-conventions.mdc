@@ -20,7 +20,7 @@ alwaysApply: true
 ## 技术栈
 
 - Next.js App Router + TypeScript，`output: 'standalone'`。
-- Tailwind + 自定义设计 token；界面文案全程中文。
+- 样式：`app/styles/` 的主题令牌与封闭工具类；`shared.css` 只放栏宽、排列和多页共用标题，其余写在组件旁的 CSS Modules。界面文案全程中文。
 - 渲染：`gray-matter` + `next-mdx-remote/rsc` + `remark-gfm` + Shiki。
 - 搜索用服务端 Flexsearch（须能搜中文）；统计用应用内 SQLite；鉴权为单管理员（环境变量 + httpOnly session）。
 - 部署：Docker Compose + Caddy HTTPS；生产 app 镜像来自 `ghcr.io/et-coolxu/etblog`（GitHub Actions 在 **`main`** 构建并推包）；`content/`、`public/uploads/`、SQLite 目录用数据卷。VPS 日常只 pull，不在服务器上 `next build`。

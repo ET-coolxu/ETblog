@@ -28,5 +28,5 @@ alwaysApply: true
 
 ## 界面
 
-- 文案中文。颜色用 `paper` / `ink` / `muted` / `rule` / `pine`，不要随手 `gray-*`。
+- 文案中文。颜色、间距、字号用 `app/styles/tokens.css` 的变量。`shared.css` 只放栏宽、排列、发丝线、链接、衬线大标题和图标尺寸；只服务一个组件的样式放旁边的 `*.module.css`。JSX 里的工具类只许 `utilities.css` 已有的间距、字号、字体和布局（显示、弹性方向、对齐），不要写任意值。
 - 无内容写空状态，不要空白页。正文页的签名是目录，不要用大面积 Hero 替代。
