@@ -14,6 +14,10 @@
   /* 文章标签：稿面的 surface-container / on-surface-variant */
   --tag-bg: #efeeeb;
   --tag: #414943;
+  /* 标签总览 pill：#f0f4ee 以 70% 叠在纸色上，边与悬停来自 stitch 稿 */
+  --tag-pill: #f3f5f0;
+  --tag-pill-border: #e2e7e0;
+  --tag-pill-hover: #ebf2ec;
   /* 列表 / 标签筛选只在这两页用，数值来自 stitch 浅色屏 */
   --list-ink: #1c1b19;
   --list-muted: #706e6b;
@@ -131,6 +135,9 @@ body {
   --chip: #2c312e;
   --tag-bg: #343936;
   --tag: #c5cbc6;
+  --tag-pill: #2a332e;
+  --tag-pill-border: #3d4842;
+  --tag-pill-hover: #314038;
   --list-ink: var(--ink);
   --list-muted: var(--muted);
   --list-dim: var(--quiet);
