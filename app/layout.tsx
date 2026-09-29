@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Literata, Newsreader, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
+import { Inter, Newsreader, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getSiteConfig } from "@/lib/site";
 import "./globals.css";
@@ -28,25 +28,11 @@ const display = Newsreader({
   display: "swap",
 });
 
-const text = Literata({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-literata",
-  display: "swap",
-});
-
-const label = Inter({
+/** 正文、导航、列表与代码。字库没有中文，中文走 Noto Sans SC。 */
+const text = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-inter",
-  display: "swap",
-});
-
-/** 列表日期、ARCHIVE 与页码。只覆盖拉丁数字，中文仍走旁边的无衬线。 */
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-jetbrains",
   display: "swap",
 });
 
@@ -82,7 +68,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body
-        className={`${sans.variable} ${serif.variable} ${display.variable} ${text.variable} ${label.variable} ${mono.variable}`}
+        className={`${sans.variable} ${serif.variable} ${display.variable} ${text.variable}`}
       >
         <ThemeProvider>{children}</ThemeProvider>
       </body>

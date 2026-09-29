@@ -19,7 +19,7 @@
 
 .prose {
   max-width: 40rem;
-  font-family: var(--font-label);
+  font-family: var(--font-sans);
   font-size: 1.0625rem;
   line-height: 1.75;
   color: var(--ink);
@@ -92,6 +92,13 @@
 
 .prose blockquote p {
   margin: 0;
+}
+
+/* 浏览器默认把 code / pre 设成等宽，这里改回正文的无衬线 */
+.prose :not(pre) > code,
+.prose pre,
+.prose pre code {
+  font-family: inherit;
 }
 
 .prose :not(pre) > code {

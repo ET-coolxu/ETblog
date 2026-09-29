@@ -1,7 +1,7 @@
 /* 文章正文排印。后台预览共用这一层。选择器必须是全局类，MDX 产出的 HTML 不走 CSS Modules。 */
 
 .markdown {
-  font-family: var(--font-label);
+  font-family: var(--font-sans);
   font-size: var(--text-prose);
   line-height: var(--leading-prose);
   color: var(--ink-soft);
@@ -146,7 +146,7 @@
 
 .markdown .task-list-item input[type="checkbox"]:checked {
   background-color: var(--pine);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23faf8f5' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11l6.1-6.2' stroke='%23fbfbf9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 /* 深色模式的 pine 是浅松绿，勾要用纸色才看得见 */
@@ -207,7 +207,7 @@ html.dark .markdown .task-list-item input[type="checkbox"]:checked {
 
 .markdown th {
   background: var(--chip);
-  font-family: var(--font-list);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: var(--tracking-chip);
@@ -225,6 +225,13 @@ html.dark .markdown .task-list-item input[type="checkbox"]:checked {
 
 .markdown del {
   color: var(--muted);
+}
+
+/* 浏览器默认把 code / pre 设成等宽，这里改回正文的无衬线 */
+.markdown :not(pre) > code,
+.markdown pre,
+.markdown pre code {
+  font-family: inherit;
 }
 
 .markdown :not(pre) > code {

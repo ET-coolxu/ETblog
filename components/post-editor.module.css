@@ -47,7 +47,7 @@
 .area {
   resize: vertical;
   background: transparent;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   line-height: var(--leading-7);
   color: var(--ink);

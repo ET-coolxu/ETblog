@@ -134,9 +134,6 @@
 
 .font-sans { font-family: var(--font-sans); }
 .font-serif { font-family: var(--font-serif); }
-.font-label { font-family: var(--font-label); }
-.font-mono { font-family: var(--font-mono); }
-.font-list { font-family: var(--font-list); }
 
 .flex { display: flex; }
 .inline-flex { display: inline-flex; }

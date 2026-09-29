@@ -2,7 +2,7 @@
    断点不放成工具类：sm 640px，md 768px，xl 1280px。编辑器双栏沿用原来的 1024px。 */
 
 :root {
-  --paper: #faf8f5;
+  --paper: #fbfbf9;
   --ink: #1c1e21;
   /* 正文比标题软一档，避免整栏一样黑 */
   --ink-soft: #2b2a27;
@@ -102,17 +102,11 @@
 
 /* next/font 的变量挂在 body 上。字体栈必须写在同一元素，:root 里解析不到。 */
 body {
-  --font-sans: var(--font-literata), var(--font-noto-sans), "PingFang SC",
-    "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  /* 网页字体写在系统字体前面，否则 Windows 雅黑会截住后面的 Noto */
+  --font-sans: var(--font-inter), var(--font-noto-sans), "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --font-serif: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
     "Noto Serif SC", serif;
-  --font-label: var(--font-inter), "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", var(--font-noto-sans), "Noto Sans SC", sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Consolas,
-    monospace;
-  /* 列表无衬线：网页字体必须在系统字体前面，否则 Windows 雅黑会截住后面的 Noto */
-  --font-list: var(--font-inter), var(--font-noto-sans), "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
 }
 
 :root {
