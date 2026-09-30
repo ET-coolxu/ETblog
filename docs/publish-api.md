@@ -83,4 +83,22 @@ curl -sS "http://localhost:3000/api/v1/posts?status=published" \
   -H "Authorization: Bearer TOKEN"
 ```
 
-本机 MCP 的配置见 `mcp/coolxu-blog/README.md`。
+## 远程 MCP
+
+地址是 `https://<站点主机>/api/mcp`，本地开发为 `http://localhost:3000/api/mcp`。`type` 用 `http`（Streamable HTTP）。请求头是 `Authorization: Bearer <PUBLISH_API_TOKEN>`。工具与本机 stdio 相同。
+
+```json
+{
+  "mcpServers": {
+    "coolxu-blog": {
+      "type": "http",
+      "url": "http://localhost:3000/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:PUBLISH_API_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+线上把 `url` 换成 `https://coolxu.com/api/mcp`。不要把 token 写进仓库。完整说明见 `mcp/coolxu-blog/README.md`。

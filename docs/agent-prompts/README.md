@@ -31,7 +31,7 @@
 
 没有进行中的提示词。
 
-最近完成：[Publish API 与 CoolXu Blog MCP](./archive/2026-09-29-publish-api.md)
+最近完成：[远程 MCP](./archive/2026-09-30-remote-mcp.md)
 
 ## 后台 V2
 

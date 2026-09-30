@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@shikijs/rehype": "^3.8.0",
     "better-sqlite3": "^11.10.0",
     "flexsearch": "^0.7.43",
@@ -27,7 +28,8 @@
     "remark-rehype": "^11.1.2",
     "server-only": "^0.0.1",
     "shiki": "^3.8.0",
-    "unist-util-visit": "^5.0.0"
+    "unist-util-visit": "^5.0.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
