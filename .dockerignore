@@ -1,4 +1,5 @@
 node_modules/
+mcp/
 .pnp
 .pnp.*
 .next/
