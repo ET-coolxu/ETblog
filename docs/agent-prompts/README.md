@@ -27,6 +27,12 @@
 
 `draft` → `ready` → `in-progress` → `done`
 
+## 当前
+
+没有进行中的提示词。
+
+最近完成：[Publish API 与 CoolXu Blog MCP](./archive/2026-09-29-publish-api.md)
+
 ## 后台 V2
 
 按顺序 `@` 下面的文件。说明见 [后台工作台 V2](../requirements/v2-admin.md)。
