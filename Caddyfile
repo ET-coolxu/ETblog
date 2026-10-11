@@ -11,3 +11,10 @@
 		X-Accel-Buffering no
 	}
 }
+
+# 微信中转临时图片服务（只读，仅 GET）；上游容器 wechat-relay-relay-1 需接入 etblog_web 网络
+wx.coolxu.com {
+	@notget not method GET
+	respond @notget 405
+	reverse_proxy wechat-relay-relay-1:8787
+}
