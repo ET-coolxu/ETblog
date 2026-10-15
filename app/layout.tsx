@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Newsreader, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
+import { PreviewBadge } from "@/components/preview-badge";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getSiteConfig } from "@/lib/site";
 import "./globals.css";
@@ -71,6 +72,7 @@ export default function RootLayout({
         className={`${sans.variable} ${serif.variable} ${display.variable} ${text.variable}`}
       >
         <ThemeProvider>{children}</ThemeProvider>
+        <PreviewBadge />
       </body>
     </html>
   );

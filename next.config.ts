@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Vercel 自己做输出追踪；standalone 会让它去找不存在的 next-server.js.nft.json。
+  // 未设置 VERCEL 时仍走 standalone，Docker / VPS 不变。
+  output: process.env.VERCEL ? undefined : "standalone",
   serverExternalPackages: ["shiki", "@shikijs/rehype", "better-sqlite3"],
   async headers() {
     return [

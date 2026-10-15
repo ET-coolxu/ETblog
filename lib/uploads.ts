@@ -1,9 +1,13 @@
+/**
+ * 读写 `public/uploads` 下的图片，路径必须落在该目录内。
+ * 动态路径都标 turbopackIgnore，避免 Turbopack 把整个仓库纳入文件追踪。
+ */
 import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
 const MAX_BYTES = 5 * 1024 * 1024;
-const UPLOADS_ROOT = path.join(process.cwd(), "public", "uploads");
+const UPLOADS_ROOT = path.join(/* turbopackIgnore: true */ process.cwd(), "public", "uploads");
 
 const ALLOWED = {
   png: { ext: ".png" },
@@ -80,7 +84,10 @@ function resolveUploadRelative(relativePath: string): string | null {
     return null;
   }
 
-  const filePath = path.resolve(UPLOADS_ROOT, ...segments);
+  const filePath = path.resolve(
+    /* turbopackIgnore: true */ UPLOADS_ROOT,
+    .../* turbopackIgnore: true */ segments,
+  );
   const relative = path.relative(UPLOADS_ROOT, filePath);
   if (relative.startsWith("..") || path.isAbsolute(relative)) {
     return null;
@@ -113,13 +120,17 @@ export async function readUploadedImage(relativePath: string): Promise<ServedUpl
   }
 
   try {
-    const bytes = await fs.readFile(filePath);
+    const bytes = await fs.readFile(/* turbopackIgnore: true */ filePath);
     return { ok: true, bytes, contentType };
   } catch {
     return { ok: false };
   }
 }
 
+/**
+ * 校验并写入一张图片到 `public/uploads/{年}/{月}/`。
+ * 拒绝 SVG 与超过 5MB 的文件；成功后返回站内 URL。
+ */
 export async function saveUploadedImage(file: File): Promise<UploadResult> {
   if (file.size <= 0) {
     return { ok: false, error: "没有收到图片文件。" };
@@ -152,7 +163,8 @@ export async function saveUploadedImage(file: File): Promise<UploadResult> {
     return { ok: false, error: "无法保存这张图片。" };
   }
 
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, buffer);
+  const directory = path.dirname(/* turbopackIgnore: true */ filePath);
+  await fs.mkdir(/* turbopackIgnore: true */ directory, { recursive: true });
+  await fs.writeFile(/* turbopackIgnore: true */ filePath, buffer);
   return { ok: true, url: `/uploads/${yyyy}/${mm}/${filename}` };
 }

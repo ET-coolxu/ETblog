@@ -1,0 +1,31 @@
+.badge {
+  position: fixed;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 20;
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-full);
+  background: var(--paper);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  line-height: var(--leading-4);
+  letter-spacing: var(--tracking-wide);
+  pointer-events: none;
+}
+
+/* 窄屏贴住视口底边。抬起 12px 时会压住首页分割线和段末；桌面仍用上面的间距。 */
+@media (max-width: 480px) {
+  .badge {
+    right: 0;
+    bottom: 0;
+    padding: 0 var(--space-1);
+    border-right: 0;
+    border-bottom: 0;
+    border-radius: var(--radius-sm) 0 0 0;
+    line-height: var(--leading-none);
+    letter-spacing: 0;
+  }
+}
