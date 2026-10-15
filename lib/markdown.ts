@@ -61,6 +61,7 @@ export async function renderMarkdown(source: string): Promise<ReactElement> {
     components: {
       img: MarkdownImage,
     },
+    // v6 起默认去掉 `{表达式}`。文章是 Markdown，保持这个默认。
     options: {
       mdxOptions: {
         format: "md",
