@@ -335,6 +335,26 @@ export const getAdminPost = cache(async (slug: string): Promise<AdminPost | null
   return readPostFile(slug);
 });
 
+/**
+ * 读取 frontmatter 里手写的摘要。
+ * 没有该字段时返回空字符串，不用正文摘录顶上。
+ * 部分更新要靠这个区分「没写摘要」和展示用摘录，避免把摘录写回文件。
+ * 文件不存在或 slug 非法时返回 null。
+ */
+export async function readStoredSummary(slug: string): Promise<string | null> {
+  const filePath = resolvePostFile(slug);
+  if (!filePath) {
+    return null;
+  }
+
+  try {
+    const raw = await fs.readFile(filePath, "utf8");
+    return asString(matter(raw).data.summary) ?? "";
+  } catch {
+    return null;
+  }
+}
+
 const SLUG_NUMERIC_SUFFIX = /-(\d+)$/;
 
 /**

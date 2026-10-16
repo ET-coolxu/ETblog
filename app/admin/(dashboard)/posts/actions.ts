@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { hasAdminSession } from "@/lib/auth";
 import { renderMarkdownPreviewHtml } from "@/lib/markdown";
@@ -8,10 +7,10 @@ import {
   deletePost,
   getAdminPost,
   savePost,
-  tagHref,
   type SavePostInput,
   type SavePostIntent,
 } from "@/lib/posts";
+import { mergePostTags, revalidatePostSurfaces } from "@/lib/revalidate-posts";
 import { deletePostViews } from "@/lib/stats";
 
 export type SaveState = {
@@ -65,23 +64,6 @@ function saveMessage(intent: SavePostIntent): string {
   return "已发布，前台已更新。";
 }
 
-/** 写入或删除后刷新公开页、该文旧路径与后台，避免缓存里仍是旧状态。 */
-function revalidatePostSurfaces(slug: string, tags: string[]) {
-  revalidatePath("/");
-  revalidatePath("/posts");
-  revalidatePath(`/posts/${slug}`);
-  revalidatePath("/tags", "layout");
-  revalidatePath("/search");
-  revalidatePath("/feed.xml");
-  revalidatePath("/sitemap.xml");
-  revalidatePath("/admin");
-  revalidatePath(`/admin/posts/${slug}`);
-  revalidatePath("/admin/stats");
-  for (const tag of tags) {
-    revalidatePath(tagHref(tag));
-  }
-}
-
 export async function createPostAction(
   _prev: SaveState,
   formData: FormData,
@@ -123,13 +105,14 @@ export async function updatePostAction(
     return { error: "未知操作。" };
   }
 
+  const existing = await getAdminPost(slug);
   const input = inputFromForm(formData, slug, intent);
   const result = await savePost(input, "update");
   if (!result.ok) {
     return { error: result.error };
   }
 
-  revalidatePostSurfaces(input.slug, input.tags);
+  revalidatePostSurfaces(input.slug, mergePostTags(existing?.tags, input.tags));
   return { message: saveMessage(intent) };
 }
 

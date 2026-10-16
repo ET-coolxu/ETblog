@@ -18,6 +18,7 @@ export async function generateMetadata({
   };
 }
 
+/** 编辑已有文章。标题和操作都在写作面里，这一页不再另放大标题。 */
 export default async function EditPostPage({ params }: EditPostPageProps) {
   const { slug } = await params;
   const post = await getAdminPost(slug);
@@ -29,24 +30,21 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   const remove = deletePostAction.bind(null, post.slug);
 
   return (
-    <main className="page-wide">
-      <h1 className="doc-title">编辑文章</h1>
-      <PostEditor
-        mode="edit"
-        status={adminPostStatus(post)}
-        action={save}
-        deleteAction={remove}
-        initial={{
-          slug: post.slug,
-          title: post.title,
-          date: post.date,
-          tags: post.tags.join("，"),
-          summary: post.summary,
-          cover: post.cover ?? "",
-          featured: post.featured,
-          body: post.body,
-        }}
-      />
-    </main>
+    <PostEditor
+      mode="edit"
+      status={adminPostStatus(post)}
+      action={save}
+      deleteAction={remove}
+      initial={{
+        slug: post.slug,
+        title: post.title,
+        date: post.date,
+        tags: post.tags.join("，"),
+        summary: post.summary,
+        cover: post.cover ?? "",
+        featured: post.featured,
+        body: post.body,
+      }}
+    />
   );
 }
