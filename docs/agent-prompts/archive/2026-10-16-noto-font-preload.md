@@ -1,7 +1,7 @@
 ---
 title: Noto 字体切片不要预加载
 type: fix
-status: in-progress
+status: done
 created: 2026-10-16
 updated: 2026-10-16
 related:
@@ -44,7 +44,7 @@ PR #11 的设计验收里，字体家族、字重、`--font-*` 变量、`font-di
 
 - [x] `app/fonts/index.ts` 里 `preload: true` 只出现在 Inter、Newsreader 的拉丁切片（`inter6`、`newsreader2`）
 - [x] 本地 `npm run build` 后用无头 Chrome 打开首页，首次加载 17 个 woff2（3 个拉丁预加载 + 页面用到的汉字切片）
-- [ ] PR 上的 Docker / next build 仍通过
+- [x] PR 上的 Docker / next build 仍通过（run 38875772109，1 分 11 秒）
 
 ## 涉及范围
 
@@ -58,4 +58,4 @@ PR #11 的设计验收里，字体家族、字重、`--font-*` 变量、`font-di
 
 ## 验证
 
-- 构建后用无头 Chromium 打开首页，统计首次加载的 woff2 请求数。
+- 构建后用无头 Chromium 打开首页，统计首次加载的 woff2 请求数。实测 17。
