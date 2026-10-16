@@ -100,6 +100,9 @@ def parse_faces(css: str) -> list[dict]:
                     }
                 )
                 in_face = False
+                # 子集注释只描述紧跟着的这一条。不清掉的话，/* latin */
+                # 会粘到后面没有新注释的汉字切片上。
+                comment = ""
     return faces
 
 
@@ -221,8 +224,10 @@ def main() -> None:
                     "variable": variable,
                     "src": src,
                     "unicode_range": unicode_range,
-                    # 只预加载拉丁切片。汉字切片留给页面实际用到的码位。
-                    "preload": is_latin,
+                    # 浏览器会预加载 preload 的文件，不管 unicode-range。
+                    # 只预加载 Inter / Newsreader 的拉丁切片。Noto 全部不预加载，
+                    # 否则首屏会拉下约 200 个汉字 woff2。
+                    "preload": is_latin and family["id"] in {"inter", "newsreader"},
                     "adjust": False,
                 }
             )
@@ -279,6 +284,8 @@ def write_typescript(calls: list[dict]) -> None:
         " * 中文 Noto 按 unicode-range 分片；`--font-*` 名字与改前一致。",
         " * 每个切片关闭自动回退，避免 Arial 插在字体栈中间挡住后面的汉字。",
         " * 字重 400 的拉丁文件单独计算 size-adjust。",
+        " * 只预加载 Inter 与 Newsreader 的拉丁切片。Noto 切片一律不预加载，",
+        " * 否则浏览器会无视 unicode-range，首屏拉下全部汉字 woff2。",
         " */",
         "",
     ]
