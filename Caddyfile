@@ -11,3 +11,9 @@
 		X-Accel-Buffering no
 	}
 }
+
+# Beszel VPS 监控（自带登录）；容器 beszel 需接入 etblog_web 网络
+monitor.coolxu.com {
+	encode gzip
+	reverse_proxy beszel:8090
+}
