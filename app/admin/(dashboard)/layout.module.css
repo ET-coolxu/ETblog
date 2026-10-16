@@ -1,9 +1,22 @@
 .frame {
   display: flex;
-  min-height: 100dvh;
-  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--paper);
 }
 
 .main {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
   flex: 1;
+  flex-direction: column;
+  overflow: auto;
+  background: var(--paper);
+}
+
+@media (max-width: 767px) {
+  .frame {
+    flex-direction: column;
+  }
 }

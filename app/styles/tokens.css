@@ -10,6 +10,11 @@
   --quiet: #8b9096;
   --rule: #e8e5df;
   --pine: #27503d;
+  /* pine 实心按钮上的字：浅色用纸色，深色用深墨 */
+  --on-pine: #fbfbf9;
+  /* 后台侧栏、表格、表单面板。主区仍用 --paper */
+  --panel: #ffffff;
+  --danger: #9b3b3b;
   --chip: #f7f5f0;
   /* 文章标签：稿面的 surface-container / on-surface-variant */
   --tag-bg: #efeeeb;
@@ -126,6 +131,9 @@ body {
   --quiet: #8c948f;
   --rule: #3a3f3c;
   --pine: #a4d0b8;
+  --on-pine: #1c1e21;
+  --panel: #2c312e;
+  --danger: #f0b4b4;
   --chip: #2c312e;
   --tag-bg: #343936;
   --tag: #c5cbc6;

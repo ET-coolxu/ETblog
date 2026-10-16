@@ -5,7 +5,7 @@ alwaysApply: true
 
 # 项目约定
 
-面向中文读者的可自托管个人博客。产品细节以 `docs/requirements/v1.md` 为准。
+面向中文读者的可自托管个人博客。公开站以 `docs/requirements/v1.md` 为准；后台工作台以 `docs/requirements/v2-admin.md` 为准。
 
 ## 信源与内容
 

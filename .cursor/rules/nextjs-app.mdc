@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Next.js App Router 写法
 
-对照 `docs/项目说明/`。产品边界仍以 `docs/requirements/v1.md` 为准。
+对照 `docs/项目说明/`。公开站产品边界以 `docs/requirements/v1.md` 为准；后台工作台以 `docs/requirements/v2-admin.md` 为准。
 
 ## 组件与数据
 

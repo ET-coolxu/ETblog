@@ -36,13 +36,13 @@ export function LoginForm() {
           required
           className={styles.field}
         />
+        {state.error ? (
+          <p className={styles.alert} role="alert">
+            {state.error}
+          </p>
+        ) : null}
       </div>
-      {state.error ? (
-        <p className={styles.alert} role="alert">
-          {state.error}
-        </p>
-      ) : null}
-      <button type="submit" disabled={pending} className="link">
+      <button type="submit" disabled={pending} className={styles.submit}>
         {pending ? "登录中…" : "登录"}
       </button>
     </form>

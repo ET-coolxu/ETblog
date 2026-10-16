@@ -14,24 +14,22 @@ function todayIso(): string {
   return `${year}-${month}-${day}`;
 }
 
+/** 新建文章。顶栏和文稿栏都在写作面里，本页不再另放大标题。 */
 export default function NewPostPage() {
   return (
-    <main className="page-wide">
-      <h1 className="doc-title">写文章</h1>
-      <PostEditor
-        mode="create"
-        action={createPostAction}
-        initial={{
-          slug: "",
-          title: "",
-          date: todayIso(),
-          tags: "",
-          summary: "",
-          cover: "",
-          featured: false,
-          body: "",
-        }}
-      />
-    </main>
+    <PostEditor
+      mode="create"
+      action={createPostAction}
+      initial={{
+        slug: "",
+        title: "",
+        date: todayIso(),
+        tags: "",
+        summary: "",
+        cover: "",
+        featured: false,
+        body: "",
+      }}
+    />
   );
 }
