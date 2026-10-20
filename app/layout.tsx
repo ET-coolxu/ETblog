@@ -1,40 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Newsreader, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getSiteConfig } from "@/lib/site";
+import { fontVariableClassName } from "./fonts";
 import "./globals.css";
-
-const sans = Noto_Sans_SC({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-noto-sans",
-  display: "swap",
-});
-
-const serif = Noto_Serif_SC({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-noto-serif",
-  display: "swap",
-});
-
-/** 标题与引用。opsz 让大标题用展示字，而不是把正文字号放大。中文不在字库里。 */
-const display = Newsreader({
-  subsets: ["latin"],
-  weight: "variable",
-  style: ["normal", "italic"],
-  axes: ["opsz"],
-  variable: "--font-newsreader",
-  display: "swap",
-});
-
-/** 正文、导航、列表与代码。字库没有中文，中文走 Noto Sans SC。 */
-const text = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 export function generateMetadata(): Metadata {
   const site = getSiteConfig();
@@ -67,9 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body
-        className={`${sans.variable} ${serif.variable} ${display.variable} ${text.variable}`}
-      >
+      <body className={fontVariableClassName}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
