@@ -4,6 +4,12 @@ import { EmptyState } from "@/components/post-card";
 import { listTags, tagHref } from "@/lib/posts";
 import styles from "./page.module.css";
 
+/**
+ * 标签来自已发布文章，文章在运行时的 content 卷里。
+ * 构建期预渲染会把后来用 MCP 加上的标签（例如「资讯」）留在总览外面。
+ */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "标签",
 };

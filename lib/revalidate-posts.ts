@@ -14,12 +14,14 @@ export function mergePostTags(before: readonly string[] | undefined, after: read
 /**
  * 刷新首页、列表、该文、标签、搜索、feed、sitemap 和后台。
  * 不整站重建。tags 传本次涉及的标签（更新时用 mergePostTags）。
+ * `/tags` 必须按页面路径刷新：公开站在 `(site)` 路由组里，
+ * `revalidatePath("/tags", "layout")` 会去对 `/tags/layout`，碰不到这一页。
  */
 export function revalidatePostSurfaces(slug: string, tags: readonly string[]): void {
   revalidatePath("/");
   revalidatePath("/posts");
   revalidatePath(`/posts/${slug}`);
-  revalidatePath("/tags", "layout");
+  revalidatePath("/tags");
   revalidatePath("/search");
   revalidatePath("/feed.xml");
   revalidatePath("/sitemap.xml");
