@@ -1,8 +1,10 @@
 # ET blog
 
-可自托管的个人博客。第一版按 [docs/todo-v1.md](docs/todo-v1.md) 分阶段实现；产品说明见 [docs/requirements/v1.md](docs/requirements/v1.md)。
+可自托管的个人博客。产品说明在 [docs/requirements/](docs/requirements/)。做哪一版以当次说明的「现在开始做 V…」为准。
 
 对着本仓库学 Next.js：[docs/项目说明](docs/项目说明/README.md)。
+
+协作规则见 [.cursor/rules/project.mdc](.cursor/rules/project.mdc)。需求换版时按 [.cursor/rules/iteration.mdc](.cursor/rules/iteration.mdc) 同步规则和 [架构说明](docs/架构/项目架构.md)。自然语言描述的新需求、优化或架构，先整理提示词：类型模板在 [docs/agent/](docs/agent/)，已确认成品在 [docs/agent/use Prompt/](docs/agent/use%20Prompt/)，流程见 [.cursor/skills/agent-prompts/SKILL.md](.cursor/skills/agent-prompts/SKILL.md)。
 
 当前已完成公开阅读、搜索、暗色模式、RSS/sitemap、访问统计，以及后台登录、发文和图片上传。
 

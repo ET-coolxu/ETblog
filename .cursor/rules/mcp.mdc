@@ -1,0 +1,14 @@
+---
+description: MCP 客户端只通过 Publish API 读写文章
+globs: mcp/coolxu-blog/src/**/*.ts,mcp/coolxu-blog/package.json,mcp/coolxu-blog/README.md
+alwaysApply: false
+---
+
+# MCP 客户端
+
+`mcp/coolxu-blog/` 是独立小程序，让 AI 列出、读取、新建和更新文章。它和站点分开构建，不要把页面或 `lib/` 的读盘逻辑抄进这里。
+
+- 文章仍只存在站点的 `content/posts/`。本目录只转发 HTTP，不写本地 Markdown，也不连 SQLite。
+- 工具、字段和状态机以 `docs/publish-api.md` 为准。文档没写的能力不要加。
+- 认证只用 `PUBLISH_API_TOKEN`。不要读取管理员 cookie，不要把 token 写进仓库。
+- 远程 HTTP 与本机 stdio 共用同一组工具。

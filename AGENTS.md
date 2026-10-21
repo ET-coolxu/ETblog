@@ -1,14 +1,10 @@
 # AGENTS
 
-产品说明：公开站 `docs/requirements/v1.md`；后台工作台 `docs/requirements/v2-admin.md`。执行清单：`docs/todo-v1.md`。改产品行为先改 PRD。核心功能与逻辑再写提示词，然后改代码。
+产品说明在 `docs/requirements/`。做哪一版以用户说出的「现在开始做 V…」为准。目录和构建见 `docs/架构/项目架构.md`。
 
-1. 新能力、行为、数据读写、鉴权、架构、逻辑缺陷：先在 `docs/agent-prompts/` 写提示词，再改代码。文案、样式、格式等简单修改直接改。
-2. 需要提示词时，实现时 `@` 对应文件，或让 agent 按该文件执行。
-3. 改核心需求先改 PRD 与提示词；完成后把文件移到 `docs/agent-prompts/archive/`。
+自然语言描述新需求、优化或架构，且没有明确说实现时：只整理提示词，不写业务代码。流程见 `.cursor/skills/agent-prompts/SKILL.md`。用户明确说「按这个实现」之后才写代码。
 
-规则：`.cursor/rules/main.mdc`、`.cursor/rules/project-conventions.mdc`、`.cursor/rules/nextjs-app.mdc`、`.cursor/rules/agent-prompts.mdc`  
-技能：`.cursor/skills/agent-prompts/SKILL.md`  
-用法：`docs/agent-prompts/README.md`
+规则：`.cursor/rules/project.mdc`、`.cursor/rules/iteration.mdc`、`.cursor/rules/agent-prompts.mdc`、`.cursor/rules/app.mdc`、`.cursor/rules/mcp.mdc`
 
 <!-- BEGIN:nextjs-agent-rules -->
 

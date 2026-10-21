@@ -6,6 +6,8 @@ alwaysApply: false
 
 # 提示词文件格式
 
+本规则只约束历史目录 `docs/agent-prompts/`。新提示词写入 `docs/agent/`，格式见 `.cursor/skills/agent-prompts/SKILL.md`。
+
 `_templates/` 只作复制源。任务文件放在 `features/`、`optimizations/`、`architecture/`、`fixes/`，完成后移到 `archive/`。
 
 ## 文件名

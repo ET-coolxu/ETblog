@@ -1,0 +1,29 @@
+---
+description: Next.js 站点的目录、Server/Client 边界和样式
+globs: app/**/*.{ts,tsx,css},components/**/*.{ts,tsx,css},lib/**/*.ts,proxy.ts
+alwaysApply: false
+---
+
+# 站点应用
+
+管 `app/`、`components/`、`lib/` 和根目录 `proxy.ts`。页面只放 `app/`，可复用界面放 `components/`，读写文件、搜索、统计和鉴权放 `lib/`。文章 Markdown 不放进 `app/`，不要用 `@next/mdx`。
+
+公开页在 `app/(site)/`，套站点页眉页脚。后台在 `app/admin/`，不要套 site layout。`mcp/coolxu-blog/` 不进这一层，它只调用 Publish API。
+
+- 默认 Server Component。要 state、事件或浏览器 API 时才加 `"use client"`。
+- 客户端组件不读没有 `NEXT_PUBLIC_` 的环境变量，不 import 读磁盘、SQLite 或鉴权的模块。
+- `lib/auth.ts`、读写文件系统和 SQLite 使用 `server-only`。
+- 列表读盘用 `react.cache()` 做请求内去重。
+- 站内跳转用 `next/link`；外链和下载用 `<a>`。
+- 文档标题用 `generateMetadata` / `metadata`，格式 `{页面} · {SITE_NAME}`。
+- `proxy.ts` 只检查有没有 cookie（`/admin/*`、`/api/upload`）。HMAC 验签放在后台 layout、Server Action 和上传接口。
+- 颜色、间距、字号用 `app/styles/tokens.css`。`shared.css` 只放栏宽、排列、发丝线、链接、衬线大标题和图标尺寸。单个组件的样式放旁边的 `*.module.css`。JSX 工具类只用 `utilities.css` 里已有的间距、字号、字体和布局。
+- 没有内容时写中文空状态。
+
+```ts
+/**
+ * 把合法 slug 解析成 `content/posts/{slug}.md` 的绝对路径。
+ * 非法字符或路径穿越时返回 null，禁止读写目录外的文件。
+ */
+function resolvePostFile(slug: string): string | null { /* lib/posts.ts */ }
+```

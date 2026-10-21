@@ -344,7 +344,7 @@ const nextConfig: NextConfig = {
 
 阶段 2 已在现有外壳上增加公开阅读，说明见 [02-阶段二-公开阅读.md](./02-阶段二-公开阅读.md)。骨架侧需要记住的仍是：路由组、layout 嵌套、Server Component、环境变量、`app/styles/` 里的主题令牌。
 
-产品行为以 [docs/requirements/v1.md](../requirements/v1.md) 为准。实现清单见 [docs/todo-v1.md](../todo-v1.md)。
+产品行为以当次说明的「现在开始做 V…」为准，文档在 [docs/requirements/](../requirements/)。第一版实现清单见 [docs/todo-v1.md](../todo-v1.md)。
 
 ---
 

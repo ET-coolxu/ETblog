@@ -1,74 +1,111 @@
 ---
 name: agent-prompts
-description: 为核心功能与逻辑在 docs/agent-prompts 中创建、更新、归档并执行提示词。新能力、行为、数据读写、鉴权、架构、逻辑缺陷，或用户要写/改/发送提示词时使用。文案、样式、格式等简单修改不要用本技能。
+description: >-
+  Compiles simple requirement/optimization descriptions into ready-to-paste prompts,
+  saves them under docs/agent/use Prompt, maintains the docs/agent prompt library,
+  and aligns prompts with .cursor/rules. Use when the user describes a new feature or
+  optimization in plain language, attaches screenshots, asks to 整理提示词/生成提示词,
+  mentions docs/agent、新需求、优化、架构、use Prompt, or when proposing prompt-library updates.
 ---
 
-# Agent Prompts
+# Agent 提示词库（docs/agent）
 
-提示词文件是核心功能与逻辑的任务说明：发给 AI 实现，也用来存档和改需求。何时要写，以 `.cursor/rules/agent-prompts.mdc` 为准。文案、样式、格式、不改行为的小补丁直接改代码，不要建提示词。
+## 分层职责
 
-## 目录
+| 层 | 路径 | 职责 |
+|----|------|------|
+| Rule | `.cursor/rules/agent-prompts.mdc` | 轻量触发：整理模式 / 库迭代提醒 |
+| Skill | 本文件 | 整理、选用、迭代的完整流程 |
+| 类型模板 | `docs/agent/新需求.md`、`优化.md`、`架构.md` 等 | 可复用的通用提示词骨架 |
+| 会话成品 | `docs/agent/use Prompt/` | 已填好、可复制到其他会话的提示词 |
 
+冲突时以 `.cursor/rules`、`docs/requirements/` 和 `docs/架构/项目架构.md` 为准，并提议更新过时的类型模板。提示词库不替代 `docs/requirements/`。
+
+## 本项目
+
+整理提示词时读取这些文件，不要沿用其它仓库的约定：
+
+- `docs/requirements/`（只读用户本次说的「现在开始做 V…」那一版，并核对它尚未取代的更早条目；没说明时先问）
+- `docs/publish-api.md`
+- `docs/架构/项目架构.md`
+- `.cursor/rules/project.mdc`
+- `.cursor/rules/app.mdc`
+- `.cursor/rules/mcp.mdc`
+
+稳定约束以 `.cursor/rules/project.mdc` 和类型模板里的「前置约束」为准。某一期才禁止的交互不要写进类型模板，那些随 `.cursor/rules/iteration.mdc` 更新。
+
+## 默认模式：整理提示词（优先）
+
+用户用**简单自然语言**描述新需求 / 优化 / 架构设计 / 方案（可带截图），且**未**明确要求「按这个实现 / 开始写代码」时：
+
+**只整理提示词，不写业务代码。**
+
+### 流程
+
+1. **选型**：判断 `新需求`、`优化` 或 `架构`；不确定则问一句
+   - **架构**：功能域分层/模块边界/数据流/状态归属尚不清，需要先出设计方案
+   - **新需求**：范围相对清晰，目标是澄清后实现功能
+   - **优化**：已有实现，要改结构、性能或代码质量
+2. **追问**：对照所选模板的缺口提问（目标、范围、页面/逻辑、约束、验收、相关路径、截图含义等），消除假设后再生成
+3. **读模板**：读取 `docs/agent/新需求.md`、`优化.md` 或 `架构.md`（及现行 rules），不要凭记忆硬套过期细则
+4. **出草稿**：在回复中用普通 Markdown 给出完整提示词（**禁止**用代码围栏包裹整段提示词，以免破坏内部 Markdown 结构）。用标题区分元信息与正文，例如以 `## 提示词正文` 起头
+5. **确认后落盘**：用户确认（如「确认 / 可以 / 保存」）后，写入  
+   `docs/agent/use Prompt/<文件名>.md`（LF）  
+   文件结构见下；未确认前不写入该目录
+6. **实现开关**：仅当用户明确说「按这个实现 / 开始做 / 在本会话执行」等之后，才按该提示词写代码；否则即使提示词已保存也保持只整理（`架构` 类型默认到设计结束为止）
+
+### 落盘文件格式
+
+路径：`docs/agent/use Prompt/`  
+命名：`YYYYMMDD-简短中文标题-新需求.md`、`…-优化.md` 或 `…-架构.md`（标题由内容概括，避免空格与特殊符号）
+
+文件为普通 Markdown：上方元信息，`---` 分隔后是可复制的提示词正文（仍是 Markdown，不用代码围栏）：
+
+```markdown
+# <简短标题>
+
+- 类型：新需求 | 优化 | 架构
+- 来源会话：（可选）一句话背景
+- 状态：已确认
+
+复制下方「提示词正文」整节（含该二级标题之下全部内容）到新会话即可。
+
+---
+
+## 提示词正文
+
+（填好占位后的完整提示词，保持 Markdown 标题/列表/代码块可用）
 ```
-docs/agent-prompts/
-  _templates/       # 只作模板，禁止当任务文件改
-  features/         # 新需求
-  optimizations/    # 优化
-  architecture/     # 架构更新
-  fixes/            # 缺陷修复
-  archive/          # 已完成
-```
 
-## 工作流
+### 触发示例
 
-复制此清单并勾选：
+- 「我要做这个功能（附图），先给我开发方案提示词」
+- 「这块功能怎么分层、状态放哪，帮我整理成架构提示词」
+- 「整理成新需求提示词，确认后我拷到别的会话」
+- 简单描述需求/优化/架构但未贴完整提示词 → 默认走本模式
 
-```
-- [ ] 1. 定类型与文件名
-- [ ] 2. 从模板写提示词，status: draft
-- [ ] 3. 补全到可执行，status: ready
-- [ ] 4. 按该文件实现（不要另起一套需求）
-- [ ] 5. 完成后 status: done，移入 archive/
-```
+## 执行模式（需明确指令）
 
-### 1. 定类型与文件名
+仅当用户明确要求按提示词**实现**时：
 
-| 用户在说 | 目录 | 模板 |
-|---|---|---|
-| 新功能、新页面、新能力 | `features/` | `_templates/feature.md` |
-| 性能、体验、可读性、重构但不改产品边界 | `optimizations/` | `_templates/optimization.md` |
-| 目录结构、技术选型、数据流、部署拓扑 | `architecture/` | `_templates/architecture.md` |
-| 修 bug、回归 | `fixes/` | `_templates/fix.md` |
+1. 以 `docs/agent/use Prompt/` 中已确认文件的「提示词正文」为准（或用户粘贴的同等 Markdown）
+2. 按其中工作流程执行；并遵守 `.cursor/rules`、`docs/requirements/` 与 `docs/架构/项目架构.md`
 
-文件名：`YYYY-MM-DD-short-slug.md`（今天的日期 + 英文短横线 slug）。
+## 迭代类型模板（必须确认制）
 
-已有相近提示词且尚未 `done`：更新那份，不要另开重复文件。已归档的需求要再改：新开一份，`related` 写上旧文件路径。
+改 `docs/agent/新需求.md`、`优化.md`、`架构.md` 或新增通用类型时：
 
-### 2–3. 写提示词
+1. 架构/约定变化、任务沉淀、用户要求、与 rules 冲突时，回复末尾提「提示词库建议」
+2. **先建议，后写入**；未确认禁止改类型模板
+3. 仅新增中文命名的**通用**类型；禁止为单次需求建类型文件（单次成品进 `use Prompt/`）
+4. 新类型结构见 [template.md](template.md)
 
-1. 复制对应模板到目标目录并改名。
-2. 填 frontmatter：`title`、`type`、`status`、`created`、`updated`。
-3. 正文必须能单独发给 AI 执行，至少包含：背景、目标、非目标、约束、验收标准、验证方式。
-4. 对照 `.cursor/rules/project-conventions.mdc`，冲突的需求写进「约束」或「非目标」。
-5. 写完把 `status` 改为 `ready`，把路径告诉用户，说明可以 `@` 该文件发给 AI。
+> **提示词库建议**  
+> 建议更新 `docs/agent/优化.md`：……  
+> 是否按此更新？
 
-已有提示词的任务若在聊天里改了需求、验收或范围：立刻写回该文件，再继续改代码。
+## 与 Rule 联动
 
-### 4. 按提示词实现
-
-- 先读目标提示词全文，再读项目约定与相关代码。
-- 把 `status` 改为 `in-progress`。
-- 只做提示词里的范围；发现缺口就先改提示词。
-- 验收标准逐条勾选。
-
-### 5. 归档
-
-1. `status: done`，`updated` 改为当天。
-2. 把文件移到 `docs/agent-prompts/archive/`（文件名不变）。
-3. 若有未完成项，不要归档；保持 `in-progress` 并写明剩余项。
-
-## status
-
-`draft` → `ready` → `in-progress` → `done`（随后移入 `archive/`）
-
-不要把任务文件放进 `_templates/`。走提示词的需求不要只在对话里改。
+- 自然语言需求/优化/架构且未要求实现 → Rule 提醒走「整理提示词」
+- `use Prompt/` 写入须用户确认草稿之后
+- 类型模板迭代与 Rule 精简策略不变：细节留在 Skill，避免三处全文重复

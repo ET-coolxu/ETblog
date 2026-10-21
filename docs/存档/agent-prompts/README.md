@@ -1,8 +1,10 @@
 # Agent 提示词
 
+这里是旧任务记录。新的提示词不要放进本目录，写到 [`docs/agent/`](../agent/)。
+
 这里存放发给 AI 的任务提示词，也是需求存档。核心功能与逻辑改代码前先有对应文件。文案、样式、格式等简单修改不必写提示词。
 
-公开站以 [docs/requirements/v1.md](../requirements/v1.md) 为准。后台工作台以 [docs/requirements/v2-admin.md](../requirements/v2-admin.md) 为准。改需求先改 PRD，再改对应提示词。
+产品行为以当次说明的「现在开始做 V…」为准，文档在 [`docs/requirements/`](../requirements/)。改需求先改该版文档，再按 `.cursor/rules/iteration.mdc` 同步规则。
 
 ## 怎么用
 

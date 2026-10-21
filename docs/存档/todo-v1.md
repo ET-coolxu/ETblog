@@ -9,9 +9,9 @@ related:
 
 # 第一版实现 TODO
 
-按阶段从上到下做，不要跳步。产品行为以 [docs/requirements/v1.md](./requirements/v1.md) 为准。每阶段开始时 `@` 对应提示词，做完勾选本文件，并把该提示词 `status` 改为 `done` 后移入 `docs/agent-prompts/archive/`。
+按阶段从上到下做，不要跳步。本文件只记录第一版实现清单。当前做哪一版以当次说明的「现在开始做 V…」为准，文档在 [docs/requirements/](./requirements/)。本清单各阶段的提示词已在 `docs/agent-prompts/archive/`。之后的新需求不要再往该目录追加，走 `docs/agent/`。
 
-改需求：先改 PRD，再改提示词，再改本 TODO，最后改代码。
+改需求：先改 PRD，再按 `.cursor/rules/iteration.mdc` 同步规则和架构说明，然后改代码。
 
 ## 进度总览
 
