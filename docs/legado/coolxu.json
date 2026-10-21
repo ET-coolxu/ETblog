@@ -1,0 +1,53 @@
+[
+  {
+    "bookSourceName": "CoolXu's Blog",
+    "bookSourceUrl": "https://coolxu.com",
+    "bookSourceGroup": "博客",
+    "bookSourceType": 0,
+    "bookUrlPattern": "https://coolxu.com/posts/.+",
+    "customOrder": 0,
+    "enabled": true,
+    "enabledExplore": true,
+    "lastUpdateTime": 1759248000000,
+    "respondTime": 180000,
+    "weight": 0,
+    "bookSourceComment": "不改网站。发现里的「全部文章」是一本书，每篇已发布文章是一章，顺序与网站一致（新的在前）；目录会顺着「下一页」翻完。搜索走网站搜索，每条结果是一篇文章。正文取文章页中 class 为 markdown 的区域。草稿和存档不在公开列表里。",
+    "exploreUrl": "全部文章::https://coolxu.com/posts",
+    "ruleExplore": {
+      "bookList": "tag.html",
+      "name": "tag.header@tag.a.0@text",
+      "author": "tag.footer@tag.span.0@text",
+      "intro": "@@meta[name=description]@content",
+      "lastChapter": "tag.h2.0@tag.a@text",
+      "bookUrl": "@js:\nString(baseUrl)\n"
+    },
+    "searchUrl": "https://coolxu.com/search?q={{key}}",
+    "ruleSearch": {
+      "bookList": "tag.article",
+      "name": "tag.h2@tag.a@text",
+      "intro": "tag.p.1@text",
+      "kind": "tag.li@tag.a@text",
+      "coverUrl": "tag.img@src",
+      "bookUrl": "tag.h2@tag.a@href"
+    },
+    "ruleBookInfo": {
+      "name": "@js:\nif (/\\/posts\\/[^/?#]+/.test(String(baseUrl))) {\n  java.getString(\"tag.h1@text\");\n} else {\n  java.getString(\"tag.header@tag.a.0@text\");\n}\n",
+      "author": "tag.footer@tag.span.0@text",
+      "intro": "@@meta[name=description]@content",
+      "kind": "tag.li@tag.a@text",
+      "lastChapter": "@js:\nif (/\\/posts\\/[^/?#]+/.test(String(baseUrl))) {\n  java.getString(\"tag.h1@text\");\n} else {\n  java.getString(\"tag.h2.0@tag.a@text\");\n}\n",
+      "updateTime": "tag.time.0@text",
+      "coverUrl": "@js:\nvar src = \"\";\nif (/\\/posts\\/[^/?#]+/.test(String(baseUrl))) {\n  src = String(java.getString(\"tag.article@tag.img@src\") || \"\");\n}\nif (src && src.charAt(0) === \"/\") {\n  src = String(baseUrl).replace(/^(https?:\\/\\/[^/]+).*$/, \"$1\") + src;\n}\nsrc;\n"
+    },
+    "ruleToc": {
+      "chapterList": "@js:\nif (/\\/posts\\/[^/?#]+/.test(String(baseUrl))) {\n  java.getElements(\"tag.h1\");\n} else {\n  java.getElements(\"tag.article\");\n}\n",
+      "chapterName": "@js:\nvar title = java.getString(\"tag.h2@tag.a@text\");\nif (!title) title = java.getString(\"text\");\nString(title || \"\");\n",
+      "chapterUrl": "@js:\nvar href = String(java.getString(\"tag.h2@tag.a@href\") || \"\");\nif (!href) href = String(baseUrl || \"\");\nif (href.charAt(0) === \"/\") {\n  href = String(baseUrl).replace(/^(https?:\\/\\/[^/]+).*$/, \"$1\") + href;\n}\nhref;\n",
+      "nextTocUrl": "@js:\nvar href = \"\";\nvar nodes = java.getElements(\"tag.a\");\nvar total = nodes.size ? nodes.size() : nodes.length;\nfor (var i = 0; i < total; i++) {\n  var node = nodes.get ? nodes.get(i) : nodes[i];\n  java.setContent(node);\n  var text = String(java.getString(\"text\") || \"\");\n  if (text.indexOf(\"下一页\") >= 0) {\n    href = String(java.getString(\"href\") || \"\");\n    break;\n  }\n}\nif (href && href.charAt(0) === \"/\") {\n  href = String(baseUrl).replace(/^(https?:\\/\\/[^/]+).*$/, \"$1\") + href;\n}\nhref;\n"
+    },
+    "ruleContent": {
+      "content": "class.markdown@html",
+      "imageStyle": "FULL"
+    }
+  }
+]
