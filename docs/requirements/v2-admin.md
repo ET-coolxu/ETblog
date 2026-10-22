@@ -12,7 +12,7 @@ updated: 2026-09-29
 
 视觉结构以 `D:\docs\blog\design\admin\prototypes-v2\` 的 HTML 为准（`01-login`、`02-overview`、`03-editor`、`04-stats`）。`prototypes/` 顶栏稿不要实现。
 
-色板和字体跟访客站，用 `app/styles/tokens.css` 与现有 `next/font`。不要把原型里的另一套色值或 Source Sans 3 引进来。浅色按原型结构定稿；深色用现有 `.dark` 令牌，结构相同。
+色板跟访客站，用 `app/styles/tokens.css`。字体用 `next/font/local` 的两套自托管字体。不要把原型里的另一套色值或 Source Sans 3 引进来。浅色按原型结构定稿；深色用现有 `.dark` 令牌，结构相同。
 
 实现任务：
 

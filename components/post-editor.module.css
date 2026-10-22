@@ -284,9 +284,9 @@
 }
 
 .preview :global(.markdown) h1 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-2xl);
-  font-weight: 600;
+  font-weight: 400;
   color: var(--ink);
 }
 

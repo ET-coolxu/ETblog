@@ -151,7 +151,7 @@ sudo docker compose version
 
 当前 SSH 会话若尚未加入 `docker` 组，本清单后续 Docker 命令一律用 `sudo docker`。
 
-成功标准：`sudo docker compose version` 有输出。构建需要出网（镜像与 `next/font/google`）。
+成功标准：`sudo docker compose version` 有输出。字体文件在仓库内，构建不访问 `fonts.googleapis.com`；出网只为拉镜像。
 
 ---
 

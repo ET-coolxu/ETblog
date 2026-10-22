@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { fontVariableClassName } from "@/app/fonts";
 import { getSiteConfig } from "@/lib/site";
-import { fontVariableClassName } from "./fonts";
 import "./globals.css";
 
 export function generateMetadata(): Metadata {

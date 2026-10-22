@@ -1,4 +1,4 @@
-/* 全站栏宽、排列，以及多页共用的衬线大标题。只服务一个组件的样式放在该组件的 module.css。 */
+/* 全站栏宽、排列，以及多页共用的大标题。只服务一个组件的样式放在该组件的 module.css。 */
 
 .shell,
 .page,
@@ -100,11 +100,11 @@
   color: var(--ink);
 }
 
-/* 关于、标签、搜索、后台的衬线大标题 */
+/* 关于、标签、搜索、后台的大标题 */
 .doc-title {
   font-family: var(--font-serif);
   font-size: var(--text-3xl);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 2.25rem;
   color: var(--ink);
 }

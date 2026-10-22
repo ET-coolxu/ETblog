@@ -102,16 +102,6 @@
   --tracking-chip: 0.04em;
   --tracking-tag: 0.08em;
   --tracking-back: 0.02em;
-
-}
-
-/* next/font 的变量挂在 body 上。字体栈必须写在同一元素，:root 里解析不到。 */
-body {
-  /* 网页字体写在系统字体前面，否则 Windows 雅黑会截住后面的 Noto */
-  --font-sans: var(--font-inter), var(--font-noto-sans), "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-  --font-serif: var(--font-newsreader), var(--font-noto-serif), "Songti SC",
-    "Noto Serif SC", serif;
 }
 
 :root {
@@ -121,6 +111,13 @@ body {
   --reading: 760px;
   --toc-w: 190px;
   --ease: 150ms ease;
+}
+
+/* 与 next/font 变量同一元素。网页字体在系统字体前面。 */
+body {
+  --font-sans: var(--font-noto-sans), "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
+  --font-serif: var(--font-noto-serif), "Songti SC", "SimSun", serif;
 }
 
 .dark {

@@ -113,10 +113,8 @@
   margin-bottom: var(--space-1);
 }
 
-/* 列表页标题。光学尺寸关掉，和稿面的 Newsreader 正文切一致 */
 .pageTitle {
   font-family: var(--font-serif);
-  font-optical-sizing: none;
   font-size: var(--text-page);
   font-weight: 400;
   line-height: var(--leading-page);
@@ -208,9 +206,8 @@
 
 .title {
   font-family: var(--font-serif);
-  font-optical-sizing: none;
   font-size: var(--text-xl);
-  font-weight: 500;
+  font-weight: 400;
   line-height: var(--leading-7);
   letter-spacing: var(--tracking-tight);
   color: var(--list-ink);

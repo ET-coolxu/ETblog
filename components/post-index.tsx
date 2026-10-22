@@ -45,7 +45,7 @@ export function PostIndexView({
 }
 
 /**
- * 全部文章页头：衬线题、ARCHIVE 计数、篇数，下面是分类芯片。
+ * 全部文章页头：页题、ARCHIVE 计数、篇数，下面是分类芯片。
  * 芯片进入标签页；「全部」停在本页。
  */
 export function PostIndexHeading({ count, tags }: { count: number; tags: TagCount[] }) {

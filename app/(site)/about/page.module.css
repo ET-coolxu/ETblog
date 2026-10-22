@@ -11,7 +11,7 @@
   margin-bottom: var(--space-8);
   font-family: var(--font-serif);
   font-size: 1.9375rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   color: var(--ink);
@@ -37,7 +37,7 @@
 .prose h2,
 .prose h3 {
   font-family: var(--font-serif);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: var(--tracking-title);
   color: var(--ink);
 }

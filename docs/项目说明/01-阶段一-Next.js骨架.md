@@ -216,13 +216,17 @@ export function generateMetadata(): Metadata {
 
 这不是普通 React 函数，而是 Next 约定的导出。只有 `layout.tsx` / `page.tsx` 可以这样导出。
 
-### 6.2 `next/font`：字体不靠 `<link>`
+### 6.2 自托管字体
 
-根布局顶部用 `Noto_Sans_SC`、`Noto_Serif_SC` 等。Next 会在构建时拉字体、生成 CSS 变量（如 `--font-noto-sans`），挂到 `<body className=...>` 上。`app/styles/tokens.css` 再把它们收成 `--font-sans`、`--font-serif` 等，组件里用 `var(--font-sans)`。
+全站用两个本地 woff2：Noto Sans SC 与 Noto Serif SC。各一次 `next/font/local` 的 `localFont`，定义在 `app/fonts/index.ts`。构建期不访问 Google Fonts。
 
-好处：减少布局抖动，也不用在 HTML 里手写 Google Fonts 外链。
+`--font-sans` 和 `--font-serif` 写在 `app/styles/tokens.css` 的 `body` 上，和这两个 `next/font` 变量同一元素。组件里仍用 `var(--font-sans)`、`var(--font-serif)`。根布局把 `fontVariableClassName` 挂在 `<body>` 上。
 
-`display: "swap"` 表示字体没就绪时先用后备字体，避免文字长时间不可见。
+```css
+--font-sans: var(--font-noto-sans), "PingFang SC", "Hiragino Sans GB",
+  "Microsoft YaHei", sans-serif;
+--font-serif: var(--font-noto-serif), "Songti SC", "SimSun", serif;
+```
 
 `suppressHydrationWarning` 加在 `<html>` 上，是给阶段 3 暗色模式预留的：主题 class 可能在客户端才写上，避免服务端 HTML 和浏览器第一次对不上时报警告。阶段 1 还没有切换逻辑。
 
@@ -356,7 +360,6 @@ const nextConfig: NextConfig = {
 | layout / page / 路由组 | [Layouts and pages](https://nextjs.org/docs/app/getting-started/layouts-and-pages) |
 | 默认服务端组件 | [Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components) |
 | `generateMetadata` | [Metadata](https://nextjs.org/docs/app/getting-started/metadata-and-og-images) |
-| `next/font` | [Fonts](https://nextjs.org/docs/app/getting-started/fonts) |
 | `next/link` | [Linking and navigating](https://nextjs.org/docs/app/getting-started/linking-and-navigating) |
 | `output: "standalone"` | [Standalone output](https://nextjs.org/docs/app/api-reference/config/next-config-js/output) |
 | 环境变量 | [Environment variables](https://nextjs.org/docs/app/guides/environment-variables) |

@@ -15,7 +15,6 @@
 .markdown h3 {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-optical-sizing: auto;
   color: var(--ink);
   /* 锚点跳转时让开固定顶栏 */
   scroll-margin-top: var(--space-24);
@@ -168,9 +167,8 @@ html.dark .markdown .task-list-item input[type="checkbox"]:checked {
   color: var(--ink);
   font-family: var(--font-serif);
   font-style: italic;
-  /* 中文衬线没有斜体字，关掉合成斜体；拉丁仍用 Newsreader 的真斜体 */
+  /* 中文衬线没有斜体字，关掉合成斜体 */
   font-synthesis: none;
-  font-optical-sizing: auto;
   font-weight: 300;
   font-size: var(--text-quote);
   line-height: var(--leading-quote);

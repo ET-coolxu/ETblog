@@ -22,7 +22,6 @@
   font-weight: 400;
   line-height: 2.35rem;
   letter-spacing: var(--tracking-title);
-  font-optical-sizing: auto;
   color: var(--ink);
 }
 

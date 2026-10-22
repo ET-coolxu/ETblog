@@ -20,7 +20,7 @@
   flex-shrink: 0;
   font-family: var(--font-serif);
   font-size: var(--text-xl);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: var(--tracking-tight);
   color: var(--ink);
   transition: color var(--ease);

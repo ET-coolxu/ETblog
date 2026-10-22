@@ -16,9 +16,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-md);
-  font-weight: 500;
+  font-weight: 400;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   color: var(--ink);
