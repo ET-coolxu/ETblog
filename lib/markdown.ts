@@ -2,7 +2,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import type { ReactElement } from "react";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
-import rehypeShiki from "@shikijs/rehype";
+import rehypeShiki, { type RehypeShikiOptions } from "@shikijs/rehype";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
@@ -11,6 +11,34 @@ import type { Heading, Root } from "mdast";
 import { visit } from "unist-util-visit";
 import GithubSlugger from "github-slugger";
 import { MarkdownImage } from "@/components/markdown-image";
+
+/**
+ * 正文和后台预览共用这一份，避免两处各建一次高亮器，或因配置不一致而重建。
+ * 不传 langs 时 @shikijs/rehype 会载入 Shiki 全部语言；这里只预载常用语言，其余靠 lazy 按需加载。
+ * bash 与 shell 不是独立语法 id，而是 shellscript 的别名；bundledLanguages 含这两个键，高亮器接受。
+ */
+const shikiOptions: RehypeShikiOptions = {
+  theme: "vitesse-light",
+  defaultLanguage: "text",
+  fallbackLanguage: "text",
+  lazy: true,
+  langs: [
+    "typescript",
+    "tsx",
+    "javascript",
+    "jsx",
+    "bash",
+    "shell",
+    "json",
+    "css",
+    "html",
+    "markdown",
+    "yaml",
+    "python",
+    "sql",
+    "diff",
+  ],
+};
 
 export type TocItem = {
   id: string;
@@ -55,6 +83,9 @@ export function extractToc(markdown: string): TocItem[] {
   return items;
 }
 
+/**
+ * 把 Markdown 编译成正文 React 节点。代码高亮与后台预览共用 `shikiOptions`。
+ */
 export async function renderMarkdown(source: string): Promise<ReactElement> {
   const { content } = await compileMDX({
     source,
@@ -75,13 +106,7 @@ export async function renderMarkdown(source: string): Promise<ReactElement> {
               properties: { className: "heading-anchor" },
             },
           ],
-          [
-            rehypeShiki,
-            {
-              theme: "vitesse-light",
-              defaultLanguage: "text",
-            },
-          ],
+          [rehypeShiki, shikiOptions],
         ],
       },
     },
@@ -100,15 +125,15 @@ export async function renderMarkdownToHtml(source: string): Promise<string> {
   return String(file);
 }
 
+/**
+ * 把 Markdown 渲染成后台预览 HTML。代码高亮与正文共用 `shikiOptions`。
+ */
 export async function renderMarkdownPreviewHtml(source: string): Promise<string> {
   const file = await remark()
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSlug)
-    .use(rehypeShiki, {
-      theme: "vitesse-light",
-      defaultLanguage: "text",
-    })
+    .use(rehypeShiki, shikiOptions)
     .use(rehypeStringify)
     .process(source);
 
