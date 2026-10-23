@@ -18,6 +18,7 @@ services:
     volumes:
       - ./content:/app/content
       - ./public/uploads:/app/public/uploads
+      # SQLite 数据卷。离线地区库在镜像构建时下载并放在 /app/geo，仓库不收这个大文件。不要改挂到这里，否则会盖住镜像里的文件。
       - ./data:/app/data
     expose:
       - "3000"

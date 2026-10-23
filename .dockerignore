@@ -8,7 +8,11 @@ out/
 .gitignore
 .env
 .env*.local
+# 署名 geo/NOTICE 要进镜像，不要写成 Markdown（下面排除全部 *.md）。
+# *.mmdb 不进构建上下文；镜像构建时再下载。
 *.md
+*.mmdb
+**/*.mmdb
 docs/
 .cursor/
 .vscode/

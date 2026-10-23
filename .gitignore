@@ -37,6 +37,9 @@ public/uploads/**
 !public/uploads/2026/08/
 !public/uploads/2026/08/cover-notes.svg
 
+# 离线地区库。本地开发读取；不提交。镜像构建时下载。
+geo/*.mmdb
+
 # os / editor
 .DS_Store
 Thumbs.db
