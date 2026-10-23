@@ -118,12 +118,34 @@
 }
 
 .visitTable {
-  min-width: 44rem;
+  min-width: 52rem;
+}
+
+.credit {
+  margin-top: calc(var(--space-3) * -0.5);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-xs);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.credit a:hover {
+  color: var(--pine);
 }
 
 .ip {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+.place {
+  white-space: nowrap;
 }
 
 .referrer {

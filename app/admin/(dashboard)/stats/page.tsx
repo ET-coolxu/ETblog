@@ -245,6 +245,9 @@ export default async function AdminStatsPage({ searchParams }: AdminStatsPagePro
 
       <section className={styles.section}>
         <h2 className={styles.heading}>访问记录</h2>
+        <p className={styles.credit}>
+          <a href="https://db-ip.com">IP Geolocation by DB-IP</a>
+        </p>
         {visits.rows.length > 0 ? (
           <>
             <div className={styles.scroll}>
@@ -254,6 +257,7 @@ export default async function AdminStatsPage({ searchParams }: AdminStatsPagePro
                     <th className={styles.headCell}>时间</th>
                     <th className={styles.headCell}>页面</th>
                     <th className={styles.headCell}>IP</th>
+                    <th className={styles.headCell}>地区</th>
                     <th className={styles.headCell}>来源</th>
                   </tr>
                 </thead>
@@ -265,6 +269,7 @@ export default async function AdminStatsPage({ searchParams }: AdminStatsPagePro
                         <VisitPageCell visit={visit} postsBySlug={postsBySlug} />
                       </td>
                       <td className={`${styles.cell} ${styles.ip}`}>{visit.ip}</td>
+                      <td className={`${styles.cell} ${styles.place}`}>{visit.place || "未知"}</td>
                       <td className={`${styles.cell} ${styles.referrer}`} title={visit.referrer || undefined}>
                         {visit.referrer || "直接访问"}
                       </td>

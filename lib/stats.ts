@@ -1,7 +1,7 @@
 /**
  * 应用内 SQLite 浏览统计与访问记录。
  * `post_views` 按 slug 累计已发布正文；`daily_views` 按上海时区自然日累计今日浏览。
- * `page_visits` 记首页、文章列表、已发布正文和关于。
+ * `page_visits` 记首页、文章列表、已发布正文和关于，并保存写入时解析出的地区。
  * 删文只删该 slug 的累计行，不回退当日次数，也不改已有访问记录。
  */
 import "server-only";
@@ -34,6 +34,7 @@ export type PageVisitRow = {
   path: string;
   slug: string | null;
   ip: string;
+  place: string;
   referrer: string;
 };
 
@@ -54,6 +55,7 @@ type VisitInsert = {
   path: string;
   slug: string | null;
   ip: string;
+  place: string;
   referrer: string | null;
 };
 
@@ -63,6 +65,7 @@ type VisitDbRow = {
   path: string;
   slug: string | null;
   ip: string;
+  place: string | null;
   referrer: string;
 };
 
@@ -94,12 +97,34 @@ function getStatsDb(): StatsDatabase {
       path TEXT NOT NULL,
       slug TEXT,
       ip TEXT NOT NULL,
-      referrer TEXT NOT NULL DEFAULT ''
+      referrer TEXT NOT NULL DEFAULT '',
+      place TEXT NOT NULL DEFAULT '未知'
     );
     CREATE INDEX IF NOT EXISTS page_visits_visited_at ON page_visits (visited_at DESC, id DESC);
     CREATE INDEX IF NOT EXISTS page_visits_day_ip ON page_visits (day, ip);
   `);
+  ensurePlaceColumn(globalForStats.statsDb);
   return globalForStats.statsDb;
+}
+
+/**
+ * 给已有的 `page_visits` 补上 `place` 列，默认「未知」。
+ * 新库的建表语句里已经有这一列时直接返回。不读取地址库，也不改写旧行的其他字段。
+ */
+function ensurePlaceColumn(db: StatsDatabase): void {
+  const columns = db.prepare("PRAGMA table_info(page_visits)").all() as { name: string }[];
+  if (columns.some((column) => column.name === "place")) {
+    return;
+  }
+
+  try {
+    db.exec("ALTER TABLE page_visits ADD COLUMN place TEXT NOT NULL DEFAULT '未知'");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/duplicate column/i.test(message)) {
+      throw error;
+    }
+  }
 }
 
 /** 统计日界固定为 Asia/Shanghai 的自然日，不跟服务器本地时区走。 */
@@ -206,6 +231,8 @@ function cleanReferrer(value: string | null): string {
  * 公开页成功打开之后记一次访问。调用前须已确认页面会正常打开，例如正文不存在时不要调用。
  * 带管理员 session 不记，预取也不记。cookie 和请求头在渲染期读取，再传入 after()；
  * Server Component 的 after 回调里不能再读这些请求数据。读取请求数据也会让该页按请求渲染。
+ * 地区字符串在进入 after() 之前就算好：IP 属于请求数据，地址库是本地文件。
+ * 解析失败时地区为「未知」，仍然调度 after()，避免把访问记录和正文浏览次数一起丢掉。
  * 已发布正文同时给累计浏览和当日浏览加 1。准备或写入失败只打日志，不抛给访客。
  */
 export async function trackPageVisit(page: TrackedPage): Promise<void> {
@@ -221,10 +248,20 @@ export async function trackPageVisit(page: TrackedPage): Promise<void> {
 
     const ip = clientIpFromHeaders(headerList);
     const referrer = headerList.get("referer");
+    let place = "未知";
+    if (ip) {
+      try {
+        const { lookupPlace } = await import("@/lib/geo");
+        place = await lookupPlace(ip);
+      } catch (error) {
+        console.error("解析地区失败", error);
+      }
+    }
     const visit: VisitInsert = {
       path: pathForTrackedPage(page),
       slug: page.kind === "post" ? page.slug : null,
       ip,
+      place,
       referrer,
     };
 
@@ -240,8 +277,8 @@ export async function trackPageVisit(page: TrackedPage): Promise<void> {
 }
 
 /**
- * 写入一行访问记录。IP 为空时跳过。来源过长会截断。失败只打日志。
- * 不修改 `post_views` 或 `daily_views`。
+ * 写入一行访问记录。IP 为空时跳过整行。来源过长会截断。地区沿用调用方已经算好的字符串。
+ * 失败只打日志。不修改 `post_views` 或 `daily_views`。
  */
 function recordPageVisit(visit: VisitInsert): void {
   if (!visit.ip || !visit.path) {
@@ -254,8 +291,8 @@ function recordPageVisit(visit: VisitInsert): void {
     getStatsDb()
       .prepare(
         `
-          INSERT INTO page_visits (visited_at, day, path, slug, ip, referrer)
-          VALUES (?, ?, ?, ?, ?, ?)
+          INSERT INTO page_visits (visited_at, day, path, slug, ip, referrer, place)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `,
       )
       .run(
@@ -265,6 +302,7 @@ function recordPageVisit(visit: VisitInsert): void {
         visit.slug,
         visit.ip,
         cleanReferrer(visit.referrer),
+        visit.place || "未知",
       );
   } catch (error) {
     console.error("记录访问失败", error);
@@ -375,7 +413,7 @@ export function listPageVisits(page: number): PageVisitList {
   const rows = db
     .prepare(
       `
-        SELECT id, visited_at, path, slug, ip, referrer
+        SELECT id, visited_at, path, slug, ip, place, referrer
         FROM page_visits
         ORDER BY visited_at DESC, id DESC
         LIMIT ? OFFSET ?
@@ -392,6 +430,7 @@ export function listPageVisits(page: number): PageVisitList {
       path: row.path,
       slug: row.slug,
       ip: row.ip,
+      place: row.place ?? "",
       referrer: row.referrer,
     })),
   };

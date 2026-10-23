@@ -225,6 +225,8 @@ sudo chown -R 1001:1001 content public/uploads data
 
 成功标准：`ls -ld content public/uploads data` 的属主 uid 为 `1001`。不要改这些目录里的 Markdown 正文内容。
 
+`content/`、`public/uploads/`、`data/` 是容器要写的数据目录。离线地区库在镜像构建时下载固定的 2026-10 MMDB，打进应用镜像的 `/app/geo`，不在这三份目录里。仓库不收这个大文件。VPS 不要下载地区库，也不要挂卷盖住 `/app/geo`。`./data:/app/data` 只会盖住镜像里的 `/app/data`。
+
 ---
 
 ## 步骤 7 — 启动（仅在 DNS 已指向本机之后）
@@ -293,7 +295,7 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 6. 步骤 8 各 URL 的 HTTP 状态
 7. 未做项：文章未改、无 www、无 CDN
 
-不要回报完整 `SESSION_SECRET`。提醒：备份时拷走 `content/`、`public/uploads/`、`data/`，不要依赖 Git 里的上传与统计库。
+不要回报完整 `SESSION_SECRET`。提醒：备份时拷走 `content/`、`public/uploads/`、`data/`，不要依赖 Git 里的上传与统计库。地区库在镜像构建时下载并打进镜像，不必跟这三份目录一起备份。
 
 ---
 
@@ -319,7 +321,7 @@ curl -sI --max-time 20 https://coolxu.com/admin | head -n 20
 
 助手**不要**默认在 VPS 执行 `git pull` 再 `--build`。那会在小内存机器上 `next build`，容易 OOM，也会用 Git 碰到 `content/`。
 
-VPS 侧由 Actions SSH 调用 `scripts/vps-deploy-from-ghcr.sh`：登录 GHCR → 只 checkout 该 SHA 的 `docker-compose.yml` / `Caddyfile` / 该脚本 → `docker compose pull app` → `up -d --no-build`。应用代码来自镜像；运行时仍读本机 `.env`。
+VPS 侧由 Actions SSH 调用 `scripts/vps-deploy-from-ghcr.sh`：登录 GHCR → 只 checkout 该 SHA 的 `docker-compose.yml` / `Caddyfile` / 该脚本 → `docker compose pull app` → `up -d --no-build`。应用代码和离线地区库都来自镜像。地址库由 Actions 在 docker build 时下载固定的 2026-10 并打进镜像，仓库不收这个大文件。运行时仍读本机 `.env`。不要在 VPS 上为地区库另行下载。
 
 ### 首次启用 GHCR（一次性，人类在 GitHub 填 Secrets）
 
