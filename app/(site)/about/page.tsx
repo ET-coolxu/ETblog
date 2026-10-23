@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { EmptyState } from "@/components/post-card";
 import { renderMarkdown } from "@/lib/markdown";
 import { getAboutSource } from "@/lib/posts";
+import { trackPageVisit } from "@/lib/stats";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 /** 关于页。版式跟 stitch 关于稿，不套文章页的大标题和 meta。 */
 export default async function AboutPage() {
   const source = await getAboutSource();
+  await trackPageVisit({ kind: "about" });
 
   return (
     <main className={`measure ${styles.page}`}>

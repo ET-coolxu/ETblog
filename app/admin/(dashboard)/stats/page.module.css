@@ -22,7 +22,7 @@
 
 .kpis {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
   gap: var(--space-3);
   margin-top: var(--space-8);
 }
@@ -115,6 +115,48 @@
   border-collapse: collapse;
   text-align: left;
   font-size: var(--text-sm);
+}
+
+.visitTable {
+  min-width: 44rem;
+}
+
+.ip {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.referrer {
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.pagerLink {
+  color: var(--ink);
+  transition: color var(--ease);
+}
+
+.pagerLink:hover {
+  color: var(--pine);
+}
+
+.pagerDisabled {
+  color: var(--quiet);
+}
+
+.pagerStatus {
+  font-variant-numeric: tabular-nums;
 }
 
 .headCell {

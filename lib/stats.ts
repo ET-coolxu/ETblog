@@ -1,12 +1,17 @@
 /**
- * 应用内 SQLite 浏览统计。
- * `post_views` 按 slug 累计；`daily_views` 按上海时区自然日累计。
- * 谁该被计入由调用方决定。删文只删该 slug 的累计行，不回退当日次数。
+ * 应用内 SQLite 浏览统计与访问记录。
+ * `post_views` 按 slug 累计已发布正文；`daily_views` 按上海时区自然日累计今日浏览。
+ * `page_visits` 记首页、文章列表、已发布正文和关于。
+ * 删文只删该 slug 的累计行，不回退当日次数，也不改已有访问记录。
  */
 import "server-only";
 import fs from "node:fs";
+import net from "node:net";
 import path from "node:path";
 import Database from "better-sqlite3";
+import { after } from "next/server";
+import { headers } from "next/headers";
+import { hasAdminSession } from "@/lib/auth";
 import { listPublishedPosts } from "@/lib/posts";
 
 export type PostViewStat = {
@@ -16,10 +21,50 @@ export type PostViewStat = {
   views: number;
 };
 
+/** 一次要记的公开页。正文必须带已发布 slug。 */
+export type TrackedPage =
+  | { kind: "home" }
+  | { kind: "posts" }
+  | { kind: "about" }
+  | { kind: "post"; slug: string };
+
+export type PageVisitRow = {
+  id: number;
+  visitedAt: string;
+  path: string;
+  slug: string | null;
+  ip: string;
+  referrer: string;
+};
+
+export type PageVisitList = {
+  page: number;
+  pageCount: number;
+  rows: PageVisitRow[];
+};
+
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_PATH = path.join(DATA_DIR, "stats.sqlite");
+const VISIT_PAGE_SIZE = 20;
+const REFERRER_MAX_LENGTH = 512;
 
 type StatsDatabase = Database.Database;
+
+type VisitInsert = {
+  path: string;
+  slug: string | null;
+  ip: string;
+  referrer: string | null;
+};
+
+type VisitDbRow = {
+  id: number;
+  visited_at: string;
+  path: string;
+  slug: string | null;
+  ip: string;
+  referrer: string;
+};
 
 const globalForStats = globalThis as typeof globalThis & {
   statsDb?: StatsDatabase;
@@ -31,7 +76,8 @@ function getStatsDb(): StatsDatabase {
     globalForStats.statsDb = new Database(DB_PATH);
   }
 
-  // 进程里若已有旧连接，仍补建日累计表，避免热更新后今日浏览写不进去。
+  // 热更新后的旧连接也要补上新表，并给连续打开几个页面留出等待锁的时间。
+  globalForStats.statsDb.pragma("busy_timeout = 3000");
   globalForStats.statsDb.exec(`
     CREATE TABLE IF NOT EXISTS post_views (
       slug TEXT PRIMARY KEY,
@@ -41,6 +87,17 @@ function getStatsDb(): StatsDatabase {
       day TEXT PRIMARY KEY,
       views INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS page_visits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      visited_at TEXT NOT NULL,
+      day TEXT NOT NULL,
+      path TEXT NOT NULL,
+      slug TEXT,
+      ip TEXT NOT NULL,
+      referrer TEXT NOT NULL DEFAULT ''
+    );
+    CREATE INDEX IF NOT EXISTS page_visits_visited_at ON page_visits (visited_at DESC, id DESC);
+    CREATE INDEX IF NOT EXISTS page_visits_day_ip ON page_visits (day, ip);
   `);
   return globalForStats.statsDb;
 }
@@ -57,6 +114,161 @@ function shanghaiDate(now = new Date()): string {
   const month = parts.find((part) => part.type === "month")?.value ?? "01";
   const day = parts.find((part) => part.type === "day")?.value ?? "01";
   return `${year}-${month}-${day}`;
+}
+
+function pathForTrackedPage(page: TrackedPage): string {
+  switch (page.kind) {
+    case "home":
+      return "/";
+    case "posts":
+      return "/posts";
+    case "about":
+      return "/about";
+    case "post":
+      return `/posts/${page.slug}`;
+  }
+}
+
+/**
+ * 从请求头取出访客 IP。
+ * 生产环境 Caddy 未配置 trusted_proxies，会丢掉客户端自带的 X-Forwarded-For，
+ * 改写成它实际连上的地址。本机直接访问时该头为空，Next 会填入连接地址。
+ * 头里若有多段，取最右侧，那是最近一层代理写上的地址。
+ * `::ffff:` 开头的 IPv4 映射收成 IPv4，同一地址只算一个访客。无法解析时返回空字符串。
+ */
+function clientIpFromHeaders(headerList: Headers): string {
+  const forwarded = headerList.get("x-forwarded-for");
+  if (!forwarded) {
+    return "";
+  }
+
+  const parts = forwarded
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return normalizeIp(parts[parts.length - 1] ?? "");
+}
+
+function normalizeIp(raw: string): string {
+  let value = raw.trim();
+  if (value.startsWith("[") && value.endsWith("]")) {
+    value = value.slice(1, -1);
+  }
+
+  const zone = value.indexOf("%");
+  if (zone >= 0) {
+    value = value.slice(0, zone);
+  }
+
+  const lower = value.toLowerCase();
+  if (lower.startsWith("::ffff:")) {
+    const mapped = lower.slice("::ffff:".length);
+    if (net.isIP(mapped) === 4) {
+      return mapped;
+    }
+  }
+
+  if (net.isIP(value) === 4) {
+    return value;
+  }
+  if (net.isIP(lower) === 6) {
+    return lower;
+  }
+  return "";
+}
+
+/**
+ * Next 的路由预取和浏览器 prefetch 都还没把页面打开，不记。
+ * 真正点开时的客户端跳转会带 `rsc`，但不带 `next-router-prefetch`。
+ */
+function isPrefetchRequest(headerList: Headers): boolean {
+  if (headerList.has("next-router-prefetch")) {
+    return true;
+  }
+
+  const purpose = (headerList.get("purpose") ?? headerList.get("sec-purpose") ?? "").toLowerCase();
+  return purpose.includes("prefetch");
+}
+
+function cleanReferrer(value: string | null): string {
+  if (!value) {
+    return "";
+  }
+
+  const cleaned = value.replace(/[\u0000-\u001F\u007F]/g, "").trim();
+  if (!cleaned) {
+    return "";
+  }
+  return cleaned.length > REFERRER_MAX_LENGTH ? cleaned.slice(0, REFERRER_MAX_LENGTH) : cleaned;
+}
+
+/**
+ * 公开页成功打开之后记一次访问。调用前须已确认页面会正常打开，例如正文不存在时不要调用。
+ * 带管理员 session 不记，预取也不记。cookie 和请求头在渲染期读取，再传入 after()；
+ * Server Component 的 after 回调里不能再读这些请求数据。读取请求数据也会让该页按请求渲染。
+ * 已发布正文同时给累计浏览和当日浏览加 1。准备或写入失败只打日志，不抛给访客。
+ */
+export async function trackPageVisit(page: TrackedPage): Promise<void> {
+  try {
+    if (await hasAdminSession()) {
+      return;
+    }
+
+    const headerList = await headers();
+    if (isPrefetchRequest(headerList)) {
+      return;
+    }
+
+    const ip = clientIpFromHeaders(headerList);
+    const referrer = headerList.get("referer");
+    const visit: VisitInsert = {
+      path: pathForTrackedPage(page),
+      slug: page.kind === "post" ? page.slug : null,
+      ip,
+      referrer,
+    };
+
+    after(() => {
+      if (page.kind === "post") {
+        recordPostView(page.slug);
+      }
+      recordPageVisit(visit);
+    });
+  } catch (error) {
+    console.error("准备访问记录失败", error);
+  }
+}
+
+/**
+ * 写入一行访问记录。IP 为空时跳过。来源过长会截断。失败只打日志。
+ * 不修改 `post_views` 或 `daily_views`。
+ */
+function recordPageVisit(visit: VisitInsert): void {
+  if (!visit.ip || !visit.path) {
+    console.error("访问记录缺少客户端 IP 或页面，已跳过");
+    return;
+  }
+
+  try {
+    const now = new Date();
+    getStatsDb()
+      .prepare(
+        `
+          INSERT INTO page_visits (visited_at, day, path, slug, ip, referrer)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `,
+      )
+      .run(
+        now.toISOString(),
+        shanghaiDate(now),
+        visit.path,
+        visit.slug,
+        visit.ip,
+        cleanReferrer(visit.referrer),
+      );
+  } catch (error) {
+    console.error("记录访问失败", error);
+  }
 }
 
 /**
@@ -110,6 +322,22 @@ export function getTodayPageViews(): number {
   return row?.views ?? 0;
 }
 
+/** 上海时区当天，访问记录里不重复的 IP 数。上线前的访问不会回填。 */
+export function getTodayUniqueVisitors(): number {
+  const row = getStatsDb()
+    .prepare("SELECT COUNT(DISTINCT ip) AS total FROM page_visits WHERE day = ?")
+    .get(shanghaiDate()) as { total: number };
+  return Number(row.total) || 0;
+}
+
+/** 访问记录里不重复的 IP 数。不随上海时区换日回退。 */
+export function getTotalUniqueVisitors(): number {
+  const row = getStatsDb()
+    .prepare("SELECT COUNT(DISTINCT ip) AS total FROM page_visits")
+    .get() as { total: number };
+  return Number(row.total) || 0;
+}
+
 export function getPostPageViews(slug: string): number {
   const row = getStatsDb()
     .prepare("SELECT views FROM post_views WHERE slug = ?")
@@ -127,6 +355,46 @@ export function getAllPostViewCounts(): Map<string, number> {
     views: number;
   }[];
   return new Map(rows.map((row) => [row.slug, row.views]));
+}
+
+/**
+ * 访问记录按时间从新到旧，每页 20 条。
+ * 页码小于 1 时当作第 1 页；超出则夹到最后一页。没有记录时 `pageCount` 为 0。
+ */
+export function listPageVisits(page: number): PageVisitList {
+  const db = getStatsDb();
+  const totalRow = db.prepare("SELECT COUNT(*) AS total FROM page_visits").get() as { total: number };
+  const total = Number(totalRow.total) || 0;
+  if (total === 0) {
+    return { page: 1, pageCount: 0, rows: [] };
+  }
+
+  const pageCount = Math.ceil(total / VISIT_PAGE_SIZE);
+  const current = Math.min(Math.max(Math.floor(page) || 1, 1), pageCount);
+  const offset = (current - 1) * VISIT_PAGE_SIZE;
+  const rows = db
+    .prepare(
+      `
+        SELECT id, visited_at, path, slug, ip, referrer
+        FROM page_visits
+        ORDER BY visited_at DESC, id DESC
+        LIMIT ? OFFSET ?
+      `,
+    )
+    .all(VISIT_PAGE_SIZE, offset) as VisitDbRow[];
+
+  return {
+    page: current,
+    pageCount,
+    rows: rows.map((row) => ({
+      id: row.id,
+      visitedAt: row.visited_at,
+      path: row.path,
+      slug: row.slug,
+      ip: row.ip,
+      referrer: row.referrer,
+    })),
+  };
 }
 
 export async function listPublishedPostViews(): Promise<PostViewStat[]> {
@@ -156,7 +424,7 @@ export async function getTopPublishedPostViews(limit = 10): Promise<PostViewStat
 
 /**
  * 删除指定 slug 的 PV 行。行不存在仍算成功；失败只打日志，不抛给调用方。
- * 不改 `daily_views`：当日已经发生的次数保留。
+ * 不改 `daily_views`，也不改 `page_visits`：当日次数和已有访问记录都保留。
  */
 export function deletePostViews(slug: string): void {
   if (!slug) {

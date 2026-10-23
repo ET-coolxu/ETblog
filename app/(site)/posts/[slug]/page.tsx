@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { after } from "next/server";
 import { notFound } from "next/navigation";
 import { CoverImage } from "@/components/cover-image";
 import { PostReadingFrame, TocDetails } from "@/components/table-of-contents";
-import { hasAdminSession } from "@/lib/auth";
 import { extractToc, renderMarkdown } from "@/lib/markdown";
 import {
   formatPostDate,
@@ -12,7 +10,7 @@ import {
   getPublishedPost,
   tagHref,
 } from "@/lib/posts";
-import { recordPostView } from "@/lib/stats";
+import { trackPageVisit } from "@/lib/stats";
 import styles from "./page.module.css";
 
 type PostPageProps = {
@@ -56,12 +54,7 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
-  const isAdmin = await hasAdminSession();
-  after(() => {
-    if (!isAdmin) {
-      recordPostView(post.slug);
-    }
-  });
+  await trackPageVisit({ kind: "post", slug: post.slug });
 
   const [content, adjacent] = await Promise.all([
     renderMarkdown(post.body),

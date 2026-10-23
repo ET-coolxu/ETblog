@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { POSTS_PAGE_SIZE, parsePageParam, slicePage } from "@/components/pagination";
 import { PostFilterHeader, PostIndexHeading, PostIndexView } from "@/components/post-index";
 import { listPublishedPosts, listTags, postsHref } from "@/lib/posts";
+import { trackPageVisit } from "@/lib/stats";
 
 type PostsPageProps = {
   searchParams: Promise<{ tag?: string; page?: string }>;
@@ -19,6 +20,10 @@ export async function generateMetadata({
 export default async function PostsPage({ searchParams }: PostsPageProps) {
   const { tag, page: pageParam } = await searchParams;
   const [all, tags] = await Promise.all([listPublishedPosts(), listTags()]);
+  // `?tag=` 与 /tags 都是标签页，不记。翻页仍算文章列表。
+  if (!tag) {
+    await trackPageVisit({ kind: "posts" });
+  }
   const filtered = tag ? all.filter((post) => post.tags.includes(tag)) : all;
   const { pageCount, currentPage, slice } = slicePage(filtered, parsePageParam(pageParam), POSTS_PAGE_SIZE);
 
