@@ -33,3 +33,4 @@ Next.js App Router + TypeScript，`output: 'standalone'`。本地用 Node.js 20+
 - 功能分支合入 `test` 看 CI 构建，验证后再合入 `main`。生产数据卷挂 `content/`、`public/uploads/` 和 SQLite 目录。
 - 不要执行 `git commit` 或 `git push`。安装、构建、`docker compose` 等长时间命令只写出完整命令，由用户执行。
 - 新增或改动的导出函数，以及鉴权、路径、缓存等非显而易见逻辑，写中文 JSDoc。
+- 实现过程中出现的明显 lint 或框架报错，在同一轮修掉，不要留到做完再问要不要改。
