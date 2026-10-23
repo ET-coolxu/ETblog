@@ -19,7 +19,7 @@ export default async function TagsPage() {
   const tags = await listTags();
 
   return (
-    <main className="page">
+    <main className="measure page">
       <header className={styles.heading}>
         <h1 className={styles.title}>标签</h1>
         <p className={styles.total}>共 {tags.length} 个主题索引</p>

@@ -7,7 +7,7 @@ export function SiteFooter() {
 
   return (
     <footer className={styles.footer}>
-      <div className={`shell ${styles.inner}`}>
+      <div className={`measure ${styles.inner}`}>
         <p className={styles.line}>
           <span>{site.author}</span>
           <span aria-hidden>·</span>

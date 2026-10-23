@@ -13,7 +13,7 @@ export default async function AboutPage() {
   const source = await getAboutSource();
 
   return (
-    <main className={styles.page}>
+    <main className={`measure ${styles.page}`}>
       <h1 className={styles.title}>关于</h1>
       {source ? (
         <div className={styles.prose}>{await renderMarkdown(source)}</div>

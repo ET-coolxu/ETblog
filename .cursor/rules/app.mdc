@@ -17,7 +17,7 @@ alwaysApply: false
 - 站内跳转用 `next/link`；外链和下载用 `<a>`。
 - 文档标题用 `generateMetadata` / `metadata`，格式 `{页面} · {SITE_NAME}`。
 - `proxy.ts` 只检查有没有 cookie（`/admin/*`、`/api/upload`）。HMAC 验签放在后台 layout、Server Action 和上传接口。
-- 颜色、间距、字号用 `app/styles/tokens.css`。`shared.css` 只放栏宽、排列、发丝线、链接、衬线大标题和图标尺寸。单个组件的样式放旁边的 `*.module.css`。JSX 工具类只用 `utilities.css` 里已有的间距、字号、字体和布局。
+- 颜色、间距、字号用 `app/styles/tokens.css`。`shared.css` 只放栏宽、排列、发丝线、链接、衬线大标题和图标尺寸。单个组件的样式放旁边的 `*.module.css`。JSX 工具类只用 `utilities.css` 里已有的间距、字号、字体和布局。公开站新页面的水平宽度只用 `measure`。模块样式里不再用 `max-width` 或 `padding-inline` 收栏。文章阅读栏只用 `table-of-contents` 网格，与 `.measure` 共用 `--measure` 与 `--gutter`。改 `--measure`、`--toc`、`--toc-gap` 时，按 `tokens.css` 里的算式同步改 80rem。后台不引用这四个变量。
 - 没有内容时写中文空状态。
 
 ```ts

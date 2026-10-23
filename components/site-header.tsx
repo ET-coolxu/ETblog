@@ -9,7 +9,7 @@ export function SiteHeader() {
 
   return (
     <header className={styles.header}>
-      <div className={`shell ${styles.bar}`}>
+      <div className={`measure ${styles.bar}`}>
         <Link href="/" className={styles.brand}>
           {site.name}
         </Link>

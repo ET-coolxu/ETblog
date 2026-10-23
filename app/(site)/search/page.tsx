@@ -23,7 +23,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const results = query ? await searchPublishedPosts(query) : [];
 
   return (
-    <main className="page">
+    <main className="measure page">
       <h1 className="doc-title">搜索</h1>
       <form action="/search" method="get" className={styles.form} role="search">
         <label htmlFor="search-q" className="sr-only">

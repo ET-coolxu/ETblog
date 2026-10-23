@@ -1,11 +1,18 @@
 .frame {
-  display: block;
+  display: grid;
+  align-items: start;
+  grid-template-columns:
+    minmax(var(--gutter), 1fr)
+    min(var(--measure), 100% - var(--gutter) * 2)
+    minmax(var(--gutter), 1fr);
 }
 
 .column {
-  width: 100%;
-  max-width: var(--reading);
-  margin-inline: auto;
+  grid-column: 2;
+  grid-row: 1;
+  width: auto;
+  max-width: none;
+  margin-inline: 0;
 }
 
 .list {
@@ -100,21 +107,8 @@
   color: var(--muted);
 }
 
-@media (min-width: 1280px) {
-  .frame {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 760px) minmax(0, 1fr);
-    align-items: start;
-    column-gap: var(--space-8);
-  }
-
-  /* 无目录时也要钉在中间列，否则唯一的网格项会落到左列 */
-  .column {
-    grid-column: 2;
-    grid-row: 1;
-    margin-inline: 0;
-  }
-
+/* 80rem = --measure + 2 × (--toc + --toc-gap) = 52rem + 2 × 14rem。改那三个变量时同步改这里。 */
+@media (min-width: 80rem) {
   .details {
     display: none;
   }
@@ -123,7 +117,12 @@
     position: sticky;
     top: var(--space-28);
     display: block;
-    width: var(--toc-w);
+    /* 全局是 border-box。改回 content-box 后，12rem 是目录本身，右侧 2rem 留白在宽度之外。
+       视口刚到 80rem 时，滚动条会让侧列略窄于 14rem；max-width 把目录收进格子，避免探出屏幕。 */
+    box-sizing: content-box;
+    width: var(--toc);
+    max-width: calc(100% - var(--toc-gap));
+    padding-right: var(--toc-gap);
     justify-self: end;
     align-self: start;
     grid-column: 1;

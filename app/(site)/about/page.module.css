@@ -1,10 +1,7 @@
-/* /about 对照 stitch 稿：760px 柱、31px 页题，正文 17px / 行高 1.75，不超过 40rem。 */
+/* /about：页题约 31px，正文 17px / 行高 1.75。水平宽度用 .measure。 */
 
 .page {
-  width: 100%;
-  max-width: var(--reading);
-  margin-inline: auto;
-  padding: var(--space-10) var(--space-6) var(--space-16);
+  padding-block: var(--space-10) var(--space-16);
 }
 
 .title {
@@ -18,7 +15,6 @@
 }
 
 .prose {
-  max-width: 40rem;
   font-family: var(--font-sans);
   font-size: 1.0625rem;
   line-height: 1.75;

@@ -1,39 +1,19 @@
 /* 全站栏宽、排列，以及多页共用的大标题。只服务一个组件的样式放在该组件的 module.css。 */
 
-.shell,
-.page,
-.page-wide,
-.page-tall {
-  width: 100%;
+/* 公开站水平栏宽。宽度就是文字栏本身，调用方不要再加 padding-inline 或 max-width。 */
+.measure {
+  width: min(var(--measure), 100% - var(--gutter) * 2);
   margin-inline: auto;
 }
 
-/* 顶栏、页脚、首页、文章列表：窄屏 20px，768px 起 16px */
-.shell {
-  max-width: var(--column);
-  padding-inline: var(--space-5);
-}
-
-@media (min-width: 768px) {
-  .shell {
-    padding-inline: var(--space-4);
-  }
-}
-
-/* 关于、标签、搜索、后台窄页 */
+/* 标签、搜索：只留上下留白，宽度交给同一元素上的 .measure */
 .page {
-  max-width: var(--column);
-  padding: var(--space-16) var(--space-6);
+  padding-block: var(--space-16);
 }
 
-.page-wide {
-  max-width: var(--column-wide);
-  padding: var(--space-16) var(--space-6);
-}
-
+/* 未找到页：只留上下留白，宽度交给同一元素上的 .measure */
 .page-tall {
-  max-width: var(--column);
-  padding: var(--space-24) var(--space-6);
+  padding-block: var(--space-24);
 }
 
 .stack {

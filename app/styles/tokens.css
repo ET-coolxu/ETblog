@@ -1,5 +1,7 @@
 /* 全站主题。组件和公共类只引用这些变量，不写死颜色和散落的字号。
-   断点不放成工具类：sm 640px，md 768px，xl 1280px。编辑器双栏沿用原来的 1024px。 */
+   公开站栏宽只有 --measure、--toc、--toc-gap、--gutter 这一组变量。
+   640px 只用于组件内部排列，不进入栏宽。
+   编辑器 1024px 和后台 768px 不属于公开站栏宽。 */
 
 :root {
   --paper: #fbfbf9;
@@ -106,10 +108,13 @@
 
 :root {
   --header-h: 4rem;
-  --column: 48rem;
-  --column-wide: 72rem;
-  --reading: 760px;
-  --toc-w: 190px;
+  /* 目录断点 = --measure + 2 × (--toc + --toc-gap) = 52rem + 2 × 14rem = 80rem。
+     媒体查询不能用自定义属性，80rem 在 components/table-of-contents.module.css 写成字面量。
+     改这三个变量时同步改那条媒体查询。 */
+  --measure: 52rem;
+  --toc: 12rem;
+  --toc-gap: var(--space-8);
+  --gutter: clamp(var(--space-5), 4vw, var(--space-10));
   --ease: 150ms ease;
 }
 

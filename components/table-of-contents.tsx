@@ -79,7 +79,8 @@ function TocLinks({ items }: { items: TocItem[] }) {
 
 /**
  * 正文阅读栏与左侧目录的外壳。
- * xl 起三列：左右 1fr 配重，中间 760px 始终居中。目录在左列贴着阅读栏，不占正文宽度。
+ * 三列网格与 `.measure` 共用 `--measure` 和 `--gutter`，中间列始终是正文。
+ * 视口达到 80rem 时左侧出现目录；更窄时目录在标题和正文之间。
  * 高亮状态在这里观察一次，折叠目录与侧栏共用。
  */
 export function PostReadingFrame({
@@ -104,7 +105,7 @@ export function PostReadingFrame({
 }
 
 /**
- * 窄屏目录。放在题头和正文之间；xl 起隐藏，避免和左侧栏重复。
+ * 窄屏目录。放在标题和正文之间；80rem 起隐藏，避免和左侧栏重复。
  */
 export function TocDetails({ items }: { items: TocItem[] }) {
   if (items.length === 0) {

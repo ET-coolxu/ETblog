@@ -1,6 +1,6 @@
 .main {
   width: 100%;
-  padding: var(--space-12) var(--space-5);
+  padding-block: var(--space-12);
 }
 
 .meta {
@@ -133,10 +133,6 @@
 }
 
 @media (min-width: 768px) {
-  .main {
-    padding-inline: var(--space-10);
-  }
-
   .title {
     font-size: var(--text-display);
     line-height: 3.2rem;

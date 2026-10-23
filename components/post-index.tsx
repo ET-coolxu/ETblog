@@ -29,7 +29,7 @@ export function PostIndexView({
 }) {
   return (
     <div className={styles.page}>
-      <main className={`shell ${styles.main}`}>
+      <main className={`measure ${styles.main}`}>
         {header}
         {posts.length > 0 ? (
           <PostIndexList posts={posts} activeTag={activeTag} />

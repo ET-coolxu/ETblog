@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function SiteNotFound() {
   return (
-    <main className="page-tall">
+    <main className="measure page-tall">
       <h1 className="font-serif text-2xl">没有找到这个页面</h1>
       <p className={styles.lede}>可能是链接写错了，或这是一篇尚未发布的草稿。</p>
       <p className="mt-6">
