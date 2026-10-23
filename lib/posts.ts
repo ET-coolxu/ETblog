@@ -566,6 +566,32 @@ export const getAboutSource = cache(async (): Promise<string | null> => {
   }
 });
 
+export type SaveAboutResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * 把关于页正文写入固定的 `content/pages/about.md`。
+ * 不接收路径，调用方不能改写到别的文件。
+ * 写入前去掉 BOM 和末尾空白；去掉首尾空白后没有正文则写成空文件。
+ * 去掉首尾空白后以 `---` 开头则拒绝，且不改磁盘，避免公开渲染把正文当成 frontmatter 吃掉。
+ * 不自动包裹 frontmatter。
+ */
+export async function saveAboutSource(body: string): Promise<SaveAboutResult> {
+  const stripped = body.replace(/^\uFEFF/, "").replace(/\s+$/, "");
+  const trimmed = stripped.trim();
+  if (trimmed.startsWith("---")) {
+    return { ok: false, error: "正文不要写成 frontmatter。" };
+  }
+
+  try {
+    await fs.mkdir(path.dirname(ABOUT_FILE), { recursive: true });
+    await fs.writeFile(ABOUT_FILE, trimmed ? stripped : "", "utf8");
+  } catch {
+    return { ok: false, error: "保存关于页失败。" };
+  }
+
+  return { ok: true };
+}
+
 export function tagHref(tag: string): string {
   return `/tags/${encodeURIComponent(tag)}`;
 }

@@ -1,0 +1,89 @@
+.page {
+  width: 100%;
+  max-width: 68.75rem;
+  padding: var(--space-8);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+
+.intro {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 42rem;
+  margin-top: var(--space-6);
+}
+
+.label {
+  display: block;
+  margin-bottom: var(--space-1-5);
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--muted);
+}
+
+.body {
+  width: 100%;
+  min-height: 22rem;
+  resize: vertical;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  padding: var(--space-4);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-7);
+  color: var(--ink);
+  outline: none;
+}
+
+.body:focus {
+  border-color: var(--pine);
+}
+
+.alert {
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--danger);
+}
+
+.status {
+  font-size: var(--text-sm);
+  line-height: var(--leading-5);
+  color: var(--pine);
+}
+
+.save {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--pine);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--on-pine);
+  transition: background var(--ease);
+}
+
+.save:hover {
+  background: color-mix(in oklab, var(--pine) 88%, black);
+}
+
+.save:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}

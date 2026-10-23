@@ -6,7 +6,7 @@
 
 协作规则见 [.cursor/rules/project.mdc](.cursor/rules/project.mdc)。需求换版时按 [.cursor/rules/iteration.mdc](.cursor/rules/iteration.mdc) 同步规则和 [架构说明](docs/架构/项目架构.md)。自然语言描述的新需求、优化或架构，先整理提示词：类型模板在 [docs/agent/](docs/agent/)，已确认成品在 [docs/agent/use Prompt/](docs/agent/use%20Prompt/)，流程见 [.cursor/skills/agent-prompts/SKILL.md](.cursor/skills/agent-prompts/SKILL.md)。
 
-当前已完成公开阅读、搜索、暗色模式、RSS/sitemap、访问统计（含访问记录、地区和独立访客），以及后台登录、发文和图片上传。
+当前已完成公开阅读、搜索、暗色模式、RSS/sitemap、访问统计（含访问记录、地区和独立访客），以及后台登录、发文、图片上传和关于页编辑。
 
 **生产上线（coolxu.com）**：自动化运维助手请完整执行 [docs/vps-go-live.md](docs/vps-go-live.md)，不要只读本节摘要。日常更新：功能 PR 合入 **`test`** → CI 构建通过 → 再合入 **`main`**（或在 Actions 里对 `main` Run workflow），由 GitHub 构建镜像；不要默认在 VPS 上 `docker compose up --build`。GHCR 上线复盘见 [docs/2026-09-15-ghcr-go-live-retrospective.md](docs/2026-09-15-ghcr-go-live-retrospective.md)。
 

@@ -7,16 +7,17 @@ import { useTheme } from "next-themes";
 import { logoutAction } from "@/app/admin/login/actions";
 import styles from "./admin-sidebar.module.css";
 
-type NavKey = "posts" | "write" | "stats";
+type NavKey = "posts" | "write" | "about" | "stats";
 
 const navItems: { href: string; label: string; key: NavKey }[] = [
   { href: "/admin", label: "文章", key: "posts" },
   { href: "/admin/posts/new", label: "写文章", key: "write" },
+  { href: "/admin/about", label: "关于", key: "about" },
   { href: "/admin/stats", label: "统计", key: "stats" },
 ];
 
 /**
- * 侧栏选中。文章只认 `/admin`；写文章同时覆盖新建和编辑已有文章。
+ * 侧栏选中。文章只认 `/admin`；写文章覆盖新建和编辑；关于只认 `/admin/about`。
  */
 function isNavActive(pathname: string, key: NavKey): boolean {
   if (key === "posts") {
@@ -24,6 +25,9 @@ function isNavActive(pathname: string, key: NavKey): boolean {
   }
   if (key === "write") {
     return pathname.startsWith("/admin/posts/");
+  }
+  if (key === "about") {
+    return pathname === "/admin/about" || pathname.startsWith("/admin/about/");
   }
   return pathname === "/admin/stats" || pathname.startsWith("/admin/stats/");
 }
@@ -115,6 +119,20 @@ function NavIcon({ name }: { name: NavKey }) {
           stroke="currentColor"
           strokeWidth="1.75"
           strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  if (name === "about") {
+    return (
+      <svg viewBox="0 0 24 24" className={styles.icon} aria-hidden>
+        <circle cx="12" cy="8" r="3.25" fill="none" stroke="currentColor" strokeWidth="1.75" />
+        <path
+          d="M5.5 19.25c1.15-3.1 3.45-4.6 6.5-4.6s5.35 1.5 6.5 4.6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
         />
       </svg>
     );
