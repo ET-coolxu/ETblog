@@ -316,6 +316,31 @@ export async function getPublishedPostsByTag(tag: string): Promise<PostMeta[]> {
   return posts.filter((post) => post.tags.includes(tag));
 }
 
+/**
+ * 取标签「舰队」里日期最新的一篇已发布文章，并用正文二级标题个数作为 bot 数。
+ * 顺序沿用已发布列表：日期降序，同一天按 slug。没有这篇时返回 null；
+ * 文章在但没有二级标题时 bot 数为 0。专栏页和舰队页共用。
+ * 目录解析按需加载，列表和发文接口不会因此带上 Markdown 编译器。
+ */
+export const getLatestFleetPost = cache(
+  async (): Promise<{ post: Post; botCount: number } | null> => {
+    const posts = await listPublishedPosts();
+    const latest = posts.find((post) => post.tags.includes("舰队"));
+    if (!latest) {
+      return null;
+    }
+
+    const post = await getPublishedPost(latest.slug);
+    if (!post) {
+      return null;
+    }
+
+    const { extractToc } = await import("@/lib/markdown");
+    const botCount = extractToc(post.body).filter((item) => item.depth === 2).length;
+    return { post, botCount };
+  },
+);
+
 async function fileExists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);

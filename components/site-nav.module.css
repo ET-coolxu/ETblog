@@ -86,3 +86,19 @@
     gap: var(--space-7);
   }
 }
+
+@media (max-width: 419px) {
+  .nav {
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 379px) {
+  .nav {
+    gap: var(--space-2-5);
+  }
+
+  .bar {
+    gap: var(--space-2);
+  }
+}

@@ -29,3 +29,15 @@
 .brand:hover {
   color: var(--pine);
 }
+
+@media (max-width: 419px) {
+  .bar {
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 379px) {
+  .brand {
+    font-size: var(--text-lg);
+  }
+}

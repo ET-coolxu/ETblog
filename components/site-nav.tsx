@@ -5,8 +5,13 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import styles from "./site-nav.module.css";
 
-const navItems = [
+const navItems: ReadonlyArray<{
+  href: string;
+  label: string;
+  also?: readonly string[];
+}> = [
   { href: "/posts", label: "文章" },
+  { href: "/columns", label: "专栏", also: ["/fleet"] },
   { href: "/tags", label: "标签" },
   { href: "/about", label: "关于" },
 ];
@@ -27,11 +32,22 @@ export function SiteNav() {
   return (
     <div className={styles.bar}>
       <nav aria-label="主导航" className={styles.nav}>
-        {navItems.map((item) => (
-          <Link key={item.href} href={item.href} className={itemClass(isActive(pathname, item.href))}>
-            {item.label}
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const active =
+            isActive(pathname, item.href) ||
+            (item.also?.some((path) => isActive(pathname, path)) ?? false);
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={itemClass(active)}
+              aria-current={active ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
       <span className={styles.rule} aria-hidden />
       <div className={styles.tools}>

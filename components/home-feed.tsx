@@ -8,12 +8,24 @@ const LATEST_LIMIT = 6;
 
 /**
  * 首页信息流：精选导语在上，最新列表在下。
- * 调用方须传入已发布文章；已进精选的不会再出现在最新里。
+ * 调用方须传入已发布文章，以及首页要排除的标签。
+ * 已进精选的不会再出现在最新里。排除发生在截取 6 篇之前，精选不受排除影响。
+ * 「全部 N 篇」的 N 仍是传入的全部已发布篇数。
  */
-export function HomeFeed({ posts }: { posts: PostMeta[] }) {
+export function HomeFeed({
+  posts,
+  excludeTags,
+}: {
+  posts: PostMeta[];
+  excludeTags: readonly string[];
+}) {
   const featured = posts.filter((post) => post.featured);
   const featuredSlugs = new Set(featured.map((post) => post.slug));
-  const latest = posts.filter((post) => !featuredSlugs.has(post.slug)).slice(0, LATEST_LIMIT);
+  const excluded = new Set(excludeTags);
+  const latest = posts
+    .filter((post) => !featuredSlugs.has(post.slug))
+    .filter((post) => !post.tags.some((tag) => excluded.has(tag)))
+    .slice(0, LATEST_LIMIT);
   const [lead, ...restFeatured] = featured;
 
   if (posts.length === 0) {

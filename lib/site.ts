@@ -5,6 +5,25 @@ export type SiteConfig = {
   intro: string;
 };
 
+const DEFAULT_HOME_EXCLUDE_TAGS = ["Bot周报", "资讯", "舰队"];
+
+/**
+ * 首页「最新」要排除的标签。
+ * 未设置 `HOME_EXCLUDE_TAGS` 时用默认清单；变量存在但去空白后为空则不排除。
+ * 只给首页用。文章列表、标签页、搜索和 RSS 不读它。
+ */
+export function getHomeExcludeTags(): string[] {
+  const raw = process.env.HOME_EXCLUDE_TAGS;
+  if (raw === undefined) {
+    return DEFAULT_HOME_EXCLUDE_TAGS;
+  }
+
+  return raw
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
+
 export function getSiteConfig(): SiteConfig {
   return {
     name: process.env.SITE_NAME ?? "个人博客",

@@ -1,0 +1,150 @@
+.main {
+  width: 100%;
+  padding-block: var(--space-12);
+}
+
+.back {
+  display: inline-flex;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-back);
+  line-height: var(--leading-back);
+  color: var(--muted);
+  transition: color var(--ease);
+}
+
+.back:hover {
+  color: var(--pine);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: var(--leading-5);
+  letter-spacing: var(--tracking-chip);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tag {
+  display: inline-block;
+  border-radius: var(--radius-xs);
+  background: var(--tag-bg);
+  padding: var(--space-0-5) var(--space-2-5);
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  line-height: var(--leading-4);
+  letter-spacing: var(--tracking-tag);
+  color: var(--tag);
+  transition: color var(--ease);
+}
+
+.tag:hover {
+  color: var(--pine);
+}
+
+.title {
+  margin-top: var(--space-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-h2);
+  font-weight: 400;
+  line-height: 2.35rem;
+  letter-spacing: var(--tracking-title);
+  color: var(--ink);
+}
+
+.body {
+  margin-top: var(--space-10);
+}
+
+/* 只约束段落里单独一张图。正文栏宽仍由 PostReadingFrame 决定。 */
+.body > p > img:only-child {
+  display: block;
+  width: 100%;
+  max-width: 27.5rem;
+  margin-inline: auto;
+}
+
+/* 「角色」「协作对象」紧跟在 bot 的二级标题后，只在本页弱化。 */
+.body h2 + ul {
+  font-size: var(--text-md);
+  line-height: var(--leading-record);
+  color: var(--muted);
+}
+
+.body h2 + ul > li + li {
+  margin-top: var(--space-0-5);
+}
+
+.body h2 + ul > li::before {
+  background: var(--quiet);
+  opacity: 1;
+  top: var(--space-2-5);
+}
+
+.body h2 + ul strong {
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.body h2 + ul + p {
+  margin-top: var(--space-3);
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-16);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--rule);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--quiet);
+}
+
+.more {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-back);
+  color: var(--pine);
+  white-space: nowrap;
+  transition: color var(--ease);
+}
+
+.more:hover {
+  color: var(--ink);
+}
+
+.empty {
+  margin-top: var(--space-10);
+  padding-block: var(--space-8);
+  border-block: 1px solid var(--rule);
+  font-size: var(--text-md);
+  color: var(--muted);
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: var(--text-display);
+    line-height: 3.2rem;
+    letter-spacing: var(--tracking-snug);
+  }
+}
+
+@media (max-width: 639px) {
+  .body h2 {
+    font-size: var(--text-h3);
+    line-height: var(--leading-h3);
+  }
+}

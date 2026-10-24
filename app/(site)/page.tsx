@@ -1,5 +1,6 @@
 import { HomeFeed } from "@/components/home-feed";
 import { listPublishedPosts } from "@/lib/posts";
+import { getHomeExcludeTags } from "@/lib/site";
 import { trackPageVisit } from "@/lib/stats";
 
 /**
@@ -14,7 +15,7 @@ export default async function HomePage() {
 
   return (
     <main className="measure py-12">
-      <HomeFeed posts={posts} />
+      <HomeFeed posts={posts} excludeTags={getHomeExcludeTags()} />
     </main>
   );
 }
